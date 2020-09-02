@@ -1,6 +1,9 @@
 {{template "base" .}}
 
-{{define "title"}}{{ index (.Page.TitleMap) $.Lang}}{{end}}
+{{define "title"}}
+    {{$lecture := index .RowSets "lecture"}}
+    {{$lecture.LectureName}}
+{{end}}
 
 
 {{define "css"}}
@@ -161,6 +164,7 @@
     <div class="container">
         <div class="row">
             <div class="col">
+                <p>&nbsp;</p>
                 {{$lecture := index .RowSets "lecture"}}
                 <h3>{{$lecture.LectureName}}</h3>
 
