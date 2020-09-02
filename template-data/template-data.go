@@ -4,7 +4,7 @@ import (
 	"github.com/tsawler/goblender/pkg/templates"
 )
 
-// AddDefaultData
+// AddDefaultData adds default data for templates
 func AddDefaultData(td *templates.TemplateData) *templates.TemplateData {
 	return td
 }
