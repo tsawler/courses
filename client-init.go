@@ -1,6 +1,8 @@
 package clienthandlers
 
 import (
+	"github.com/tsawler/goblender/client/clienthandlers/clientdb"
+	template_data "github.com/tsawler/goblender/client/clienthandlers/templatedata"
 	"github.com/tsawler/goblender/pkg/config"
 	"github.com/tsawler/goblender/pkg/driver"
 	"github.com/tsawler/goblender/pkg/handlers"
@@ -12,6 +14,8 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 var parentDB *driver.DB
 var repo *handlers.DBRepo
+
+var dbModel *clientdb.DBModel
 
 // ClientInit gives client code access to goBlender configuration
 func ClientInit(conf config.AppConfig, parentDriver *driver.DB, rep *handlers.DBRepo) {
@@ -29,6 +33,10 @@ func ClientInit(conf config.AppConfig, parentDriver *driver.DB, rep *handlers.DB
 
 	// In case we need it, we get the database connection from goBlender and save it,
 	parentDB = parentDriver
+
+	// enable db for client access
+	dbModel = &clientdb.DBModel{DB: parentDB.SQL}
+	template_data.NewTemplateData(parentDB.SQL)
 
 	// We can access handlers from goBlender, but need to initialize them first.
 	if app.Database == "postgresql" {

@@ -4,6 +4,7 @@ import (
 	"github.com/tsawler/goblender/pkg/helpers"
 	"github.com/tsawler/goblender/pkg/templates"
 	"net/http"
+	"strconv"
 )
 
 // SomeHandler is an example handler
@@ -17,4 +18,37 @@ func SomeHandler(w http.ResponseWriter, r *http.Request) {
 func CustomShowHome(w http.ResponseWriter, r *http.Request) {
 	// do something interesting here, and then render the template
 	helpers.Render(w, r, "client-sample.page.tmpl", &templates.TemplateData{})
+}
+
+func AllCourses(w http.ResponseWriter, r *http.Request) {
+	courses, err := dbModel.AllCourses()
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	for _, x := range courses {
+		w.Write([]byte(x.CourseName))
+	}
+}
+
+func ShowCourse(w http.ResponseWriter, r *http.Request) {
+	courseID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	course, err := dbModel.GetCourse(courseID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	for _, x := range course.Lectures {
+		w.Write([]byte(x.LectureName))
+	}
 }
