@@ -168,6 +168,7 @@
                 <p>&nbsp;</p>
                 {{$course := index .RowSets "course"}}
                 <h1>{{$course.CourseName}}</h1>
+                <hr>
                 {{safeHTML $course.Description}}
                 <hr>
                 <h2>Lectures</h2>
