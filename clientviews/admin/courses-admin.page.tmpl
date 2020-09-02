@@ -13,8 +13,9 @@
           id="course-form">
 
         <input type="hidden" name="csrf_token" id="csrf_token" value="{{.CSRFToken}}">
-
+        <input type="hidden" name="action" id="action" value="0">
         <input type="hidden" name="sort_list" id="sort-list">
+
         <div class="col-md-6 col-sm-12 col-xs-12">
 
             <div class="form-group mt-3">
@@ -68,8 +69,26 @@
         <div class="row">
             <div class="col">
                 <hr>
-                <a class="btn btn-primary" href="#!" onclick="val()">Save</a>
-                <a class="btn btn-info" href="/admin/courses/all">Cancel</a>
+
+
+                <div class="btn-group dropup">
+                    <a class="btn btn-primary savebtn" href="#!" onclick="saveClose()" data-action="close">
+                        Save and Close
+                    </a>
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#!" onclick="val()">Save &amp; Continue</a>
+                    </div>
+                </div>
+
+
+                <a class="btn btn-info"
+                   href="/admin/courses/all">Cancel</a>
+
             </div>
         </div>
     </form>
@@ -91,6 +110,11 @@
 
         }
 
+        function saveClose() {
+            document.getElementById("action").value = "1";
+            val();
+        }
+
         function val() {
             let form = document.getElementById("course-form");
             if (form.checkValidity() === false) {
@@ -102,7 +126,6 @@
             form.classList.add("was-validated");
             form.submit();
         }
-
 
 
         function sortLectures() {

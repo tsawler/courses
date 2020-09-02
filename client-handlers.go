@@ -162,6 +162,13 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 		// inserting course
 	}
 
+	action, _ := strconv.Atoi(r.Form.Get("action"))
 	session.Put(r.Context(), "flash", "Changes saved")
+
+	if action == 1 {
+		http.Redirect(w, r, "/admin/courses/all", http.StatusSeeOther)
+		return
+	}
 	http.Redirect(w, r, fmt.Sprintf("/admin/courses/%d", course.ID), http.StatusSeeOther)
+
 }
