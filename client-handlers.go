@@ -79,3 +79,20 @@ func ShowLecture(w http.ResponseWriter, r *http.Request) {
 		RowSets: rowSets,
 	})
 }
+
+// AdminAllCourses shows list of all courses for admin
+func AdminAllCourses(w http.ResponseWriter, r *http.Request) {
+	courses, err := dbModel.AllCourses()
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["courses"] = courses
+
+	helpers.Render(w, r, "courses-all-admin.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+	})
+}
