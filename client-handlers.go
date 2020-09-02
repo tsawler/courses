@@ -200,8 +200,6 @@ func AdminLecture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	infoLog.Println(courseID, lectureID)
-
 	course, err := dbModel.GetCourse(courseID)
 	if err != nil {
 		errorLog.Println(err)
@@ -211,7 +209,7 @@ func AdminLecture(w http.ResponseWriter, r *http.Request) {
 
 	var lecture clientmodels.Lecture
 	if lectureID > 0 {
-
+		lecture, err = dbModel.GetLecture(lectureID)
 	} else {
 		lecture.CourseID = courseID
 	}
@@ -225,4 +223,60 @@ func AdminLecture(w http.ResponseWriter, r *http.Request) {
 		Form:    forms.New(nil),
 	})
 
+}
+
+func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
+	courseID, err := strconv.Atoi(r.URL.Query().Get(":courseID"))
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	lectureID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	videoID, _ := strconv.Atoi(r.Form.Get("video_id"))
+	active, _ := strconv.Atoi(r.Form.Get("active"))
+	notes := r.Form.Get("notes")
+	lectureName := r.Form.Get("lecture_name")
+
+	var lecture clientmodels.Lecture
+	if lectureID > 0 {
+		lecture, err = dbModel.GetLecture(lectureID)
+		if err != nil {
+			errorLog.Print(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+	}
+
+	lecture.CourseID = courseID
+	lecture.LectureName = lectureName
+	lecture.Active = active
+	lecture.Notes = notes
+	lecture.VideoID = videoID
+
+	if lectureID == 0 {
+		_, err := dbModel.InsertLecture(lecture)
+		if err != nil {
+			errorLog.Print(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+
+	} else {
+		err := dbModel.UpdateLecture(lecture)
+		if err != nil {
+			errorLog.Print(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+	}
+	session.Put(r.Context(), "flash", "Changes saved")
+	http.Redirect(w, r, fmt.Sprintf("/admin/courses/%d", courseID), http.StatusSeeOther)
 }

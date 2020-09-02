@@ -59,9 +59,11 @@
             <div class="form-group">
                 <label for="video_choice">Video:</label><br>
                 <select class="form-control select-search" name="video_id" id="video_choice" style="width: 100% !important;">
-                    <option value="0">No video for this lecture</option>
+{{/*                    <option value="0">No video for this lecture</option>*/}}
                     {{range .Videos}}
-                        <option value="{{.ID}}">{{.VideoName}}</option>
+                        <option value="{{.ID}}"
+                        {{if eq .ID $lecture.VideoID}} selected {{end}}
+                        >{{.VideoName}}</option>
                     {{end}}
                 </select>
             </div>
@@ -80,24 +82,10 @@
             <div class="col">
                 <hr>
 
-
-                <div class="btn-group dropup">
-                    <a class="btn btn-primary savebtn" href="#!" onclick="saveClose()" data-action="close">
-                        Save and Close
-                    </a>
-                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                            data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                        <span class="sr-only">Toggle Dropdown</span>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#!" onclick="val()">Save &amp; Continue</a>
-                    </div>
-                </div>
-
+                <a class="btn btn-primary" href="javascript:" onclick="saveClose()">Save</a>
 
                 <a class="btn btn-info"
-                   href="/admin/courses/all">Cancel</a>
+                   href="/admin/courses/{{$course.ID}}">Cancel</a>
 
             </div>
         </div>
@@ -113,10 +101,9 @@
         let videoChoice = document.getElementById("video_choice");
         document.addEventListener("DOMContentLoaded", function () {
             console.log("calling tail");
-            {{/*tail.select(videoChoice).options.handle("select", {{$lecture.VideoID}}, "#");*/}}
 
             tail.select(".select-search", {
-                search: true
+                search: true,
             });
         });
 

@@ -98,7 +98,7 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 	}
 
 	// get lectures, if any
-	query = `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.created_at,
+	query = `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.notes, l.created_at,
 			l.updated_at, v.video_name, v.file_name, v.thumb
 			from lectures l
 			left join videos v on (l.video_id = v.id)
@@ -120,6 +120,7 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 			&l.VideoID,
 			&l.Active,
 			&l.SortOrder,
+			&l.Notes,
 			&l.CreatedAt,
 			&l.UpdatedAt,
 			&l.Video.VideoName,
@@ -163,7 +164,7 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 	}
 
 	// get lectures, if any
-	query = `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.created_at,
+	query = `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.notes, l.created_at,
 			l.updated_at, v.video_name, v.file_name, v.thumb
 			from lectures l
 			left join videos v on (l.video_id = v.id)
@@ -185,6 +186,7 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 			&l.VideoID,
 			&l.Active,
 			&l.SortOrder,
+			&l.Notes,
 			&l.CreatedAt,
 			&l.UpdatedAt,
 			&l.Video.VideoName,
@@ -210,7 +212,7 @@ func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
 
 	var l clientmodels.Lecture
 
-	query := `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.created_at,
+	query := `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.notes, l.created_at,
 			l.updated_at, v.video_name, v.file_name, v.thumb
 			from lectures l
 			left join videos v on (l.video_id = v.id)
@@ -225,6 +227,7 @@ func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
 		&l.VideoID,
 		&l.Active,
 		&l.SortOrder,
+		&l.Notes,
 		&l.CreatedAt,
 		&l.UpdatedAt,
 		&l.Video.VideoName,
@@ -273,4 +276,44 @@ func (m *DBModel) InsertCourse(c clientmodels.Course) (int, error) {
 	}
 
 	return newID, nil
+}
+
+// InsertCourse inserts a course lecture and returns new id
+func (m *DBModel) InsertLecture(c clientmodels.Lecture) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var newID int
+
+	query := `insert into lectures (course_id, lecture_name, video_id, active, sort_order, notes, created_at, updated_at)
+			values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`
+
+	err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.VideoID, c.Active, c.SortOrder, c.Notes, time.Now(), time.Now()).Scan(&newID)
+
+	if err != nil {
+		fmt.Println("Error inserting new course lecture")
+		fmt.Println(err)
+		return 0, err
+	}
+
+	return newID, nil
+}
+
+// UpdateLecture updates a course lecture
+func (m *DBModel) UpdateLecture(c clientmodels.Lecture) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `update lectures set lecture_name = $1, video_id = $2, active = $3, notes = $4,
+			updated_at = $5 where id = $6`
+
+	_, err := m.DB.ExecContext(ctx, query, c.LectureName, c.VideoID, c.Active, c.Notes, time.Now(), c.ID)
+
+	if err != nil {
+		fmt.Println("Error inserting new course lecture")
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
 }
