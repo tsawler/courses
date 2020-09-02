@@ -47,7 +47,7 @@ func (m *DBModel) AllCourses() ([]clientmodels.Course, error) {
 func (m *DBModel) AllActiveCourses() ([]clientmodels.Course, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	stmt := "SELECT id, course_name, active, created_at, updated_at FROM Courses ORDER BY course_name"
+	stmt := "SELECT id, course_name, active, created_at, updated_at FROM courses where active = 1 ORDER BY course_name"
 
 	rows, err := m.DB.QueryContext(ctx, stmt)
 	if err != nil {

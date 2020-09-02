@@ -21,16 +21,27 @@ func CustomShowHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func AllCourses(w http.ResponseWriter, r *http.Request) {
-	courses, err := dbModel.AllCourses()
+
+	pg, err := repo.DB.GetPageBySlug("courses")
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	courses, err := dbModel.AllActiveCourses()
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
 		return
 	}
 
-	for _, x := range courses {
-		w.Write([]byte(x.CourseName))
-	}
+	rowSets := make(map[string]interface{})
+	rowSets["courses"] = courses
+
+	helpers.Render(w, r, "courses.page.tmpl", &templates.TemplateData{
+		Page:    pg,
+		RowSets: rowSets,
+	})
 }
 
 func ShowCourse(w http.ResponseWriter, r *http.Request) {
