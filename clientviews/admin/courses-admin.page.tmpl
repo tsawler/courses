@@ -61,7 +61,16 @@
                     <a class="list-group-item list-group-item-action"
                        data-id="{{.ID}}"
                        id="sort_{{.ID}}"
-                       href="/admin/courses/lecture/{{$course.ID}}/{{.ID}}">{{.LectureName}}</a>
+                       {{if eq .Active 0}}
+                       style="background: lightgrey;"
+                       {{end}}
+                       href="/admin/courses/lecture/{{$course.ID}}/{{.ID}}">
+                        {{if eq .Active 1}}
+                            {{.LectureName}}
+                        {{else}}
+                            {{.LectureName}} (inactive)
+                        {{end}}
+                    </a>
                 {{end}}
             </div>
             <div>&nbsp;</div>
