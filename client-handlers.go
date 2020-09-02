@@ -150,6 +150,7 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 		}
 		course = c
 		course.CourseName = r.Form.Get("course_name")
+		course.Description = r.Form.Get("description")
 		active, _ := strconv.Atoi(r.Form.Get("active"))
 		course.Active = active
 		err = dbModel.UpdateCourse(course)
@@ -161,6 +162,7 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// inserting course
 		course.CourseName = r.Form.Get("course_name")
+		course.Description = r.Form.Get("description")
 		active, _ := strconv.Atoi(r.Form.Get("active"))
 		course.Active = active
 
@@ -225,6 +227,7 @@ func AdminLecture(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// PostAdminLecture posts a lecture
 func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
 	courseID, err := strconv.Atoi(r.URL.Query().Get(":courseID"))
 	if err != nil {

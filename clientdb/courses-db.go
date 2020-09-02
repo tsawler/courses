@@ -80,7 +80,7 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 
 	var course clientmodels.Course
 
-	query := "select id, course_name, active, created_at, updated_at from courses where id = $1"
+	query := "select id, course_name, active, description, created_at, updated_at from courses where id = $1"
 
 	row := m.DB.QueryRowContext(ctx, query, id)
 
@@ -88,6 +88,7 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 		&course.ID,
 		&course.CourseName,
 		&course.Active,
+		&course.Description,
 		&course.CreatedAt,
 		&course.UpdatedAt,
 	)
@@ -146,7 +147,7 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 
 	var course clientmodels.Course
 
-	query := "select id, course_name, active, created_at, updated_at from courses where id = $1"
+	query := "select id, course_name, active, description, created_at, updated_at from courses where id = $1"
 
 	row := m.DB.QueryRowContext(ctx, query, id)
 
@@ -154,6 +155,7 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 		&course.ID,
 		&course.CourseName,
 		&course.Active,
+		&course.Description,
 		&course.CreatedAt,
 		&course.UpdatedAt,
 	)
@@ -247,9 +249,9 @@ func (m *DBModel) UpdateCourse(c clientmodels.Course) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `update courses set course_name = $1, active = $2, updated_at = $3 where id = $4`
+	query := `update courses set course_name = $1, active = $2, description = $3, updated_at = $4 where id = $5`
 
-	_, err := m.DB.ExecContext(ctx, query, c.CourseName, c.Active, time.Now(), c.ID)
+	_, err := m.DB.ExecContext(ctx, query, c.CourseName, c.Active, c.Description, time.Now(), c.ID)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -264,10 +266,10 @@ func (m *DBModel) InsertCourse(c clientmodels.Course) (int, error) {
 
 	var newID int
 
-	query := `insert into courses (course_name, active, created_at, updated_at)
-			values ($1, $2, $3, $4) returning id`
+	query := `insert into courses (course_name, active, description, created_at, updated_at)
+			values ($1, $2, $3, $4, $5) returning id`
 
-	err := m.DB.QueryRowContext(ctx, query, c.CourseName, c.Active, time.Now(), time.Now()).Scan(&newID)
+	err := m.DB.QueryRowContext(ctx, query, c.CourseName, c.Active, c.Description, time.Now(), time.Now()).Scan(&newID)
 
 	if err != nil {
 		fmt.Println("Error inserting new course")

@@ -7,12 +7,13 @@ import (
 
 // Course describes course model
 type Course struct {
-	ID         int
-	CourseName string
-	Active     int
-	Lectures   []Lecture
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	ID          int
+	CourseName  string
+	Active      int
+	Lectures    []Lecture
+	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 // Lecture describes a lecture
