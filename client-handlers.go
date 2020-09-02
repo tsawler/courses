@@ -1,6 +1,8 @@
 package clienthandlers
 
 import (
+	"github.com/tsawler/goblender/client/clienthandlers/clientmodels"
+	"github.com/tsawler/goblender/pkg/forms"
 	"github.com/tsawler/goblender/pkg/helpers"
 	"github.com/tsawler/goblender/pkg/templates"
 	"net/http"
@@ -94,5 +96,36 @@ func AdminAllCourses(w http.ResponseWriter, r *http.Request) {
 
 	helpers.Render(w, r, "courses-all-admin.page.tmpl", &templates.TemplateData{
 		RowSets: rowSets,
+	})
+}
+
+// AdminCourse shows course for add/edit
+func AdminCourse(w http.ResponseWriter, r *http.Request) {
+	courseID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	var course clientmodels.Course
+
+	if courseID > 0 {
+		c, err := dbModel.GetCourse(courseID)
+		if err != nil {
+			errorLog.Println(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+
+		course = c
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["course"] = course
+
+	helpers.Render(w, r, "courses-admin.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+		Form:    forms.New(nil),
 	})
 }

@@ -1,0 +1,70 @@
+{{template "admin-base" .}}
+
+{{define "title"}}Course - vMaintain Admin{{end}}
+
+{{define "admin-title"}}Course{{end}}
+{{define "content-title"}}Course{{end}}
+{{define "css"}}
+{{end}}
+
+{{define "content"}}
+    {{$course := index .RowSets "course"}}
+    <form method="post" action="/admin/courses/{{$course.ID}}" novalidate class="needs-validation"
+          id="course-form">
+        <div class="col-md-6 col-sm-12 col-xs-12">
+            <div class="form-group mt-3">
+                <label for="course_name">Course Name</label>
+                {{with .Form.Errors.Get "course_name"}}
+                    <label class='text-danger'>{{.}}</label>
+                {{end}}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
+                    </div>
+                    <input class="form-control required {{with .Form.Errors.Get "course_name"}} is-invalid {{end}}"
+                           id="course_name"
+                           required
+                           autocomplete="off" type='text'
+                           name='course_name'
+                           value='{{$course.CourseName}}'>
+                    <div class="invalid-feedback">
+                        Please enter a value
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <label for="template">Active</label>
+                <select id="active" name="active" class="custom-select">
+                    <option value="0" {{if eq $course.Active 0}} selected {{end}}>No</option>
+                    <option value="1" {{if eq $course.Active 1}} selected {{end}}>Yes</option>
+                </select>
+            </div>
+
+            <hr>
+            <div class="float-left">
+            <h3>Lectures</h3>
+            </div>
+            <div class="float-right">
+                <a class="btn btn-outline-secondary" href="javascript;" onclick="addLecture()">Add Lecture</a>
+            </div>
+            <div class="clearfix"></div>
+
+            <div class="list-group mt-3">
+                {{range $course.Lectures}}
+                    <a class="list-group-item list-group-item-action" href="/admin/courses/lecture/{{$course.ID}}/{{.ID}}">{{.LectureName}}</a>
+                {{end}}
+            </div>
+            <div>&nbsp;</div>
+        </div>
+    </form>
+
+{{end}}
+
+{{define "js"}}
+<script>
+    function addLecture() {
+
+    }
+</script>
+{{end}}
