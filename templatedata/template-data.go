@@ -8,6 +8,7 @@ import (
 
 var dbModel *clientdb.DBModel
 
+// NewTemplateData sets database connection
 func NewTemplateData(p *sql.DB) {
 	dbModel = &clientdb.DBModel{DB: p}
 }
