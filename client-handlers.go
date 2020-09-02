@@ -160,6 +160,17 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		// inserting course
+		course.CourseName = r.Form.Get("course_name")
+		active, _ := strconv.Atoi(r.Form.Get("active"))
+		course.Active = active
+
+		newID, err := dbModel.InsertCourse(course)
+		if err != nil {
+			errorLog.Println(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+		course.ID = newID
 	}
 
 	action, _ := strconv.Atoi(r.Form.Get("action"))

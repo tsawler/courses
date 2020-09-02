@@ -253,3 +253,24 @@ func (m *DBModel) UpdateCourse(c clientmodels.Course) error {
 	}
 	return nil
 }
+
+// InsertCourse inserts a course and returns new id
+func (m *DBModel) InsertCourse(c clientmodels.Course) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var newID int
+
+	query := `insert into courses (course_name, active, created_at, updated_at)
+			values ($1, $2, $3, $4) returning id`
+
+	err := m.DB.QueryRowContext(ctx, query, c.CourseName, c.Active, time.Now(), time.Now()).Scan(&newID)
+
+	if err != nil {
+		fmt.Println("Error inserting new course")
+		fmt.Println(err)
+		return 0, err
+	}
+
+	return newID, nil
+}
