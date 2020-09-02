@@ -183,3 +183,46 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/admin/courses/%d", course.ID), http.StatusSeeOther)
 
 }
+
+// AdminLecture shows form for lecture
+func AdminLecture(w http.ResponseWriter, r *http.Request) {
+	courseID, err := strconv.Atoi(r.URL.Query().Get(":courseID"))
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	lectureID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	infoLog.Println(courseID, lectureID)
+
+	course, err := dbModel.GetCourse(courseID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	var lecture clientmodels.Lecture
+	if lectureID > 0 {
+
+	} else {
+		lecture.CourseID = courseID
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["course"] = course
+	rowSets["lecture"] = lecture
+
+	helpers.Render(w, r, "lecture-admin.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+		Form:    forms.New(nil),
+	})
+
+}

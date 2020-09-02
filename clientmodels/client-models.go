@@ -24,6 +24,7 @@ type Lecture struct {
 	Video       models.Video
 	SortOrder   int
 	Active      int
+	Notes       string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

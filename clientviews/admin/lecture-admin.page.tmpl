@@ -1,45 +1,54 @@
 {{template "admin-base" .}}
 
-{{define "title"}}Course - vMaintain Admin{{end}}
+{{define "title"}}Lecture - vMaintain Admin{{end}}
 
-{{define "admin-title"}}Course{{end}}
-{{define "content-title"}}Course{{end}}
+{{define "admin-title"}}Lecture{{end}}
+{{define "content-title"}}Lecture{{end}}
 {{define "css"}}
+    <link href="/static/js/ts/bootstrap4/tail.select-default.min.css" rel="stylesheet">
+        <style>
+            .tail-select {
+                width: 100%;
+            }
+            trix-toolbar .trix-button-group--file-tools {
+                display: none;
+            }
+        </style>
 {{end}}
 
 {{define "content"}}
     {{$course := index .RowSets "course"}}
-    <form method="post" action="/admin/courses/{{$course.ID}}" novalidate class="needs-validation"
-          id="course-form">
+    {{$lecture := index .RowSets "lecture"}}
+    <form method="post" action="/admin/courses/lecture/{{$course.ID}}/{{$lecture.ID}}" novalidate class="needs-validation"
+          id="lecture-form">
 
         <input type="hidden" name="csrf_token" id="csrf_token" value="{{.CSRFToken}}">
         <input type="hidden" name="action" id="action" value="0">
-        <input type="hidden" name="sort_list" id="sort-list">
 
         <div class="col-md-6 col-sm-12 col-xs-12">
 
             <div class="form-group mt-3">
-                <label for="course_name">Course Name</label>
-                {{with .Form.Errors.Get "course_name"}}
+                <label for="course_name">Lecture Name</label>
+                {{with .Form.Errors.Get "lecture_name"}}
                     <label class='text-danger'>{{.}}</label>
                 {{end}}
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
                     </div>
-                    <input class="form-control required {{with .Form.Errors.Get "course_name"}} is-invalid {{end}}"
-                           id="course_name"
+                    <input class="form-control required {{with .Form.Errors.Get "lecture_name"}} is-invalid {{end}}"
+                           id="lecture_name"
                            required
                            autocomplete="off" type='text'
-                           name='course_name'
-                           value='{{$course.CourseName}}'>
+                           name='lecture_name'
+                           value='{{$lecture.LectureName}}'>
                     <div class="invalid-feedback">
                         Please enter a value
                     </div>
                 </div>
             </div>
 
-            <div class="form-group ">
+            <div class="form-group">
                 <label for="active">Active</label>
                 <select id="active" name="active" class="custom-select">
                     <option value="0" {{if eq $course.Active 0}} selected {{end}}>No</option>
@@ -47,24 +56,25 @@
                 </select>
             </div>
 
-            <hr>
-            <div class="float-left">
-                <h3>Lectures</h3>
+            <div class="form-group">
+                <label for="video_choice">Video:</label><br>
+                <select class="form-control select-search" name="video_id" id="video_choice" style="width: 100% !important;">
+                    <option value="0">No video for this lecture</option>
+                    {{range .Videos}}
+                        <option value="{{.ID}}">{{.VideoName}}</option>
+                    {{end}}
+                </select>
             </div>
-            <div class="float-right">
-                <a class="btn btn-outline-secondary" href="/admin/courses/lecture/{{$course.ID}}/0" >Add Lecture</a>
-            </div>
-            <div class="clearfix"></div>
 
-            <div class="list-group mt-3" id="lecture-list">
-                {{range $course.Lectures}}
-                    <a class="list-group-item list-group-item-action"
-                       data-id="{{.ID}}"
-                       id="sort_{{.ID}}"
-                       href="/admin/courses/lecture/{{$course.ID}}/{{.ID}}">{{.LectureName}}</a>
-                {{end}}
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <input id="notes" type="hidden" name="notes"
+                       value="{{- if ne $lecture.Notes "" -}}{{-  $lecture.Notes -}}{{- end -}}"
+                >
+                <trix-editor class="trix-content" input="notes"></trix-editor>
             </div>
-            <div>&nbsp;</div>
+
+
         </div>
         <div class="row">
             <div class="col">
@@ -96,14 +106,18 @@
 {{end}}
 
 {{define "js"}}
-    <script>
-        let lectureList;
-        let lectures;
+    {{$lecture := index .RowSets "lecture"}}
 
+    <script src="/static/js/ts/tail.select.min.js"></script>
+    <script>
+        let videoChoice = document.getElementById("video_choice");
         document.addEventListener("DOMContentLoaded", function () {
-            lectures = document.getElementById('lecture-list');
-            sortLectures();
-            performSort();
+            console.log("calling tail");
+            {{/*tail.select(videoChoice).options.handle("select", {{$lecture.VideoID}}, "#");*/}}
+
+            tail.select(".select-search", {
+                search: true
+            });
         });
 
         function saveClose() {
@@ -112,7 +126,7 @@
         }
 
         function val() {
-            let form = document.getElementById("course-form");
+            let form = document.getElementById("lecture-form");
             if (form.checkValidity() === false) {
                 this.event.preventDefault();
                 this.event.stopPropagation();
@@ -123,31 +137,6 @@
             form.submit();
         }
 
-
-        function sortLectures() {
-            componentList = Sortable.create(lectures, {
-                animation: 150,
-                chosenClass: 'sortable-chosen',
-                onUpdate: function (event) {
-                    performSort();
-                },
-                onAdd: function (event) {
-                    performSort();
-                },
-                onRemove: function (event) {
-                    performSort();
-                }
-            });
-        }
-
-        function performSort() {
-            let items = componentList.toArray();
-            let obj = [];
-            for (let i = 0; i < items.length; i++) {
-                obj.push({id: items[i], order: (i + 1)});
-            }
-            document.getElementById("sort-list").value = JSON.stringify(obj);
-        }
 
     </script>
 {{end}}
