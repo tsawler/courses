@@ -1,0 +1,3 @@
+migrations/schema.sql
+.env
+database.yml
