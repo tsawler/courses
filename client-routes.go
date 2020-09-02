@@ -3,25 +3,16 @@ package clienthandlers
 import (
 	"github.com/bmizerany/pat"
 	"github.com/justinas/alice"
+	mw "github.com/tsawler/goblender/pkg/middleware"
 	"net/http"
 )
 
-// ClientRoutes is used to handle custom routes for specific clients. Prepend some unique (and site wide) value
-// to the start of each route in order to avoid clashes with pages, etc. Middleware can be applied by importing and
-// using the middleware.* functions.
+// ClientRoutes is used to handle custom routes for specific clients
 func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddleware alice.Chain) (*pat.PatternServeMux, error) {
 
-	// example of overriding standard route
-	//mux.Get("/", dynamicMiddleware.ThenFunc(CustomShowHome))
-
-	// we can use any of the handlers in goBlender, e.g.
-	//mux.Get("/client/yellow/submarine", standardMiddleWare.ThenFunc(handlers.Repo.ShowGalleryPage(app)))
-
-	// this route requires both a goBlender middleware, and a custom client middleware
-	//mux.Get("/client/some-handler", standardMiddleWare.Append(mw.Auth).Append(SomeRole).ThenFunc(SomeHandler))
-
-	mux.Get("/courses/all", dynamicMiddleware.ThenFunc(AllCourses))
-	mux.Get("/courses/overview/:ID", dynamicMiddleware.ThenFunc(ShowCourse))
+	mux.Get("/courses/all", dynamicMiddleware.Append(mw.Auth).ThenFunc(AllCourses))
+	mux.Get("/courses/overview/:ID", dynamicMiddleware.Append(mw.Auth).ThenFunc(ShowCourse))
+	mux.Get("/courses/lecture/:ID", dynamicMiddleware.Append(mw.Auth).ThenFunc(ShowLecture))
 
 	// public folder
 	fileServer := http.FileServer(http.Dir("./client/clienthandlers/public/"))

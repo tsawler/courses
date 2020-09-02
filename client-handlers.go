@@ -48,7 +48,34 @@ func ShowCourse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, x := range course.Lectures {
-		w.Write([]byte(x.LectureName))
+	rowSets := make(map[string]interface{})
+	rowSets["course"] = course
+
+	helpers.Render(w, r, "course.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+	})
+}
+
+// ShowLecture shows one lecture
+func ShowLecture(w http.ResponseWriter, r *http.Request) {
+	lectureID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
 	}
+
+	lecture, err := dbModel.GetLecture(lectureID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["lecture"] = lecture
+
+	helpers.Render(w, r, "lecture.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+	})
 }

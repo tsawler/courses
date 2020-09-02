@@ -202,3 +202,39 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 
 	return course, nil
 }
+
+// GetLecture returns one lecture
+func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var l clientmodels.Lecture
+
+	query := `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.created_at,
+			l.updated_at, v.video_name, v.file_name, v.thumb
+			from lectures l
+			left join videos v on (l.video_id = v.id)
+			where l.id = $1`
+
+	row := m.DB.QueryRowContext(ctx, query, id)
+
+	err := row.Scan(
+		&l.ID,
+		&l.CourseID,
+		&l.LectureName,
+		&l.VideoID,
+		&l.Active,
+		&l.SortOrder,
+		&l.CreatedAt,
+		&l.UpdatedAt,
+		&l.Video.VideoName,
+		&l.Video.FileName,
+		&l.Video.Thumb,
+	)
+
+	if err != nil {
+		return l, err
+	}
+
+	return l, nil
+}
