@@ -11,6 +11,7 @@
     {{$course := index .RowSets "course"}}
     <form method="post" action="/admin/courses/{{$course.ID}}" novalidate class="needs-validation"
           id="course-form">
+        <input type="text" class="form-control" name="sort_list" id="sort-list">
         <div class="col-md-6 col-sm-12 col-xs-12">
             <div class="form-group mt-3">
                 <label for="course_name">Course Name</label>
@@ -43,28 +44,90 @@
 
             <hr>
             <div class="float-left">
-            <h3>Lectures</h3>
+                <h3>Lectures</h3>
             </div>
             <div class="float-right">
                 <a class="btn btn-outline-secondary" href="javascript;" onclick="addLecture()">Add Lecture</a>
             </div>
             <div class="clearfix"></div>
 
-            <div class="list-group mt-3">
+            <div class="list-group mt-3" id="lecture-list">
                 {{range $course.Lectures}}
-                    <a class="list-group-item list-group-item-action" href="/admin/courses/lecture/{{$course.ID}}/{{.ID}}">{{.LectureName}}</a>
+                    <a class="list-group-item list-group-item-action"
+                       data-id="{{.ID}}"
+                       id="sort_{{.ID}}"
+                       href="/admin/courses/lecture/{{$course.ID}}/{{.ID}}">{{.LectureName}}</a>
                 {{end}}
             </div>
             <div>&nbsp;</div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <hr>
+                <a class="btn btn-primary" href="javascript;" onclick="val()">Save</a>
+                <a class="btn btn-info" href="/admin/courses/all">Cancel</a>
+            </div>
         </div>
     </form>
 
 {{end}}
 
 {{define "js"}}
-<script>
-    function addLecture() {
+    <script>
+        let lectureList;
+        let lectures;
 
-    }
-</script>
+        document.addEventListener("DOMContentLoaded", function () {
+            lectures = document.getElementById('lecture-list');
+            sortLectures();
+            performSort();
+        });
+
+        function addLecture() {
+
+        }
+
+        function val() {
+            let form = $("#course-form");
+            if (form[0].checkValidity() === false) {
+                this.event.preventDefault();
+                this.event.stopPropagation();
+            }
+            form.addClass('was-validated');
+
+            if (form[0].checkValidity() === true) {
+                $("#pub-form").submit();
+            } else {
+                errorAlert('{{trans "form_errors" .Lang}}');
+            }
+        }
+
+
+
+        function sortLectures() {
+            componentList = Sortable.create(lectures, {
+                animation: 150,
+                chosenClass: 'sortable-chosen',
+                onUpdate: function (event) {
+                    performSort();
+                },
+                onAdd: function (event) {
+                    performSort();
+                },
+                onRemove: function (event) {
+                    performSort();
+                }
+            });
+        }
+
+        function performSort() {
+            let items = componentList.toArray();
+            let obj = [];
+            for (let i = 0; i < items.length; i++) {
+                obj.push({id: items[i], order: (i + 1)});
+            }
+            document.getElementById("sort-list").value = JSON.stringify(obj);
+        }
+
+    </script>
 {{end}}
