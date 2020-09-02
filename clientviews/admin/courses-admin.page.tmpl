@@ -11,8 +11,12 @@
     {{$course := index .RowSets "course"}}
     <form method="post" action="/admin/courses/{{$course.ID}}" novalidate class="needs-validation"
           id="course-form">
-        <input type="text" class="form-control" name="sort_list" id="sort-list">
+
+        <input type="hidden" name="csrf_token" id="csrf_token" value="{{.CSRFToken}}">
+
+        <input type="hidden" name="sort_list" id="sort-list">
         <div class="col-md-6 col-sm-12 col-xs-12">
+
             <div class="form-group mt-3">
                 <label for="course_name">Course Name</label>
                 {{with .Form.Errors.Get "course_name"}}
@@ -35,7 +39,7 @@
             </div>
 
             <div class="form-group ">
-                <label for="template">Active</label>
+                <label for="active">Active</label>
                 <select id="active" name="active" class="custom-select">
                     <option value="0" {{if eq $course.Active 0}} selected {{end}}>No</option>
                     <option value="1" {{if eq $course.Active 1}} selected {{end}}>Yes</option>
@@ -47,7 +51,7 @@
                 <h3>Lectures</h3>
             </div>
             <div class="float-right">
-                <a class="btn btn-outline-secondary" href="javascript;" onclick="addLecture()">Add Lecture</a>
+                <a class="btn btn-outline-secondary" href="#!" onclick="addLecture()">Add Lecture</a>
             </div>
             <div class="clearfix"></div>
 
@@ -64,7 +68,7 @@
         <div class="row">
             <div class="col">
                 <hr>
-                <a class="btn btn-primary" href="javascript;" onclick="val()">Save</a>
+                <a class="btn btn-primary" href="#!" onclick="val()">Save</a>
                 <a class="btn btn-info" href="/admin/courses/all">Cancel</a>
             </div>
         </div>
@@ -88,18 +92,15 @@
         }
 
         function val() {
-            let form = $("#course-form");
-            if (form[0].checkValidity() === false) {
+            let form = document.getElementById("course-form");
+            if (form.checkValidity() === false) {
                 this.event.preventDefault();
                 this.event.stopPropagation();
+                form.classList.add("was-validated");
+                return
             }
-            form.addClass('was-validated');
-
-            if (form[0].checkValidity() === true) {
-                $("#pub-form").submit();
-            } else {
-                errorAlert('{{trans "form_errors" .Lang}}');
-            }
+            form.classList.add("was-validated");
+            form.submit();
         }
 
 

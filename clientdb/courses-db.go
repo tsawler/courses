@@ -238,3 +238,18 @@ func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
 
 	return l, nil
 }
+
+// UpdateCourse updates a course
+func (m *DBModel) UpdateCourse(c clientmodels.Course) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `update courses set course_name = $1, active = $2, updated_at = $3 where id = $4`
+
+	_, err := m.DB.ExecContext(ctx, query, c.CourseName, c.Active, time.Now(), c.ID)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}

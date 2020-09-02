@@ -1,6 +1,7 @@
 package clienthandlers
 
 import (
+	"fmt"
 	"github.com/tsawler/goblender/client/clienthandlers/clientmodels"
 	"github.com/tsawler/goblender/pkg/forms"
 	"github.com/tsawler/goblender/pkg/helpers"
@@ -128,4 +129,39 @@ func AdminCourse(w http.ResponseWriter, r *http.Request) {
 		RowSets: rowSets,
 		Form:    forms.New(nil),
 	})
+}
+
+// PostAdminCourse updates or adds a course
+func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
+	courseID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	var course clientmodels.Course
+	if courseID > 0 {
+		c, err := dbModel.GetCourse(courseID)
+		if err != nil {
+			errorLog.Println(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+		course = c
+		course.CourseName = r.Form.Get("course_name")
+		active, _ := strconv.Atoi(r.Form.Get("active"))
+		course.Active = active
+		err = dbModel.UpdateCourse(course)
+		if err != nil {
+			errorLog.Println(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+	} else {
+		// inserting course
+	}
+
+	session.Put(r.Context(), "flash", "Changes saved")
+	http.Redirect(w, r, fmt.Sprintf("/admin/courses/%d", course.ID), http.StatusSeeOther)
 }

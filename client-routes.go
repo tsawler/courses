@@ -16,6 +16,7 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 
 	// course admin
 	mux.Get("/admin/courses/all", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(AdminAllCourses))
+	mux.Post("/admin/courses/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(PostAdminCourse))
 	mux.Get("/admin/courses/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(AdminCourse))
 
 	// public folder
