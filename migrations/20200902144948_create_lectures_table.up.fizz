@@ -1,0 +1,28 @@
+create_table("lectures") {
+  t.Column("id", "integer", {primary: true})
+  t.Column("course_id", "integer", {"unsigned":true, "null":true})
+  t.Column("lecture_name", "string", {"size": 255})
+  t.Column("video_id", "integer", {"unsigned":true, "null":true})
+  t.Column("active", "integer", {"default":0})
+  t.Column("sort_order", "integer", {"default":0})
+}
+
+
+add_foreign_key("lectures", "course_id", {"courses": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+add_foreign_key("lectures", "video_id", {"videos": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+
+sql("alter table lectures alter column created_at set default now();")
+sql("alter table lectures alter column updated_at set default now();")
+
+sql(`CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON lectures
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();`)

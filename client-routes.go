@@ -20,6 +20,10 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	// this route requires both a goBlender middleware, and a custom client middleware
 	//mux.Get("/client/some-handler", standardMiddleWare.Append(mw.Auth).Append(SomeRole).ThenFunc(SomeHandler))
 
+	mux.Get("/courses/all", dynamicMiddleware.ThenFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("All courses"))
+	}))
+
 	// public folder
 	fileServer := http.FileServer(http.Dir("./client/clienthandlers/public/"))
 	mux.Get("/client/static/", http.StripPrefix("/client/static", fileServer))

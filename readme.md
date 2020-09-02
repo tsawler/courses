@@ -4,9 +4,9 @@
 <a href="https://golang.org"><img src="https://img.shields.io/badge/powered_by-Go-3362c2.svg?style=flat-square" alt="Built with GoLang"></a> 
 
 
-# GoBlender client
+# Courses
 
-Sample project for client specific code for GoBlender.
+An extension to GoBlender that allows for delivery of video based online courses.
 
 ## Setup
 
@@ -29,8 +29,6 @@ Change  `update.sh` in GoBlender root folder so as to enable git pull of client:
 # run migrations for pg
 # soda migrate -c ../../migrations-pg/database.yml
 
-#run client migrations for mariadb
-# soda migrate -c ../../database.yml
 ```
 
 After changing, it should look like this (assuming you want to run postgres migrations):
