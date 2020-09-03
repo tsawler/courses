@@ -47,33 +47,36 @@
                     </select>
                 </div>
 
-                <hr>
-                <div class="float-left">
-                    <h3>Lectures</h3>
-                </div>
-                <div class="float-right">
-                    <a class="btn btn-outline-secondary" href="/admin/courses/lecture/{{$course.ID}}/0">Add Lecture</a>
-                </div>
-                <div class="clearfix"></div>
+                {{if gt $course.ID 0}}
+                    <hr>
+                    <div class="float-left">
+                        <h3>Lectures</h3>
+                    </div>
+                    <div class="float-right">
+                        <a class="btn btn-outline-secondary" href="/admin/courses/lecture/{{$course.ID}}/0">Add
+                            Lecture</a>
+                    </div>
+                    <div class="clearfix"></div>
 
-                <div class="list-group mt-3" id="lecture-list">
-                    {{range $course.Lectures}}
-                        <a class="list-group-item list-group-item-action"
-                           data-id="{{.ID}}"
-                           id="sort_{{.ID}}"
-                                {{if eq .Active 0}}
-                                    style="background: lightgrey;"
+                    <div class="list-group mt-3" id="lecture-list">
+                        {{range $course.Lectures}}
+                            <a class="list-group-item list-group-item-action"
+                               data-id="{{.ID}}"
+                               id="sort_{{.ID}}"
+                                    {{if eq .Active 0}}
+                                        style="background: lightgrey;"
+                                    {{end}}
+                               href="/admin/courses/lecture/{{$course.ID}}/{{.ID}}">
+                                {{if eq .Active 1}}
+                                    {{.LectureName}}
+                                {{else}}
+                                    {{.LectureName}} (inactive)
                                 {{end}}
-                           href="/admin/courses/lecture/{{$course.ID}}/{{.ID}}">
-                            {{if eq .Active 1}}
-                                {{.LectureName}}
-                            {{else}}
-                                {{.LectureName}} (inactive)
-                            {{end}}
-                        </a>
-                    {{end}}
-                </div>
-                <div>&nbsp;</div>
+                            </a>
+                        {{end}}
+                    </div>
+                    <div>&nbsp;</div>
+                {{end}}
             </div>
 
             <div class="col-md-6 col-sm-12 col-xs-12">
