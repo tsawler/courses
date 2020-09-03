@@ -168,11 +168,17 @@
                 {{$lecture := index .RowSets "lecture"}}
                 <h3>{{$lecture.LectureName}}</h3>
 
+                {{if gt $lecture.VideoID 0}}
                 <div class="embed-responsive embed-responsive-16by9">
                     <iframe src="/embedded-video/{{$lecture.VideoID}}" width="560" height="315"
                             frameborder="0"></iframe>
                 </div>
+                {{end}}
 
+                {{if ne $lecture.Notes ""}}
+                    <hr>
+                {{safeHTML $lecture.Notes}}
+                {{end}}
                 <hr>
                 <div class="text-center">
                     <a class="btn btn-outline-secondary" href="/courses/overview/{{$lecture.CourseID}}">Back to Course

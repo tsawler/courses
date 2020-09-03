@@ -59,7 +59,7 @@
             <div class="form-group">
                 <label for="video_choice">Video:</label><br>
                 <select class="form-control select-search" name="video_id" id="video_choice" style="width: 100% !important;">
-{{/*                    <option value="0">No video for this lecture</option>*/}}
+                    <option value="0" {{if eq $lecture.VideoID 0}} selected {{end}}>No video for this lecture</option>
                     {{range .Videos}}
                         <option value="{{.ID}}"
                         {{if eq .ID $lecture.VideoID}} selected {{end}}

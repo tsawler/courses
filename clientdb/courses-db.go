@@ -99,8 +99,8 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 	}
 
 	// get lectures, if any
-	query = `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.notes, l.created_at,
-			l.updated_at, v.video_name, v.file_name, v.thumb
+	query = `select l.id, l.course_id, l.lecture_name, coalesce(l.video_id, 0), l.active, l.sort_order, l.notes, l.created_at,
+			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, '')
 			from lectures l
 			left join videos v on (l.video_id = v.id)
 			where l.course_id = $1 order by l.sort_order`
@@ -166,8 +166,8 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 	}
 
 	// get lectures, if any
-	query = `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.notes, l.created_at,
-			l.updated_at, v.video_name, v.file_name, v.thumb
+	query = `select l.id, l.course_id, l.lecture_name, coalesce(l.video_id, 0), l.active, l.sort_order, l.notes, l.created_at,
+			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, '')
 			from lectures l
 			left join videos v on (l.video_id = v.id)
 			where l.course_id = $1 and l.active = 1 order by l.sort_order`
@@ -214,8 +214,8 @@ func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
 
 	var l clientmodels.Lecture
 
-	query := `select l.id, l.course_id, l.lecture_name, l.video_id, l.active, l.sort_order, l.notes, l.created_at,
-			l.updated_at, v.video_name, v.file_name, v.thumb
+	query := `select l.id, l.course_id, l.lecture_name, coalesce(l.video_id, 0), l.active, l.sort_order, l.notes, l.created_at,
+			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, '')
 			from lectures l
 			left join videos v on (l.video_id = v.id)
 			where l.id = $1`
@@ -287,15 +287,29 @@ func (m *DBModel) InsertLecture(c clientmodels.Lecture) (int, error) {
 
 	var newID int
 
-	query := `insert into lectures (course_id, lecture_name, video_id, active, sort_order, notes, created_at, updated_at)
+	if c.VideoID > 0 {
+
+		query := `insert into lectures (course_id, lecture_name, video_id, active, sort_order, notes, created_at, updated_at)
 			values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`
 
-	err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.VideoID, c.Active, c.SortOrder, c.Notes, time.Now(), time.Now()).Scan(&newID)
+		err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.VideoID, c.Active, c.SortOrder, c.Notes, time.Now(), time.Now()).Scan(&newID)
 
-	if err != nil {
-		fmt.Println("Error inserting new course lecture")
-		fmt.Println(err)
-		return 0, err
+		if err != nil {
+			fmt.Println("Error inserting new course lecture")
+			fmt.Println(err)
+			return 0, err
+		}
+	} else {
+		query := `insert into lectures (course_id, lecture_name, active, sort_order, notes, created_at, updated_at)
+			values ($1, $2, $3, $4, $5, $6, $7) returning id`
+
+		err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.Active, c.SortOrder, c.Notes, time.Now(), time.Now()).Scan(&newID)
+
+		if err != nil {
+			fmt.Println("Error inserting new course lecture")
+			fmt.Println(err)
+			return 0, err
+		}
 	}
 
 	return newID, nil
@@ -306,15 +320,28 @@ func (m *DBModel) UpdateLecture(c clientmodels.Lecture) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `update lectures set lecture_name = $1, video_id = $2, active = $3, notes = $4,
+	if c.VideoID > 0 {
+		query := `update lectures set lecture_name = $1, video_id = $2, active = $3, notes = $4,
 			updated_at = $5 where id = $6`
 
-	_, err := m.DB.ExecContext(ctx, query, c.LectureName, c.VideoID, c.Active, c.Notes, time.Now(), c.ID)
+		_, err := m.DB.ExecContext(ctx, query, c.LectureName, c.VideoID, c.Active, c.Notes, time.Now(), c.ID)
 
-	if err != nil {
-		fmt.Println("Error inserting new course lecture")
-		fmt.Println(err)
-		return err
+		if err != nil {
+			fmt.Println("Error updating course lecture")
+			fmt.Println(err)
+			return err
+		}
+	} else {
+		query := `update lectures set lecture_name = $1, video_id = null, active = $2, notes = $3,
+			updated_at = $4 where id = $5`
+
+		_, err := m.DB.ExecContext(ctx, query, c.LectureName, c.Active, c.Notes, time.Now(), c.ID)
+
+		if err != nil {
+			fmt.Println("Error updating course lecture")
+			fmt.Println(err)
+			return err
+		}
 	}
 
 	return nil
