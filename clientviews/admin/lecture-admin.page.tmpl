@@ -6,103 +6,120 @@
 {{define "content-title"}}Lecture{{end}}
 {{define "css"}}
     <link href="/static/js/ts/bootstrap4/tail.select-default.min.css" rel="stylesheet">
-        <style>
-            .tail-select {
-                width: 100%;
-            }
-            trix-toolbar .trix-button-group--file-tools {
-                display: none;
-            }
-        </style>
+    <style>
+        .tail-select {
+            width: 100%;
+        }
+
+        trix-toolbar .trix-button-group--file-tools {
+            display: none;
+        }
+    </style>
 {{end}}
 
 {{define "content"}}
     {{$course := index .RowSets "course"}}
     {{$lecture := index .RowSets "lecture"}}
-    <form method="post" action="/admin/courses/lecture/{{$course.ID}}/{{$lecture.ID}}" novalidate class="needs-validation"
+    <form method="post" action="/admin/courses/lecture/{{$course.ID}}/{{$lecture.ID}}" novalidate
+          class="needs-validation"
           id="lecture-form">
 
         <input type="hidden" name="csrf_token" id="csrf_token" value="{{.CSRFToken}}">
         <input type="hidden" name="action" id="action" value="0">
+        <div class="row">
 
-        <div class="col-md-6 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
 
-            <div class="form-group mt-3">
-                <label for="course_name">Lecture Name</label>
-                {{with .Form.Errors.Get "lecture_name"}}
-                    <label class='text-danger'>{{.}}</label>
-                {{end}}
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
-                    </div>
-                    <input class="form-control required {{with .Form.Errors.Get "lecture_name"}} is-invalid {{end}}"
-                           id="lecture_name"
-                           required
-                           autocomplete="off" type='text'
-                           name='lecture_name'
-                           value='{{$lecture.LectureName}}'>
-                    <div class="invalid-feedback">
-                        Please enter a value
+                <div class="form-group mt-3">
+                    <label for="course_name">Lecture Name</label>
+                    {{with .Form.Errors.Get "lecture_name"}}
+                        <label class='text-danger'>{{.}}</label>
+                    {{end}}
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
+                        </div>
+                        <input class="form-control required {{with .Form.Errors.Get "lecture_name"}} is-invalid {{end}}"
+                               id="lecture_name"
+                               required
+                               autocomplete="off" type='text'
+                               name='lecture_name'
+                               value='{{$lecture.LectureName}}'>
+                        <div class="invalid-feedback">
+                            Please enter a value
+                        </div>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label for="active">Active</label>
+                    <select id="active" name="active" class="custom-select">
+                        <option value="0" {{if eq $lecture.Active 0}} selected {{end}}>No</option>
+                        <option value="1" {{if eq $lecture.Active 1}} selected {{end}}>Yes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="video_choice">Video:</label><br>
+                    <select class="form-control select-search" name="video_id" id="video_choice"
+                            style="width: 100% !important;">
+                        <option value="0" {{if eq $lecture.VideoID 0}} selected {{end}}>No video for this lecture
+                        </option>
+                        {{range .Videos}}
+                            <option value="{{.ID}}"
+                                    {{if eq .ID $lecture.VideoID}} selected {{end}}
+                            >{{.VideoName}}</option>
+                        {{end}}
+                    </select>
+                </div>
+
             </div>
 
-            <div class="form-group">
-                <label for="active">Active</label>
-                <select id="active" name="active" class="custom-select">
-                    <option value="0" {{if eq $lecture.Active 0}} selected {{end}}>No</option>
-                    <option value="1" {{if eq $lecture.Active 1}} selected {{end}}>Yes</option>
-                </select>
+            <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="form-group mt-3">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes"
+                              name="notes">{{- if ne $lecture.Notes "" -}}{{-  safeHTML $lecture.Notes -}}{{- end -}}</textarea>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="video_choice">Video:</label><br>
-                <select class="form-control select-search" name="video_id" id="video_choice" style="width: 100% !important;">
-                    <option value="0" {{if eq $lecture.VideoID 0}} selected {{end}}>No video for this lecture</option>
-                    {{range .Videos}}
-                        <option value="{{.ID}}"
-                        {{if eq .ID $lecture.VideoID}} selected {{end}}
-                        >{{.VideoName}}</option>
-                    {{end}}
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="notes">Notes</label>
-                <input id="notes" type="hidden" name="notes"
-                       value="{{- if ne $lecture.Notes "" -}}{{-  $lecture.Notes -}}{{- end -}}"
-                >
-                <trix-editor class="trix-content" input="notes"></trix-editor>
-            </div>
-
-
         </div>
+
         <div class="row">
             <div class="col">
                 <hr>
-
-                <a class="btn btn-primary" href="javascript:" onclick="saveClose()">Save</a>
-
+                <a class="btn btn-primary" id="submit" href="javascript:" onclick="saveClose()">Save</a>
                 <a class="btn btn-info"
                    href="/admin/courses/{{$course.ID}}">Cancel</a>
-
             </div>
         </div>
+
     </form>
 
 {{end}}
 
 {{define "js"}}
     {{$lecture := index .RowSets "lecture"}}
-
+    <script src="https://cdn.ckeditor.com/ckeditor5/21.0.0/classic/ckeditor.js"></script>
     <script src="/static/js/ts/tail.select.min.js"></script>
     <script>
         let videoChoice = document.getElementById("video_choice");
+        let editor;
+
+        ClassicEditor
+            .create(document.querySelector('#notes'))
+            .then(newEditor => {
+                editor = newEditor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
         document.addEventListener("DOMContentLoaded", function () {
             tail.select(".select-search", {
                 search: true,
             });
+
+
         });
 
         function saveClose() {
@@ -118,10 +135,12 @@
                 form.classList.add("was-validated");
                 return
             }
+            // const editorData = editor.getData();
+            // console.log("NOtes", editorData);
+            // document.getElementById("editor").value = editorData;
             form.classList.add("was-validated");
             form.submit();
         }
-
 
     </script>
 {{end}}
