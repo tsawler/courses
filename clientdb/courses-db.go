@@ -319,3 +319,25 @@ func (m *DBModel) UpdateLecture(c clientmodels.Lecture) error {
 
 	return nil
 }
+
+// UpdateLectureSortOrder updates sort order
+func (m *DBModel) UpdateLectureSortOrder(id, order int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		update lectures set 
+			sort_order = $1, 
+			updated_at = $2
+		where 
+			id = $3`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		order,
+		time.Now(),
+		id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

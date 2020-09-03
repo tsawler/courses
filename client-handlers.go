@@ -1,6 +1,7 @@
 package clienthandlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/tsawler/goblender/client/clienthandlers/clientmodels"
 	"github.com/tsawler/goblender/pkg/forms"
@@ -131,6 +132,12 @@ func AdminCourse(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// SortOrder is type for sorting
+type SortOrder struct {
+	ID    string `json:"id"`
+	Order int    `json:"order"`
+}
+
 // PostAdminCourse updates or adds a course
 func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 	courseID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
@@ -173,6 +180,23 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		course.ID = newID
+	}
+
+	//now do sort order
+	var sorted []SortOrder
+	sortList := r.Form.Get("sort_list")
+
+	err = json.Unmarshal([]byte(sortList), &sorted)
+	if err != nil {
+		app.ErrorLog.Println(err)
+	}
+
+	for _, v := range sorted {
+		lectureID, _ := strconv.Atoi(v.ID)
+		err := dbModel.UpdateLectureSortOrder(lectureID, v.Order)
+		if err != nil {
+			app.ErrorLog.Println(err)
+		}
 	}
 
 	action, _ := strconv.Atoi(r.Form.Get("action"))
