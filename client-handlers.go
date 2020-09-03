@@ -270,7 +270,6 @@ func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
 	videoID, _ := strconv.Atoi(r.Form.Get("video_id"))
 	active, _ := strconv.Atoi(r.Form.Get("active"))
 	notes := r.Form.Get("notes")
-	infoLog.Print("Notes are", notes)
 	lectureName := r.Form.Get("lecture_name")
 
 	var lecture clientmodels.Lecture
