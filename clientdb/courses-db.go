@@ -451,3 +451,39 @@ func (m *DBModel) UpdateCourseContent(c clientmodels.Course) error {
 
 	return nil
 }
+
+// GetNextPreviousLectures gets ids for next/previous buttons
+func (m *DBModel) GetNextPreviousLectures(courseID, lectureID int) (int, int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var next, previous int
+
+	query := `select coalesce(
+				(select id from lectures where sort_order > (select sort_order from lectures where id = $1) 
+				and course_id = $2 and active = 1 order by sort_order asc limit 1), 0);`
+
+	row := m.DB.QueryRowContext(ctx, query, lectureID, courseID)
+
+	err := row.Scan(&next)
+	if err != nil {
+		fmt.Println("Error getting course next lecture")
+		fmt.Println(err)
+		return 0, 0, err
+	}
+
+	query = `select coalesce(
+				(select id from lectures where sort_order < (select sort_order from lectures where id = $1) 
+				and course_id = $2 and active = 1 order by sort_order desc limit 1), 0);`
+
+	row = m.DB.QueryRowContext(ctx, query, lectureID, courseID)
+
+	err = row.Scan(&previous)
+	if err != nil {
+		fmt.Println("Error getting course previous lecture")
+		fmt.Println(err)
+		return 0, 0, err
+	}
+
+	return next, previous, nil
+}

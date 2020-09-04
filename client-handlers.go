@@ -117,9 +117,21 @@ func ShowLecture(w http.ResponseWriter, r *http.Request) {
 		PageTitle:   lecture.LectureName,
 	}
 
+	next, prev, err := dbModel.GetNextPreviousLectures(course.ID, lecture.ID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	intMap := make(map[string]int)
+	intMap["next"] = next
+	intMap["previous"] = prev
+
 	helpers.Render(w, r, "lecture.page.tmpl", &templates.TemplateData{
 		RowSets: rowSets,
 		Page:    pg,
+		IntMap:  intMap,
 	})
 }
 

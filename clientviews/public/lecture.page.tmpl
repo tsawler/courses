@@ -160,12 +160,11 @@
                 <h3>{{$lecture.LectureName}}</h3>
 
                 {{if gt $lecture.VideoID 0}}
-                <div class="embed-responsive embed-responsive-16by9">
-                    <iframe src="/embedded-video/{{$lecture.VideoID}}" width="560" height="315"
-                            frameborder="0"></iframe>
-                </div>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe src="/embedded-video/{{$lecture.VideoID}}" width="560" height="315"
+                                frameborder="0"></iframe>
+                    </div>
                 {{end}}
-
 
 
                 <div id="content_edit" class="is-wrapper">
@@ -173,22 +172,47 @@
                 </div>
                 <p>&nbsp;</p>
 
-                {{if or (ne $course.TeamsLink "") (ne $course.ProfEmail "")}}
-                    <div class="text-center">
-                        {{if ne $course.TeamsLink ""}}
-                            <a class="btn btn-outline-secondary text-dark" target="_blank" href="{{$course.TeamsLink}}">Microsoft
-                                Teams</a>
-                        {{end}}
-                        {{if ne $course.ProfEmail ""}}
-                            <a class="btn btn-outline-secondary text-dark" href="mailto:{{$course.ProfEmail}}?subject={{$course.CourseName}}: {{$lecture.LectureName}}">Email
-                                Professor</a>
+                <div class="d-flex justify-content-between">
+
+                    <div>
+                        {{if gt (index .IntMap "previous") 0}}
+                            <a class="btn btn-outline-secondary text-dark" href="/courses/lecture/{{index .IntMap "previous"}}">&laquo;</a>
+                        {{else}}
+                            &nbsp;
                         {{end}}
                     </div>
-                {{end}}
+
+                    {{if or (ne $course.TeamsLink "") (ne $course.ProfEmail "")}}
+                        <div class="text-center">
+                            {{if ne $course.TeamsLink ""}}
+                                <a class="btn btn-outline-secondary text-dark" target="_blank"
+                                   href="{{$course.TeamsLink}}">Microsoft
+                                    Teams</a>
+                            {{end}}
+                            {{if ne $course.ProfEmail ""}}
+                                <a class="btn btn-outline-secondary text-dark"
+                                   href="mailto:{{$course.ProfEmail}}?subject={{$course.CourseName}}: {{$lecture.LectureName}}">Email
+                                    Professor</a>
+                            {{end}}
+                        </div>
+                    {{else}}
+                        <div>&nbsp;</div>
+                    {{end}}
+
+                    <div>
+                        {{if gt (index .IntMap "next") 0}}
+                            <a class="btn btn-outline-secondary text-dark" href="/courses/lecture/{{index .IntMap "next"}}">&raquo;</a>
+                        {{else}}
+                            &nbsp;
+                        {{end}}
+                    </div>
+
+                </div>
 
                 <hr class="mt-3">
                 <div class="text-center">
-                    <a class="btn btn-outline-secondary text-dark" href="/courses/overview/{{$lecture.CourseID}}">Back to Course
+                    <a class="btn btn-outline-secondary text-dark" href="/courses/overview/{{$lecture.CourseID}}">Back
+                        to Course
                         Overview</a>
                 </div>
                 <p>&nbsp;</p>
@@ -215,7 +239,8 @@
 
                         <div class="col-3">
                             {{if gt .Page.ID 1}}
-                                <a class="btn btn-info mb5 btn-rounded text-white" href="/courses/lecture/{{$lecture.ID}}">Cancel</a>
+                                <a class="btn btn-info mb5 btn-rounded text-white"
+                                   href="/courses/lecture/{{$lecture.ID}}">Cancel</a>
                             {{else}}
                                 <a class="btn btn-info mb5 btn-rounded text-white" href="/">Cancel</a>
                             {{end}}
