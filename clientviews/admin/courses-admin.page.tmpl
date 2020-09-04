@@ -64,13 +64,15 @@
                                data-id="{{.ID}}"
                                id="sort_{{.ID}}"
                                     {{if eq .Active 0}}
-                                        style="background: lightgrey;"
+                                        style="background: lightgrey; border: 1px solid white"
+                                    {{else}}
+                                        style="background: #c1f9b7; border: 1px solid white;"
                                     {{end}}
                                href="/admin/courses/lecture/{{$course.ID}}/{{.ID}}">
                                 {{if eq .Active 1}}
                                     {{.LectureName}}
                                 {{else}}
-                                    {{.LectureName}} (inactive)
+                                    <em>{{.LectureName}} (inactive)</em>
                                 {{end}}
                             </a>
                         {{end}}
