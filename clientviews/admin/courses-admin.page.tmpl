@@ -111,7 +111,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-envelope fa-fw"></i></span>
                         </div>
-                        <input class="form-control required {{with .Form.Errors.Get "course_name"}} is-invalid {{end}}"
+                        <input class="form-control required {{with .Form.Errors.Get "prof_email"}} is-invalid {{end}}"
                                id="prof_email"
                                required
                                autocomplete="off" type='email'
@@ -119,6 +119,26 @@
                                value='{{$course.ProfEmail}}'>
                         <div class="invalid-feedback">
                             Please enter a valid email address
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="teams_link">MS Teams Link</label>
+                    {{with .Form.Errors.Get "prof_name"}}
+                        <label class='text-danger'>{{.}}</label>
+                    {{end}}
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-link fa-fw"></i></span>
+                        </div>
+                        <input class="form-control required {{with .Form.Errors.Get "teams_link"}} is-invalid {{end}}"
+                               id="teams_link"
+                               autocomplete="off" type='text'
+                               name='teams_link'
+                               value='{{$course.TeamsLink}}'>
+                        <div class="invalid-feedback">
+                            Please enter a value
                         </div>
                     </div>
                 </div>
