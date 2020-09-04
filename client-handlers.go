@@ -190,6 +190,9 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 		course.CourseName = r.Form.Get("course_name")
 		active, _ := strconv.Atoi(r.Form.Get("active"))
 		course.Active = active
+		course.ProfName = r.Form.Get("prof_name")
+		course.ProfEmail = r.Form.Get("prof_email")
+		course.TeamsLink = r.Form.Get("teams_link")
 		err = dbModel.UpdateCourse(course)
 		if err != nil {
 			errorLog.Println(err)

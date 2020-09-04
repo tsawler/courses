@@ -17,7 +17,9 @@ type DBModel struct {
 func (m *DBModel) AllCourses() ([]clientmodels.Course, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	stmt := "SELECT id, course_name, active, created_at, updated_at FROM Courses ORDER BY course_name"
+	stmt := `SELECT id, course_name, active, 
+		prof_name, prof_email, teams_link,
+		created_at, updated_at FROM Courses ORDER BY course_name`
 
 	rows, err := m.DB.QueryContext(ctx, stmt)
 	if err != nil {
@@ -29,7 +31,15 @@ func (m *DBModel) AllCourses() ([]clientmodels.Course, error) {
 
 	for rows.Next() {
 		var s clientmodels.Course
-		err = rows.Scan(&s.ID, &s.CourseName, &s.Active, &s.CreatedAt, &s.UpdatedAt)
+		err = rows.Scan(
+			&s.ID,
+			&s.CourseName,
+			&s.Active,
+			&s.ProfName,
+			&s.ProfEmail,
+			&s.TeamsLink,
+			&s.CreatedAt,
+			&s.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -47,7 +57,9 @@ func (m *DBModel) AllCourses() ([]clientmodels.Course, error) {
 func (m *DBModel) AllActiveCourses() ([]clientmodels.Course, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	stmt := "SELECT id, course_name, active, created_at, updated_at FROM courses where active = 1 ORDER BY course_name"
+	stmt := `SELECT id, course_name, active, 
+		prof_name, prof_email, teams_link,
+		created_at, updated_at FROM courses where active = 1 ORDER BY course_name`
 
 	rows, err := m.DB.QueryContext(ctx, stmt)
 	if err != nil {
@@ -59,7 +71,15 @@ func (m *DBModel) AllActiveCourses() ([]clientmodels.Course, error) {
 
 	for rows.Next() {
 		var s clientmodels.Course
-		err = rows.Scan(&s.ID, &s.CourseName, &s.Active, &s.CreatedAt, &s.UpdatedAt)
+		err = rows.Scan(
+			&s.ID,
+			&s.CourseName,
+			&s.Active,
+			&s.ProfName,
+			&s.ProfEmail,
+			&s.TeamsLink,
+			&s.CreatedAt,
+			&s.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +100,9 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 
 	var course clientmodels.Course
 
-	query := "select id, course_name, active, description, created_at, updated_at from courses where id = $1"
+	query := `select id, course_name, active, description, 
+		prof_name, prof_email, teams_link,
+		created_at, updated_at from courses where id = $1`
 
 	row := m.DB.QueryRowContext(ctx, query, id)
 
@@ -89,6 +111,9 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 		&course.CourseName,
 		&course.Active,
 		&course.Description,
+		&course.ProfName,
+		&course.ProfEmail,
+		&course.TeamsLink,
 		&course.CreatedAt,
 		&course.UpdatedAt,
 	)
@@ -147,7 +172,9 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 
 	var course clientmodels.Course
 
-	query := "select id, course_name, active, description, created_at, updated_at from courses where id = $1"
+	query := `select id, course_name, active, 
+		prof_name, prof_email, teams_link,
+		description, created_at, updated_at from courses where id = $1`
 
 	row := m.DB.QueryRowContext(ctx, query, id)
 
@@ -156,6 +183,9 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 		&course.CourseName,
 		&course.Active,
 		&course.Description,
+		&course.ProfName,
+		&course.ProfEmail,
+		&course.TeamsLink,
 		&course.CreatedAt,
 		&course.UpdatedAt,
 	)
@@ -249,9 +279,18 @@ func (m *DBModel) UpdateCourse(c clientmodels.Course) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `update courses set course_name = $1, active = $2, description = $3, updated_at = $4 where id = $5`
+	query := `update courses set course_name = $1, active = $2, description = $3, 
+		prof_name = $4, prof_email = $5, teams_link = $6, updated_at = $7 where id = $8`
 
-	_, err := m.DB.ExecContext(ctx, query, c.CourseName, c.Active, c.Description, time.Now(), c.ID)
+	_, err := m.DB.ExecContext(ctx, query,
+		c.CourseName,
+		c.Active,
+		c.Description,
+		c.ProfName,
+		c.ProfEmail,
+		c.TeamsLink,
+		time.Now(),
+		c.ID)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -266,10 +305,18 @@ func (m *DBModel) InsertCourse(c clientmodels.Course) (int, error) {
 
 	var newID int
 
-	query := `insert into courses (course_name, active, description, created_at, updated_at)
-			values ($1, $2, $3, $4, $5) returning id`
+	query := `insert into courses (course_name, active, description, prof_name, prof_email, teams_link, created_at, updated_at)
+			values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`
 
-	err := m.DB.QueryRowContext(ctx, query, c.CourseName, c.Active, c.Description, time.Now(), time.Now()).Scan(&newID)
+	err := m.DB.QueryRowContext(ctx, query,
+		c.CourseName,
+		c.Active,
+		c.Description,
+		c.ProfName,
+		c.ProfEmail,
+		c.TeamsLink,
+		time.Now(),
+		time.Now()).Scan(&newID)
 
 	if err != nil {
 		fmt.Println("Error inserting new course")

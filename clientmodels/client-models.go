@@ -12,6 +12,9 @@ type Course struct {
 	Active      int
 	Lectures    []Lecture
 	Description string
+	ProfName    string
+	ProfEmail   string
+	TeamsLink   string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
