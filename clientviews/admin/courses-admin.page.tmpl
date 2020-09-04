@@ -79,14 +79,6 @@
                 {{end}}
             </div>
 
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <div class="form-group mt-3">
-                    <label for="description">Description/Notes</label>
-                    <textarea id="description" name="description">
-                       {{- if ne $course.Description "" -}}{{-  $course.Description -}}{{- end -}}
-                </textarea>
-                </div>
-            </div>
         </div>
         <div class="row">
             <div class="col">
@@ -118,20 +110,9 @@
 {{end}}
 
 {{define "js"}}
-    <script src="https://cdn.ckeditor.com/ckeditor5/21.0.0/classic/ckeditor.js"></script>
     <script>
         let lectureList;
         let lectures;
-        let editor
-
-        ClassicEditor
-            .create(document.querySelector('#description'))
-            .then(newEditor => {
-                editor = newEditor;
-            })
-            .catch(error => {
-                console.error(error);
-            });
 
         document.addEventListener("DOMContentLoaded", function () {
             lectures = document.getElementById('lecture-list');

@@ -1,4 +1,4 @@
-{{define "vcms-edit-lecture-js"}}
+{{define "vcms-edit-course-js"}}
     <script src="/static/js/ace/ace.js"></script>
     <script>
         let editor = ace.edit("pageLevelCSSEditor");
@@ -52,7 +52,7 @@
             if (typeof (isWrapper) != 'undefined' && isWrapper != null) {
                 let ajax = new XMLHttpRequest();
                 ajax.responseType = "json";
-                ajax.open("GET", "/admin/courses/lecture/get-content/{{ .Page.ID}}");
+                ajax.open("GET", "/admin/courses/course/get-content/{{ .Page.ID}}");
                 ajax.send();
                 ajax.onreadystatechange = function () {
                     if (ajax.readyState === 4) {

@@ -75,13 +75,6 @@
 
             </div>
 
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <div class="form-group mt-3">
-                    <label for="notes">Notes</label>
-                    <textarea id="notes"
-                              name="notes">{{- if ne $lecture.Notes "" -}}{{-  safeHTML $lecture.Notes -}}{{- end -}}</textarea>
-                </div>
-            </div>
         </div>
 
         <div class="row">
@@ -99,20 +92,9 @@
 
 {{define "js"}}
     {{$lecture := index .RowSets "lecture"}}
-    <script src="https://cdn.ckeditor.com/ckeditor5/21.0.0/classic/ckeditor.js"></script>
     <script src="/static/js/ts/tail.select.min.js"></script>
     <script>
         let videoChoice = document.getElementById("video_choice");
-        let editor;
-
-        ClassicEditor
-            .create(document.querySelector('#notes'))
-            .then(newEditor => {
-                editor = newEditor;
-            })
-            .catch(error => {
-                console.error(error);
-            });
 
         document.addEventListener("DOMContentLoaded", function () {
             tail.select(".select-search", {

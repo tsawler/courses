@@ -58,8 +58,22 @@ func ShowCourse(w http.ResponseWriter, r *http.Request) {
 	rowSets := make(map[string]interface{})
 	rowSets["course"] = course
 
+	pg := models.Page{
+		ID:          course.ID,
+		AccessLevel: 2,
+		Active:      1,
+		SEOImage:    0,
+		MenuId:      0,
+		MenuColor:   "navbar-light",
+		HasSlider:   0,
+		Immutable:   1,
+		Content:     course.Description,
+		PageTitle:   course.CourseName,
+	}
+
 	helpers.Render(w, r, "course.page.tmpl", &templates.TemplateData{
 		RowSets: rowSets,
+		Page:    pg,
 	})
 }
 
@@ -174,7 +188,6 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 		}
 		course = c
 		course.CourseName = r.Form.Get("course_name")
-		course.Description = r.Form.Get("description")
 		active, _ := strconv.Atoi(r.Form.Get("active"))
 		course.Active = active
 		err = dbModel.UpdateCourse(course)
@@ -186,10 +199,9 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// inserting course
 		course.CourseName = r.Form.Get("course_name")
-		course.Description = r.Form.Get("description")
 		active, _ := strconv.Atoi(r.Form.Get("active"))
 		course.Active = active
-
+		course.Description = ""
 		newID, err := dbModel.InsertCourse(course)
 		if err != nil {
 			errorLog.Println(err)
@@ -286,7 +298,6 @@ func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
 
 	videoID, _ := strconv.Atoi(r.Form.Get("video_id"))
 	active, _ := strconv.Atoi(r.Form.Get("active"))
-	notes := r.Form.Get("notes")
 	lectureName := r.Form.Get("lecture_name")
 
 	var lecture clientmodels.Lecture
@@ -302,10 +313,10 @@ func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
 	lecture.CourseID = courseID
 	lecture.LectureName = lectureName
 	lecture.Active = active
-	lecture.Notes = notes
 	lecture.VideoID = videoID
 
 	if lectureID == 0 {
+		lecture.Notes = ""
 		_, err := dbModel.InsertLecture(lecture)
 		if err != nil {
 			errorLog.Print(err)
@@ -325,6 +336,7 @@ func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/admin/courses/%d", courseID), http.StatusSeeOther)
 }
 
+// GetLectureContentJSON gets html (notes) for lecture on edit page
 func GetLectureContentJSON(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
 	lecture, err := dbModel.GetLecture(id)
@@ -350,6 +362,7 @@ func GetLectureContentJSON(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// SaveLecture saves lecture html (notes)
 func SaveLecture(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -379,4 +392,62 @@ func SaveLecture(w http.ResponseWriter, r *http.Request) {
 
 	app.Session.Put(r.Context(), "flash", "Lecture successfully updated!")
 	http.Redirect(w, r, fmt.Sprintf("/courses/lecture/%d", id), http.StatusSeeOther)
+}
+
+// GetCourseContentJSON gets html (description) for course on edit page
+func GetCourseContentJSON(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
+	course, err := dbModel.GetCourse(id)
+	if err != nil {
+		errorLog.Println(err)
+		return
+	}
+
+	theData := handlers.PageContentJSON{
+		OK:      true,
+		Content: template.HTML(course.Description),
+	}
+
+	out, err := json.MarshalIndent(theData, "", "    ")
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(out)
+	if err != nil {
+		app.ErrorLog.Println(err)
+	}
+}
+
+// SaveCourse saves course html (description)
+func SaveCourse(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		app.ErrorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	id, _ := strconv.Atoi(r.Form.Get("page_id"))
+	pageContent := r.Form.Get("thedata")
+
+	course, err := dbModel.GetCourse(id)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	course.Description = pageContent
+
+	err = dbModel.UpdateCourseContent(course)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	app.Session.Put(r.Context(), "flash", "Lecture successfully updated!")
+	http.Redirect(w, r, fmt.Sprintf("/courses/overview/%d", id), http.StatusSeeOther)
 }

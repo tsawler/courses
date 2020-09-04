@@ -155,23 +155,21 @@
 {{end}}
 
 {{define "content"}}
-
-
+    {{$course := index .RowSets "course"}}
+    <div id="content_edit" class="is-wrapper">
+        {{safeHTML $course.Description}}
+    </div>
 
 {{end}}
 
 {{define "body"}}
+    {{$course := index .RowSets "course"}}
     <div class="clearfix"></div>
     <div class="container">
         <div class="row">
             <div class="col">
                 <p>&nbsp;</p>
-                {{$course := index .RowSets "course"}}
-                <h1>{{$course.CourseName}}</h1>
-                <hr>
-                {{safeHTML $course.Description}}
-                <hr>
-                <h2>Lectures</h2>
+                <h2 class="mt-3">Lectures</h2>
                 <div class="list-group">
                     {{range $course.Lectures}}
                         <a class="list-group-item list-group-item-action" href="/courses/lecture/{{.ID}}">{{.LectureName}}</a>
@@ -228,7 +226,7 @@
     {{ .Page.JS}}
 
     {{if .IsAuthenticated}}
-        <form method="post" name="hiddensavepage" id="hiddensavepage" action="/admin/pages/ajax/savepage">
+        <form method="post" name="hiddensavepage" id="hiddensavepage" action="/admin/courses/course/ajax/savecourse">
             <input type="hidden" name="page_id" value="{{.Page.ID}}" id="hidden_page_id">
             <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
             <input type="hidden" name="thedata" id="hidden_thedata">
@@ -255,9 +253,7 @@
 
             {{if hasRole "pages" .Auth.ID}}
                 {{template "css-js-modal" .}}
-                {{template "vcms-edit-page-js" .}}
-                {{template "slider-modal" .}}
-                {{template "slider-text-modal" .}}
+                {{template "vcms-edit-course-js" .}}
                 {{template "menu-custom-modal" .}}
                 {{template "open-graph-page-modal" .}}
                 <script>
