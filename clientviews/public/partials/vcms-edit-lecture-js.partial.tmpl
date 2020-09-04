@@ -1,0 +1,631 @@
+{{define "vcms-edit-lecture-js"}}
+    <script src="/static/js/ace/ace.js"></script>
+    <script>
+        let editor = ace.edit("pageLevelCSSEditor");
+        let editor2 = ace.edit("pageLevelJSEditor");
+
+        function enableContentEdit() {
+            let hide = document.getElementsByClassName("hide-on-edit");
+            for (let i = 0; i < hide.length; i++) {
+                hide[i].style.display = "none";
+            }
+            document.getElementById("bottomSaveBar").classList.remove("d-none");
+
+            document.getElementById("content_edit").classList.add('mt-5', 'pt-5');
+            $(".is-wrapper").contentbox({
+                container: '.container',
+                row: 'row',
+                cols: ['col-md-1', 'col-md-2', 'col-md-3', 'col-md-4', 'col-md-5', 'col-md-6', 'col-md-7', 'col-md-8', 'col-md-9', 'col-md-10', 'col-md-11', 'col-md-12'],
+                framework: 'bootstrap',
+                snippetData: '/static/assets/minimalist-blocks/snippetlist.html',
+                scriptPath: '/static/contentbuilder/',
+                assetPath: '/static/assets/',
+                fontAssetPath: '/static/assets/fonts/',
+                toolbarDisplay: 'always',
+                toolbar: 'top',
+                coverImageHandler: '/admin/pages/ajax/save-cb-cover-image',
+                modulePath: '/static/assets/modules/',
+                designPath: '/static/assets/designs/',
+                contentStylePath: '/static/assets/styles/',
+                iconselect: '/static/assets/ionicons/selecticon-dark.html',
+                fileselect: '/admin/pages/file-manager',
+                imageselect: '/admin/pages/image-manager',
+                buttons: ['bold', 'italic', 'underline', 'formatting', 'color', 'align', 'textsettings', 'createLink', 'tags', 'list', 'more', '|', 'undo', 'redo'],
+                buttonsMore: ['icon', 'image', '|', 'list', 'font', 'formatPara', '|', 'html', 'preferences'],
+                elementButtons: ['left', 'center', 'right', 'full', 'list', 'more', '|', 'undo', 'redo'],
+                elementButtonsMore: ['|', 'html', 'preferences'],
+                {{if ne (index .Auth.Preferences "advanced-editing") "1"}}
+                columnHtmlEditor: false,
+                rowHtmlEditor: false,
+                {{end}}
+                snippetPathReplace: ['assets/minimalist-blocks/', '/static/assets/minimalist-blocks/'],
+                moduleConfig: [{
+                    "moduleSaveImageHandler": "/admin/save-cb-image"
+                }],
+                useSidebar: true,
+                enableContentStyle: true,
+            });
+        }
+
+        function makePageEditable() {
+            let isWrapper = document.getElementsByClassName('is-wrapper') [0];
+            if (typeof (isWrapper) != 'undefined' && isWrapper != null) {
+                let ajax = new XMLHttpRequest();
+                ajax.responseType = "json";
+                ajax.open("GET", "/admin/courses/lecture/get-content/{{ .Page.ID}}");
+                ajax.send();
+                ajax.onreadystatechange = function () {
+                    if (ajax.readyState === 4) {
+                        let json = ajax.response;
+                        if (json.ok) {
+                            document.getElementById("content_edit").innerHTML = json.content;
+                            enableContentEdit();
+                        } else {
+                            attention.alert({
+                                icon: 'error',
+                                html: "Cannot get content for edit!",
+                            })
+                        }
+                    }
+                };
+            }
+        }
+
+        function saveEditedPage() {
+            if (document.getElementById("thetitledata").value === "") {
+                attention.alert({icon: "error", html: "You must give the page a name!"})
+                $("#edit-page-details").modal({backdrop: true});
+                return false;
+            }
+
+            Swal.fire({
+                html: 'Saving Changes...',
+                timer: 5000,
+                timerProgressBar: true,
+                onBeforeOpen: () => {
+                    Swal.showLoading()
+                }
+            })
+
+            // figure out what fonts we need to add to this page, if any
+            let sMainCss = $('#content_edit').data('contentbox').mainCss();
+            let sSectionCss = $('#content_edit').data('contentbox').sectionCss();
+            let customCSS = sMainCss + sSectionCss;
+            document.getElementById("hidden_page_styles").value = customCSS;
+
+            $("#content_edit").saveimages({
+                customval: document.querySelector('meta[name="csrf-token"]').content,
+                handler: '/admin/cms/uploadimages',
+                onComplete: function () {
+                    document.getElementById("hidden_active").value = document.getElementById("active").value;
+                    document.getElementById("hidden_meta").value = document.getElementById("meta").value;
+                    document.getElementById("hidden_meta_tags").value = document.getElementById("meta_tags").value;
+                    if (document.getElementById("slider")) {
+                        document.getElementById("hidden_has_slider").value = document.getElementById("slider").value;
+                    } else {
+                        document.getElementById("hidden_has_slider").value = 0;
+                    }
+                    document.getElementById("hidden_thedata").value = $('.is-wrapper').data('contentbox').html();
+                    document.getElementById("hidden_thetitledata").value = document.getElementById("thetitledata").value;
+                    document.getElementById("hidden_access_level").value = document.getElementById("access_level").value;
+                    document.getElementById("hidden_menu_bg_color").value = document.getElementById("menu_bg_color").value;
+                    document.getElementById("hiddensavepage").submit();
+                }
+            });
+            $("#content_edit").data('saveimages').save();
+            document.getElementById("bottomSaveBar").classList.add('d-none');
+        }
+
+        function createId() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (let i = 0; i < 10; i++) {
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return text;
+        }
+
+        function deletePage() {
+            attention.confirm({
+                html: "Are you sure you want to delete this page?",
+                icon: "warning",
+                callback: function (result) {
+                    if (result !== false) {
+                        window.location.href = '/admin/delete-page/{{.Page.ID}}'
+                    }
+                },
+            })
+        }
+
+        function showMenuOptions() {
+            var options = {backdrop: false,};
+            $('#menuSettingsModal').modal(options);
+        }
+
+        function showOpenGraphModal() {
+            var options = {backdrop: false,};
+            $('#openGraphModal').modal(options);
+        }
+
+        function setPageMenuSettings() {
+            document.getElementById("hidden_menu_bg_color").value = document.getElementById("menu_bg_color").value;
+            document.getElementById("hidden_menu_transparent").value = document.getElementById("menu_transparent").value;
+        }
+
+        function openCSSModal() {
+            var options = {backdrop: false,};
+            editor.setTheme("ace/theme/dreamweaver");
+            editor.getSession().setMode("ace/mode/html");
+            editor.setValue($("#pageLevelCSS").val());
+            $('#pageCSSModal').modal(options);
+        }
+
+        function openJSModal() {
+            let options = {backdrop: false,};
+            editor2.setTheme("ace/theme/dreamweaver");
+            editor2.getSession().setMode("ace/mode/html");
+            let js = atob($("#hidden_page_js").val());
+            editor2.setValue(js);
+            $('#pageJSModal').modal(options);
+        }
+
+        function savePageJS() {
+            document.getElementById("hidden_page_js").value = btoa(editor2.getValue());
+        }
+
+        function savePageCSS() {
+            document.getElementById("hidden_page_css").value = btoa(editor.getValue());
+        }
+
+        function uploadSliderImage() {
+            let img = new Image();
+            let fileInput = document.getElementById("uploadedImage");
+            let file = fileInput.files && fileInput.files[0];
+
+            img.src = window.URL.createObjectURL(file);
+
+            img.onload = function () {
+                let width = img.naturalWidth;
+                let height = img.naturalHeight;
+                window.URL.revokeObjectURL(img.src);
+
+                if (width >= 1200 && height >= 565) {
+                    document.getElementById("button-addon2").innerHTML = "<i class=\"fa fa-refresh fa-spin fa-fw\"></i>";
+
+                    let form = document.forms.namedItem("sliderform");
+                    let formData = new FormData(form);
+                    formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
+
+                    let ajax = new XMLHttpRequest();
+                    ajax.responseType = "json";
+                    ajax.open("POST", "/admin/pages/ajax/upload-slider-image");
+                    ajax.send(formData);
+                    ajax.onreadystatechange = function () {
+                        if ((ajax.readyState === 4) && (ajax.status === 200)) {
+                            let resp = ajax.response;
+                            let json = JSON.parse(JSON.stringify(resp));
+                            if (!json.ok) {
+                                errorAlert("Errors: " + json.message);
+                            } else {
+                                document.getElementById("slider_id").value = json.slider_id
+                                $("#uploadProgressModal").modal('hide');
+                                document.getElementById("button-addon2").innerHTML = "<i class='fa fa-upload'></i>";
+                                refreshSliderImages();
+                            }
+                        }
+                    };
+                } else {
+                    attention.alert({
+                        icon: 'error',
+                        html: "Your image is too small. It must be at least 1200 px by 565 px",
+                    })
+                    return false;
+                }
+            }
+        }
+
+        function progressHandler(event) {
+            var percent = (event.loaded / event.total) * 100;
+            document.getElementById("progress-slider").setAttribute("aria-valuenow", Math.round(percent));
+            document.getElementById("progress-slider").setAttribute("style", 'width: ' + Math.round(percent) + '%;');
+        }
+
+        function errorHandler(event) {
+            $("#uploadProgressModal").modal('hide');
+            errorAlert('Upload error!');
+        }
+
+        function abortHandler(event) {
+            $("#uploadProgressModal").modal('hide');
+            errorAlert('An error occurred!');
+        }
+
+        function refreshSliderImages() {
+            let ajax = new XMLHttpRequest();
+            ajax.responseType = "json";
+            ajax.open("get", "/admin/pages/ajax/refresh-slider-images?slider_id=" + document.getElementById("slider_id").value);
+            ajax.send();
+            ajax.onreadystatechange = function () {
+                if ((ajax.readyState === 4) && (ajax.status === 200)) {
+                    let resp = ajax.response;
+                    let json = JSON.parse(JSON.stringify(resp));
+
+                    let html = "";
+                    json.forEach(function (item) {
+                        if (item.is_video === 0) {
+                            html += '<li class="list-inline-item" data-id="' + item.id + '"><img style="max-width: 100px" id="slider_image_' + item.id + '" src="/static/site-content/sliders/{{.Page.ID}}/thumb-' + item.thumbnail
+                                + '" class="img img-responsive" data-src="/static/site-content/sliders/{{.Page.ID}}/md-' + item.thumbnail + '" style="max-width: 100px">';
+                        } else {
+                            html += '<li class="list-inline-item" data-id="' + item.id + '"><img style="max-width: 100px" id="slider_image_' + item.id + '" src="/static/site-content/videos/' + item.thumbnail
+                                + '" class="img img-responsive" data-src="/static/site-content/videos/' + item.thumbnail + '" style="max-width: 150px">'
+                        }
+                        html += '<br><a href="#!" onclick="deleteSliderImage('
+                            + item.id + ')"><i class="fa fa-trash"></i></a> ';
+                        if (item.inactive == 1) {
+                            html += ' <span class="text-danger">Inactive</span> ';
+                        }
+                        html += '<a href="#!" onclick="editSliderTitle(' + item.id + ')"><i class="fa fa-pencil-square-o"></i></a> '
+                            + '<input type="hidden" name="title_' + item.id + '" value="' + item.title + '" id="title_' + item.id + '">'
+                            + '<input type="hidden" name="subtitle_' + item.id + '" value="' + item.subtitle + '" id="subtitle_' + item.id + '">'
+                            + '<input type="hidden" name="button_text_' + item.id + '" value="' + item.button_text + '" id="button_text_' + item.id + '">'
+                            + '<input type="hidden" name="button_url_' + item.id + '" value="' + item.button_url + '" id="button_url_' + item.id + '">'
+                            + '<input type="hidden" name="button_style_' + item.id + '" value="' + item.button_style + '" id="button_style_' + item.id + '">'
+                            + '<input type="hidden" name="title_color_' + item.id + '" value="' + item.title_color + '" id="title_color_' + item.id + '">'
+                            + '<input type="hidden" name="subtitle_color_' + item.id + '" value="' + item.subtitle_color + '" id="subtitle_color_' + item.id + '">'
+                            + '<input type="hidden" name="title_shadow_' + item.id + '" value="' + item.title_shadow + '" id="title_shadow_' + item.id + '">'
+                            + '<input type="hidden" name="subtitle_shadow_' + item.id + '" value="' + item.subtitle_shadow + '" id="subtitle_shadow_' + item.id + '">'
+                            + '<input type="hidden" name="new_window_' + item.id + '" value="' + item.new_window + '" id="new_window_' + item.id + '">'
+                            + '<input type="hidden" name="is_video_' + item.id + '" value="' + item.is_video + '" id="is_video_' + item.id + '">'
+                            + '<input type="hidden" name="video_id_' + item.id + '" value="' + item.video_id + '" id="video_id_' + item.id + '">'
+                            + '<input type="hidden" name="duration_' + item.id + '" value="' + item.duration + '" id="duration_' + item.id + '">'
+                            + '<input type="hidden" name="overlay_' + item.id + '" value="' + item.overlay + '" id="overlay_' + item.id + '">'
+                            + '<input type="hidden" name="slide_active_' + item.id + '" value="' + item.active + '" id="slide_active_' + item.id + '">'
+                            + '<input type="hidden" name="background_video_' + item.id + '" value="' + item.background_video + '" id="background_video_' + item.id + '">'
+                            + '<input type="hidden" name="vposition_' + item.id + '" value="' + item.vposition + '" id="vposition_' + item.id + '">'
+                            + '<input type="hidden" name="hposition_' + item.id + '" value="' + item.hposition + '" id="hposition_' + item.id + '">'
+
+                            + '</li>';
+                    });
+                    document.getElementById("slider_images").innerHTML = html;
+                    updateSliderSortOrder();
+                }
+            }
+        }
+
+
+        function saveSlider() {
+            let formData = new FormData();
+            formData.append('slider_id', document.getElementById("slider_id").value);
+            formData.append('page_id', document.getElementById("hidden_page_id").value);
+            formData.append('transition_type', document.getElementById("transition_type").value);
+            formData.append('delay', document.getElementById("slider_delay").value);
+            formData.append('pause_on_hover', document.getElementById("pause_on_hover").value);
+            formData.append('show_indicators', document.getElementById("show_indicators").value);
+            formData.append('sort_order', document.getElementById("slider_images_sort_order").value);
+            formData.append('slider_height', "0");
+            formData.append('slider_width', document.getElementById("slider_width").value);
+            formData.append('csrf_token', {{.CSRFToken}});
+
+            let ajax = new XMLHttpRequest();
+            ajax.responseType = "json";
+            ajax.open("POST", "/admin/pages/ajax/save-slider");
+            ajax.send(formData);
+
+            ajax.onreadystatechange = function () {
+                if ((ajax.readyState === 4) && (ajax.status === 200)) {
+                    let resp = ajax.response;
+                    let json = JSON.parse(JSON.stringify(resp));
+                    if (json.ok) {
+                        document.getElementById("slider_id").value = json.slider_id;
+                        $('#sliderModal').modal('hide');
+                    } else {
+                        attention.alert({
+                            icon: 'error',
+                            html: json.message,
+                        })
+                    }
+                } else if ((ajax.readyState === 4) && (ajax.status !== 200)) {
+                    errorAlert("Something went wrong");
+                }
+            }
+        }
+
+        function updateSliderSortOrder() {
+            var a = {};
+            $("#slider_images li").each(function (i, el) {
+                a[$(el).data('id')] = $(el).index() + 1;
+            });
+            sorteda = JSON.stringify(a);
+            $("#slider_images_sort_order").val(sorteda);
+        }
+
+
+        function sortSlider() {
+            $("#slider_images").sortable().bind('sortupdate', function (event, ui) {
+                var a = {};
+                $("#slider_images li").each(function (i, el) {
+                    a[$(el).data('id')] = $(el).index() + 1;
+                });
+                sorteda = JSON.stringify(a);
+                $("#slider_images_sort_order").val(sorteda);
+            });
+        }
+
+
+        $(document).ajaxSuccess(function () {
+            if ($("#slider_images").hasClass('ui-sortable')) {
+                $("#slider_images").sortable("destroy");
+            }
+            $("#slider_images").sortable().bind('sortupdate', function (event, ui) {
+                var a = {};
+                $("#slider_images li").each(function (i, el) {
+                    a[$(el).data('id')] = $(el).index() + 1;
+                });
+                sorteda = JSON.stringify(a);
+                $("#slider_images_sort_order").val(sorteda);
+            });
+            var a = {};
+            $("#slider_images li").each(function (i, el) {
+                a[$(el).data('id')] = $(el).index() + 1;
+            });
+            sorteda = JSON.stringify(a);
+            $("#slider_images_sort_order").val(sorteda);
+
+            $(".modal").on('hidden.bs.modal', function () {
+                $(this).data('bs.modal', null);
+            });
+        });
+
+        function deleteSliderImage(x) {
+            attention.confirm({
+                html: "Are you sure you want to delete this image?",
+                icon: 'warning',
+                callback: function (result) {
+                    console.log("checking " + x);
+                    if (result !== false) {
+                        let ajax = new XMLHttpRequest();
+                        ajax.responseType = "json";
+                        ajax.open("GET", "/admin/pages/ajax/delete-slider-image?id=" + x);
+                        ajax.send();
+
+                        ajax.onreadystatechange = function (result) {
+
+                            if ((ajax.readyState === 4) && (ajax.status === 200)) {
+                                let resp = ajax.response;
+                                let json = JSON.parse(JSON.stringify(resp));
+                                if (json.ok) {
+                                    refreshSliderImages();
+                                } else {
+                                    attention.alert({
+                                        icon: 'error',
+                                        html: json.message,
+                                    })
+                                }
+                            } else if ((ajax.readyState === 4) && (ajax.status !== 200)) {
+                                let resp = ajax.response;
+                                let json = JSON.parse(JSON.stringify(resp));
+                                attention.alert({
+                                    icon: 'error',
+                                    html: json.message,
+                                })
+                            }
+                        }
+                    }
+                }
+            })
+        }
+
+        function removeClassesFromPreviewButton() {
+            document.getElementById("demo-btn").classList.remove('btn-light', 'btn-dark', 'btn-primary',
+                'btn-warning', 'btn-danger', 'btn-secondary', 'btn-success', 'btn-outline-light', 'btn-outline-dark',
+                'btn-outline-primary', 'btn-outline-warning',
+                'btn-outline-danger', 'btn-outline-success', 'btn-outline-secondary');
+        }
+
+        function editSliderTitle(x) {
+            let demoTitle = document.getElementById("demo-title");
+            let demosubTitle = document.getElementById("demo-subtitle");
+            let demoBtn = document.getElementById("demo-btn");
+            let demoSliderText = document.getElementById("demo-slider-text")
+
+            document.getElementById("hidden_slider_id").value = x;
+            document.getElementById("current_slider_image_id").value = x;
+            document.getElementById("slider_title").value = document.getElementById("title_" + x).value;
+            document.getElementById("slider_subtitle").value = document.getElementById("subtitle_" + x).value;
+            document.getElementById("button_text").value = document.getElementById("button_text_" + x).value;
+            document.getElementById("button_style").value = document.getElementById("button_style_" + x).value;
+            document.getElementById("button_url").value = document.getElementById("button_url_" + x).value;
+            removeClassesFromPreviewButton();
+            demoBtn.classList.add(document.getElementById("button_style_" + x).value);
+            document.getElementById("new_window").value = document.getElementById("new_window_" + x).value;
+            document.getElementById("duration").value = document.getElementById("duration_" + x).value;
+            document.getElementById("overlay").value = document.getElementById("overlay_" + x).value;
+            document.getElementById("background_video").value = document.getElementById("background_video_" + x).value;
+            document.getElementById("slide_active").value = document.getElementById("slide_active_" + x).value;
+            document.getElementById("hposition").value = document.getElementById("hposition_" + x).value;
+            document.getElementById("vposition").value = document.getElementById("vposition_" + x).value;
+            document.getElementById("title_shadow").value = document.getElementById("title_shadow_" + x).value;
+            document.getElementById("subtitle_shadow").value = document.getElementById("subtitle_shadow_" + x).value;
+
+            if (document.getElementById("title_shadow_" + x).value === "1") {
+                demoTitle.classList.add('outline-text');
+            }
+
+            if (document.getElementById("subtitle_shadow_" + x).value === "1") {
+                demosubTitle.classList.add('outline-text');
+            }
+
+            let textPosition = "slider-preview-" + document.getElementById("vposition").value + "-" + document.getElementById("hposition").value;
+            demoSliderText.classList.add(textPosition);
+
+
+            let titleColor = document.getElementById("title_color_" + x).value;
+            let subtitleColor = document.getElementById("subtitle_color_" + x).value;
+
+            document.getElementById("title_color_text").value = titleColor;
+            document.getElementById("subtitle_color_text").value = subtitleColor;
+            document.getElementById("current_image_for_text").setAttribute('src', document.getElementById("slider_image_" + x).dataset.src);
+
+            demoTitle.innerHTML = document.getElementById("title_" + x).value;
+            demosubTitle.innerHTML = document.getElementById("subtitle_" + x).value;
+            demoBtn.innerHTML = document.getElementById("button_text_" + x).value;
+            demoTitle.setAttribute('style', 'color:' + document.getElementById("title_color_text").value)
+            demosubTitle.setAttribute('style', 'color:' + document.getElementById("subtitle_color_text").value)
+
+            if (document.getElementById("is_video_" + x).value === "1") {
+                document.getElementById("overlay").removeAttribute("disabled");
+                document.getElementById("background_video").removeAttribute("disabled");
+            } else {
+                document.getElementById("overlay").setAttribute("disabled", "disabled");
+                document.getElementById("background_video").setAttribute("disabled", "disabled");
+            }
+
+            if (demoBtn.innerHTML.length === 0) {
+                demoBtn.classList.add("d-none");
+            } else {
+                demoBtn.classList.remove("d-none");
+                demoBtn.innerHTML = document.getElementById("button_text").value;
+            }
+
+            let sliderTitle = document.getElementById("slider_title");
+            let slidersubTitle = document.getElementById("slider_subtitle");
+            let buttonText = document.getElementById("button_text");
+            let excludeKeyPresses = ["shift", "delete", "tab"];
+
+            sliderTitle.addEventListener("keyup", function (ev) {
+                if (ev.key.toLowerCase() === "backspace") {
+                    demoTitle.innerHTML = sliderTitle.value;
+                } else if (!excludeKeyPresses.includes(ev.key.toLowerCase())) {
+                    demoTitle.innerHTML = sliderTitle.value;
+                }
+            });
+
+            slidersubTitle.addEventListener("keyup", function (ev) {
+                if (ev.key.toLowerCase() === "backspace") {
+                    demosubTitle.innerHTML = slidersubTitle.value;
+                } else if (!excludeKeyPresses.includes(ev.key.toLowerCase())) {
+                    demosubTitle.innerHTML = slidersubTitle.value;
+                }
+            });
+
+            buttonText.addEventListener("keyup", function (ev) {
+                if (ev.key.toLowerCase() === "backspace") {
+                    demoBtn.innerText = buttonText.value;
+                } else if (!excludeKeyPresses.includes(ev.key.toLowerCase())) {
+                    demoBtn.innerText = buttonText.value;
+                }
+                if (buttonText.value.length === 0) {
+                    demoBtn.classList.add("d-none");
+                } else {
+                    if (demoBtn.classList.contains("d-none")) {
+                        demoBtn.classList.remove("d-none");
+                    }
+                }
+            });
+
+            document.getElementById("button_style").addEventListener("change", function (ev) {
+                removeClassesFromPreviewButton();
+                demoBtn.classList.add(this.value);
+            })
+
+            document.getElementById("title_color_text").addEventListener("change", function (ev) {
+                demoTitle.setAttribute("style", "color:" + this.value);
+            })
+
+            document.getElementById("subtitle_color_text").addEventListener("change", function (ev) {
+                demosubTitle.setAttribute("style", "color:" + this.value);
+            })
+
+            document.getElementById("title_shadow").addEventListener("change", function (ev) {
+                if (this.value === "1") {
+                    demoTitle.classList.add("outline-text");
+                } else {
+                    demoTitle.classList.remove("outline-text");
+                }
+            })
+
+            document.getElementById("subtitle_shadow").addEventListener("change", function (ev) {
+                if (this.value === "1") {
+                    demosubTitle.classList.add("outline-text");
+                } else {
+                    demosubTitle.classList.remove("outline-text");
+                }
+            })
+
+            document.getElementById("hposition").addEventListener("change", function (ev) {
+                removePositionClasses();
+                let textPosition = "slider-preview-" + document.getElementById("vposition").value
+                    + "-"
+                    + document.getElementById("hposition").value;
+                demoSliderText.classList.add(textPosition);
+            });
+
+            document.getElementById("vposition").addEventListener("change", function (ev) {
+                removePositionClasses();
+                let textPosition = "slider-preview-" + document.getElementById("vposition").value
+                    + "-"
+                    + document.getElementById("hposition").value;
+                demoSliderText.classList.add(textPosition);
+            });
+
+            var options = {backdrop: false,};
+            $('#sliderTextModal').modal(options);
+        }
+
+        function removePositionClasses() {
+            document.getElementById("demo-slider-text").classList.remove(
+                "slider-preview-top-right", "slider-preview-top-center", "slider-preview-top-left",
+                "slider-preview-center-right", "slider-preview-center-center", "slider-preview-center-left",
+                "slider-preview-bottom-right", "slider-preview-bottom-center", "slider-preview-bottom-left");
+        }
+
+        function saveSliderText() {
+            let x = document.getElementById("hidden_slider_id").value;
+            let formData = new FormData();
+            formData.append("id", x);
+            formData.append('csrf_token', {{.CSRFToken}});
+            formData.append("title", document.getElementById("slider_title").value);
+            formData.append("subtitle", document.getElementById("slider_subtitle").value);
+            formData.append("button_text", document.getElementById("button_text").value);
+            formData.append("button_url", document.getElementById("button_url").value);
+            formData.append("button_style", document.getElementById("button_style").value);
+            formData.append("title_color", document.getElementById("title_color_text").value);
+            formData.append("subtitle_color", document.getElementById("subtitle_color_text").value);
+            formData.append("title_shadow", document.getElementById("title_shadow").value);
+            formData.append("subtitle_shadow", document.getElementById("subtitle_shadow").value);
+            formData.append("new_window", document.getElementById("new_window").value);
+            formData.append("duration", document.getElementById("duration").value);
+            formData.append("overlay", document.getElementById("overlay").value);
+            formData.append("background_video", document.getElementById("background_video").value);
+            formData.append("active", document.getElementById("slide_active").value);
+            formData.append("vposition", document.getElementById("vposition").value);
+            formData.append("hposition", document.getElementById("hposition").value);
+
+            let ajax = new XMLHttpRequest();
+            ajax.responseType = "json";
+            ajax.open("POST", "/admin/pages/ajax/update-slider-text");
+            ajax.send(formData);
+
+            ajax.onreadystatechange = function () {
+                if ((ajax.readyState === 4) && (ajax.status === 200)) {
+                    let resp = ajax.response;
+                    let json = JSON.parse(JSON.stringify(resp));
+                    if (json.ok) {
+                        $("#sliderTextModal").modal('hide');
+                        document.getElementById("demo-btn").classList.add('d-none');
+                        refreshSliderImages();
+                    } else {
+                        attention.alert({
+                            icon: 'error',
+                            html: json.message,
+                        })
+                    }
+                } else if ((ajax.readyState === 4) && (ajax.status !== 200)) {
+                    errorAlert("Something went wrong");
+                }
+            }
+        }
+
+    </script>
+{{end}}

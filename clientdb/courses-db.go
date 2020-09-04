@@ -368,3 +368,21 @@ func (m *DBModel) UpdateLectureSortOrder(id, order int) error {
 	}
 	return nil
 }
+
+// UpdateLecture updates a course lecture content (notes)
+func (m *DBModel) UpdateLectureContent(c clientmodels.Lecture) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `update lectures set notes = $1, updated_at = $2 where id = $3`
+
+	_, err := m.DB.ExecContext(ctx, query, c.Notes, time.Now(), c.ID)
+
+	if err != nil {
+		fmt.Println("Error updating course lecture")
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
+}

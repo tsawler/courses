@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"github.com/tsawler/goblender/client/clienthandlers/clientmodels"
 	"github.com/tsawler/goblender/pkg/forms"
+	"github.com/tsawler/goblender/pkg/handlers"
 	"github.com/tsawler/goblender/pkg/helpers"
+	"github.com/tsawler/goblender/pkg/models"
 	"github.com/tsawler/goblender/pkg/templates"
+	"html/template"
 	"net/http"
 	"strconv"
 )
@@ -79,8 +82,22 @@ func ShowLecture(w http.ResponseWriter, r *http.Request) {
 	rowSets := make(map[string]interface{})
 	rowSets["lecture"] = lecture
 
+	pg := models.Page{
+		ID:          lecture.ID,
+		AccessLevel: 2,
+		Active:      1,
+		SEOImage:    0,
+		MenuId:      0,
+		MenuColor:   "navbar-light",
+		HasSlider:   0,
+		Immutable:   1,
+		Content:     lecture.Notes,
+		PageTitle:   lecture.LectureName,
+	}
+
 	helpers.Render(w, r, "lecture.page.tmpl", &templates.TemplateData{
 		RowSets: rowSets,
+		Page:    pg,
 	})
 }
 
@@ -306,4 +323,60 @@ func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
 	}
 	session.Put(r.Context(), "flash", "Changes saved")
 	http.Redirect(w, r, fmt.Sprintf("/admin/courses/%d", courseID), http.StatusSeeOther)
+}
+
+func GetLectureContentJSON(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
+	lecture, err := dbModel.GetLecture(id)
+	if err != nil {
+		errorLog.Println(err)
+		return
+	}
+
+	theData := handlers.PageContentJSON{
+		OK:      true,
+		Content: template.HTML(lecture.Notes),
+	}
+
+	out, err := json.MarshalIndent(theData, "", "    ")
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(out)
+	if err != nil {
+		app.ErrorLog.Println(err)
+	}
+}
+
+func SaveLecture(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		app.ErrorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	id, _ := strconv.Atoi(r.Form.Get("page_id"))
+	pageContent := r.Form.Get("thedata")
+
+	lecture, err := dbModel.GetLecture(id)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	lecture.Notes = pageContent
+
+	err = dbModel.UpdateLectureContent(lecture)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	app.Session.Put(r.Context(), "flash", "Lecture successfully updated!")
+	http.Redirect(w, r, fmt.Sprintf("/courses/lecture/%d", id), http.StatusSeeOther)
 }
