@@ -93,8 +93,16 @@ func ShowLecture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	course, err := dbModel.GetCourse(lecture.CourseID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
 	rowSets := make(map[string]interface{})
 	rowSets["lecture"] = lecture
+	rowSets["course"] = course
 
 	pg := models.Page{
 		ID:          lecture.ID,

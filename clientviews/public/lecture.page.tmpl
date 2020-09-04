@@ -156,6 +156,7 @@
             <div class="col">
                 <p>&nbsp;</p>
                 {{$lecture := index .RowSets "lecture"}}
+                {{$course := index .RowSets "course"}}
                 <h3>{{$lecture.LectureName}}</h3>
 
                 {{if gt $lecture.VideoID 0}}
@@ -163,6 +164,19 @@
                     <iframe src="/embedded-video/{{$lecture.VideoID}}" width="560" height="315"
                             frameborder="0"></iframe>
                 </div>
+                {{end}}
+
+                {{if or (ne $course.TeamsLink "") (ne $course.ProfEmail "")}}
+                    <div class="text-center">
+                        {{if ne $course.TeamsLink ""}}
+                            <a class="btn btn-outline-secondary text-dark" target="_blank" href="{{$course.TeamsLink}}">Microsoft
+                                Teams</a>
+                        {{end}}
+                        {{if ne $course.ProfEmail ""}}
+                            <a class="btn btn-outline-secondary text-dark" href="mailto:{{$course.ProfEmail}}?subject={{$course.CourseName}}: {{$lecture.LectureName}}">Email
+                                Professor</a>
+                        {{end}}
+                    </div>
                 {{end}}
 
                 <div id="content_edit" class="is-wrapper">
