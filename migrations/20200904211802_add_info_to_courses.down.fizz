@@ -1,0 +1,3 @@
+drop_column("courses", "prof_name")
+drop_column("courses", "prof_email")
+drop_column("courses", "teams_link")

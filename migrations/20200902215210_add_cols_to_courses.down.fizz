@@ -1,1 +1,1 @@
-drop_column("coureses", "description")
+drop_column("courses", "description")

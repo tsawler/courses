@@ -1,0 +1,3 @@
+add_column("courses", "prof_name", "string", {"size": 512, "default": ""})
+add_column("courses", "prof_email", "string", {"size": 512, "default": ""})
+add_column("courses", "teams_link", "string", {"size": 512, "default": ""})
