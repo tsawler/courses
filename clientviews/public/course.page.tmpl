@@ -1,7 +1,9 @@
 {{template "base" .}}
 
-{{define "title"}}{{ index (.Page.TitleMap) $.Lang}}{{end}}
-
+{{define "title"}}
+    {{$course := index .RowSets "course"}}
+    {{$course.CourseName}}
+{{end}}
 
 {{define "css"}}
     <style>
