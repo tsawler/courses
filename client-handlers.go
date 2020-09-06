@@ -288,6 +288,11 @@ func AdminLecture(w http.ResponseWriter, r *http.Request) {
 	var lecture clientmodels.Lecture
 	if lectureID > 0 {
 		lecture, err = dbModel.GetLecture(lectureID)
+		if err != nil {
+			errorLog.Println(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
 	} else {
 		lecture.CourseID = courseID
 	}
