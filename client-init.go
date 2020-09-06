@@ -14,18 +14,13 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 var parentDB *driver.DB
 var repo *handlers.DBRepo
-
 var dbModel *clientdb.DBModel
 
-// ClientInit gives client code access to goBlender configuration
+// ClientInit  initializes client specific code
 func ClientInit(conf config.AppConfig, parentDriver *driver.DB, rep *handlers.DBRepo) {
 	// conf is the application config, from goBlender
 	app = conf
 	repo = rep
-
-	// If we have additional databases (external to this application) we set the connection here.
-	// The connection is specified in goBlender preferences.
-	//conn := app.AlternateConnection
 
 	// loggers
 	infoLog = app.InfoLog
@@ -44,12 +39,6 @@ func ClientInit(conf config.AppConfig, parentDriver *driver.DB, rep *handlers.DB
 	} else {
 		handlers.NewMysqlHandlers(parentDB, app.ServerName, app.InProduction)
 	}
-
-	// Set a different template for home page, if needed.
-	//repo.SetHomePageTemplate("client-sample.page.tmpl")
-
-	// Set a different template for inside pages, if needed.
-	//repo.SetDefaultPageTemplate("client-sample.page.tmpl")
 
 	// Create client middleware
 	NewClientMiddleware(app)

@@ -15,5 +15,6 @@ func NewTemplateData(p *sql.DB) {
 
 // AddDefaultData adds default data for templates
 func AddDefaultData(td *templates.TemplateData) *templates.TemplateData {
+	td.RowSets["courses_version"] = "1.0.0"
 	return td
 }
