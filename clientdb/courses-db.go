@@ -327,7 +327,7 @@ func (m *DBModel) InsertCourse(c clientmodels.Course) (int, error) {
 	return newID, nil
 }
 
-// InsertCourse inserts a course lecture and returns new id
+// InsertLecture inserts a lecture lecture and returns new id
 func (m *DBModel) InsertLecture(c clientmodels.Lecture) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
