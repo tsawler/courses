@@ -75,6 +75,16 @@
 
             </div>
 
+            <div class="col-md-6 col-xs-12 text-center">
+                {{if gt $lecture.ID 0}}
+                    <div class="mt-3">
+                        <a class="btn btn-outline-secondary" href="/courses/lecture/{{$lecture.ID}}" target="_blank">
+                            Display lecture for edit
+                        </a>
+                    </div>
+                {{end}}
+            </div>
+
         </div>
 
         <div class="row">
