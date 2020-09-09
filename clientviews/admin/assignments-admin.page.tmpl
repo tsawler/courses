@@ -26,7 +26,7 @@
                     <td>{{.ID}}</td>
                     <td><a href='/admin/courses/assignment/{{.ID}}'>{{.User.FirstName}} {{.User.LastName}}</a></td>
                     <td>{{.Course.CourseName}}</td>
-                    <td>{{.CreatedAt}}</td>
+                    <td>{{humanDateTime .CreatedAt}}</td>
                     <td class="text-center">
                         {{if eq .Processed 1}}
                             <span class="badge badge-primary">Processed</span>

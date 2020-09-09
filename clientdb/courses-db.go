@@ -539,13 +539,18 @@ func (m *DBModel) UpdateAssignment(a clientmodels.Assignment) error {
 	return nil
 }
 
-func (m *DBModel) AllAssignments() ([]clientmodels.Assignment, error) {
+func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
+	where := ""
+	if id > 0 {
+		where = fmt.Sprintf("where user_id = %d", id)
+	}
+
 	var a []clientmodels.Assignment
 
-	stmt := `SELECT a.id, a.file_name_display, a.file_name, a.user_id, a.course_id, 
+	stmt := fmt.Sprintf(`SELECT a.id, a.file_name_display, a.file_name, a.user_id, a.course_id, 
 		a.mark, a.total_value, a.processed, a.created_at, a.updated_at,
 		u.id, u.first_name, u.last_name, u.email,
 		c.id, c.course_name
@@ -553,7 +558,8 @@ func (m *DBModel) AllAssignments() ([]clientmodels.Assignment, error) {
 			assignments a 
 			left join users u on (a.user_id = u.id)
 			left join courses c on (a.course_id = c.id)
-		ORDER BY updated_at desc`
+		%s
+		ORDER BY updated_at desc`, where)
 
 	rows, err := m.DB.QueryContext(ctx, stmt)
 	if err != nil {

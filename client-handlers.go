@@ -544,7 +544,7 @@ func PostSubmitAssignment(w http.ResponseWriter, r *http.Request) {
 
 // Assignments displays assignments in admin tool
 func Assignments(w http.ResponseWriter, r *http.Request) {
-	a, err := dbModel.AllAssignments()
+	a, err := dbModel.AllAssignments(0)
 	if err != nil {
 		errorLog.Print(err)
 	}
@@ -553,6 +553,22 @@ func Assignments(w http.ResponseWriter, r *http.Request) {
 	rowSets["assignments"] = a
 
 	helpers.Render(w, r, "assignments-admin.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+	})
+}
+
+// StudentAssignments displays assignments in admin tool for a given student
+func StudentAssignments(w http.ResponseWriter, r *http.Request) {
+	userID := app.Session.GetInt(r.Context(), "userID")
+	a, err := dbModel.AllAssignments(userID)
+	if err != nil {
+		errorLog.Print(err)
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["assignments"] = a
+
+	helpers.Render(w, r, "student-assignments.page.tmpl", &templates.TemplateData{
 		RowSets: rowSets,
 	})
 }

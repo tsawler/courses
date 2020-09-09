@@ -1,0 +1,227 @@
+{{define "top-menu"}}
+    {{$topBar := index $.PreferenceMap "top-bar"}}
+    {{$showBar := index $.PreferenceMap "show-top-bar"}}
+    {{$logoOnMenu := index .PreferenceMap "logo-on-menu"}}
+    {{$loginOnMenu := index .PreferenceMap "login-on-menu"}}
+    {{$logo := index .PreferenceMap "logo"}}
+    {{$invertedLogo := index .PreferenceMap "reverse-logo"}}
+    {{$createAccount := index .PreferenceMap "create-account"}}
+    {{$sticky := index .PreferenceMap "sticky-menu"}}
+
+    {{$menuColor := "navbar-light"}}
+    {{$menuTransparent := 0}}
+
+    {{if .Page.PageTitle}}
+        {{$menuColor = .Page.MenuColor}}
+        {{$menuTransparent = .Page.MenuTransparent}}
+    {{end}}
+
+    {{if .Post.Title}}
+        {{$menuColor = .Post.MenuColor}}
+        {{$menuTransparent = .Post.MenuTransparent}}
+    {{end}}
+
+    <nav id="main-nav"
+         class="navbar navbar-expand-lg {{$menuColor}} {{if eq $menuTransparent 1}} bg-transparent {{end}} hide-on-edit">
+
+        {{template "top-bar" .}}
+
+        <div id="top-nav-bar" {{if eq $sticky "1"}}data-toggle="sticky-onscroll" {{end}}
+             class="container-fluid no-override" {{if eq $showBar "1"}}{{if pushDown $topBar $menuTransparent}} style="margin-top: 60px;" {{end}}{{end}}>
+
+            <a class="navbar-brand " href="/">
+                {{if eq $logoOnMenu "1"}}
+                    {{if ne $logo ""}}
+                        <img src="/static/site-content/prefs/{{$logo}}" id="menu-bar-logo" alt="logo"
+                             class="d-lg-inline mr-2 img img-responsive logo-in-navbar"/>
+                    {{end}}
+                {{end}}
+            </a>
+
+            <button class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbar-collapse">
+
+                <ul class="navbar-nav">
+                    {{if .IsAuthenticated}}
+                        {{range .MainMenu}}
+                            {{if eq .HasChildren 0}}
+                                <li class="nav-item">
+                                    <a {{if eq .NewWindow 1}} target="_blank" {{end}}
+                                            class="nav-link nodd mitem"
+                                            data-mitem-id="{{.ID}}"
+                                            href="{{.Url}}">
+                                        {{if eq .Active 0}}
+                                            <span class="text-muted"><em>{{safeHTML (index .TitleMap $.Lang)}}</em></span>
+                                        {{else}}
+                                            {{safeHTML (index .TitleMap $.Lang)}}
+                                        {{end}}
+                                    </a>
+                                </li>
+                            {{else}}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle mitem" href="#" data-mitem-id="{{.ID}}"
+                                       role="button" data-toggle="dropdown">
+                                        {{safeHTML (index .TitleMap $.Lang)}}
+                                        <i class="ion-chevron-down"></i>
+                                    </a>
+
+                                    <div class="dropdown-menu" role="menu">
+                                        {{$parentID := .ID}}
+                                        {{range .DropDownItems}}
+                                            <a {{if eq .NewWindow 1}} target="_blank" {{end}}
+                                                    class="dropdown-item ddmitem"
+                                                    data-ddmitem-id="{{.ID}}"
+                                                    data-mitem-id="{{$parentID}}"
+                                                    href="{{.Url}}">
+                                                {{if eq .Active 0}}
+                                                    <span class="text-muted"><em>{{index .TitleMap $.Lang}}</em></span>
+                                                {{else}}
+                                                    {{index .TitleMap $.Lang}}
+                                                {{end}}
+                                            </a>
+                                        {{end}}
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#!" onclick="addDDMenuItem({{$parentID}})">Add
+                                            Menu Item</a>
+                                    </div>
+                                </li>
+                            {{end}}
+                        {{end}}
+                    {{else}}
+                        {{range .MainMenu}}
+                            {{if eq .Active 1}}
+                                {{if eq .HasChildren 0}}
+                                    <li class="nav-item">
+                                        <a {{if eq .NewWindow 1}} target="_blank" {{end}}
+                                                class="nav-link nodd mitem"
+                                                data-mitem-id="{{.ID}}"
+                                                href="{{.Url}}">
+                                            {{safeHTML (index .TitleMap $.Lang)}}
+                                        </a>
+                                    </li>
+                                {{else}}
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle mitem" href="#" data-mitem-id="{{.ID}}"
+                                           role="button" data-toggle="dropdown">
+                                            {{safeHTML (index .TitleMap $.Lang)}}
+                                            <i class="ion-chevron-down"></i>
+                                        </a>
+
+                                        <div class="dropdown-menu" role="menu">
+                                            {{$parentID := .ID}}
+                                            {{range .DropDownItems}}
+                                                {{if eq .Active 1}}
+                                                    <a {{if eq .NewWindow 1}} target="_blank" {{end}}
+                                                            class="dropdown-item ddmitem"
+                                                            data-ddmitem-id="{{.ID}}"
+                                                            data-mitem-id="{{$parentID}}"
+                                                            href="{{.Url}}">
+                                                        {{index .TitleMap $.Lang}}
+                                                    </a>
+                                                {{end}}
+                                            {{end}}
+                                        </div>
+                                    </li>
+                                {{end}}
+                            {{end}}
+                        {{end}}
+                    {{end}}
+
+                    {{if .IsAuthenticated}}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle mitem" href="#" id="WrendchNavbarDropdown"
+                               role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-wrench" style="font-size: 1em"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                <a class="dropdown-item" href="/admin/users/profile">Profile</a>
+                                <a class="dropdown-item" href="/admin/assignments-for-student">My Assignments</a>
+                                {{if ge .Auth.AccessLevel 3}}
+                                    <a class="dropdown-item" href="/admin/dashboard">Dashboard</a>
+                                {{end}}
+                                <div class="dropdown-divider"></div>
+                                {{if and (hasRole "pages" .Auth.ID) .Page.PageTitle}}
+                                    <a class="dropdown-item" onclick="makePageEditable()" href="#!">Edit Page</a>
+                                    <div class="dropdown-divider"></div>
+                                {{end}}
+                                {{if and (hasRole "blogs" .Auth.ID) .Post.Title}}
+                                    <a class="dropdown-item" onclick="makePageEditable()" href="#!">Edit Blog Post</a>
+                                    <div class="dropdown-divider"></div>
+                                {{end}}
+                                {{if and (hasRole "events" .Auth.ID) .Event.Title}}
+                                    <a class="dropdown-item" onclick="makePageEditable()" href="#!">Edit Event Page</a>
+                                    <div class="dropdown-divider"></div>
+                                {{end}}
+                                {{if and (hasRole "news" .Auth.ID) .News.Title}}
+                                    <a class="dropdown-item" onclick="makePageEditable()" href="#!">Edit News Item</a>
+                                    <div class="dropdown-divider"></div>
+                                {{end}}
+
+
+                                {{if gt (index .IntMap "job-listing-id") 0 }}
+                                    {{if hasRole "jobs" .Auth.ID}}
+                                        <a class="dropdown-item" onclick="makePageEditable()" href="#!">Edit Job
+                                            Listing</a>
+                                        <div class="dropdown-divider"></div>
+                                    {{end}}
+                                {{end}}
+
+
+                                {{if hasRole "pages" .Auth.ID}}
+                                    <a class="dropdown-item" href="/admin/new-site-page">Add Page </a>
+                                {{end}}
+                                {{if hasRole "news" .Auth.ID}}
+                                    <a class="dropdown-item" href="/admin/new-news-item ">Add News Item</a>
+                                {{end}}
+                                {{if hasRole "blogs" .Auth.ID}}
+                                    <a class="dropdown-item" href="/admin/new-site-post">Add Blog Post</a>
+                                {{end}}
+                                {{if hasRole "menus" .Auth.ID}}
+                                    <a class="dropdown-item" onclick="addMenuItem()" href="#!">Add Menu Item</a>
+                                {{end}}
+                                {{if hasRole "pages" .Auth.ID}}
+                                    <a class="dropdown-item" href="/admin/flushcache">Flush application cache</a>
+                                {{end}}
+                                {{if ge .Auth.AccessLevel 3}}
+                                    <div class="dropdown-divider"></div>
+                                    <a target="_blank" class="dropdown-item"
+                                       href="https://tsawler.github.io/goblender-docs/#/"><i
+                                                class="fa fa-fw fa-external-link"></i> Documentation</a>
+                                {{end}}
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/user/logout">Logout {{ .Auth.FirstName }}</a>
+                            </div>
+                        </li>
+                    {{else}}
+                        {{if eq $createAccount "1"}}
+                            <li class="nav-item">
+                                <a class="nav-link nodd mitem" href="/user/signup">Sign Up</a>
+                            </li>
+                        {{end}}
+                        {{if eq $loginOnMenu "1"}}
+                            <li class="nav-item">
+                                <a class="nav-link nodd mitem" href="/user/login">Login</a>
+                            </li>
+                        {{end}}
+                    {{end}}
+                </ul>
+
+                <form class="form-inline my-2 my-lg-2search" method="post" action="/search/search-site">
+                    <div class="search__wrapper">
+                        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                        <input id="top-bar-search-field" type="text" autocomplete="off"
+                               class="search__field {{if eq $menuTransparent 1}} search-form-transparent {{else}}search-form{{end}}"
+                               name="search">
+                        <button id="search-form-button" type="submit"
+                                class="fa fa-search search__icon {{if eq $menuTransparent 1}} text-white {{end}}"></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+{{end}}
