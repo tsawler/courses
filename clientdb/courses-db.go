@@ -487,3 +487,30 @@ func (m *DBModel) GetNextPreviousLectures(courseID, lectureID int) (int, int, er
 
 	return next, previous, nil
 }
+
+// InsertAssignment inserts an assignment and returns new id
+func (m *DBModel) InsertAssignment(c clientmodels.Assignment) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var newID int
+
+	query := `insert into assignments (file_name_display, file_name, user_id, course_id, created_at, updated_at)
+			values ($1, $2, $3, $4, $5, $6) returning id`
+
+	err := m.DB.QueryRowContext(ctx, query,
+		c.FileNameDisplay,
+		c.FileName,
+		c.UserID,
+		c.CourseID,
+		time.Now(),
+		time.Now()).Scan(&newID)
+
+	if err != nil {
+		fmt.Println("Error inserting new assignment")
+		fmt.Println(err)
+		return 0, err
+	}
+
+	return newID, nil
+}

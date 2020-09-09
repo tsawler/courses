@@ -32,3 +32,14 @@ type Lecture struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
+
+// Assignment holds an assignment
+type Assignment struct {
+	ID              int
+	FileNameDisplay string
+	FileName        string
+	UserID          int
+	CourseID        int
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}

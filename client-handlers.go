@@ -12,6 +12,7 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // AllCourses lists all active courses with link to overview
@@ -491,15 +492,52 @@ func SubmitAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	courses, err := dbModel.AllActiveCourses()
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["courses"] = courses
 	helpers.Render(w, r, "submit-assignment.page.tmpl", &templates.TemplateData{
-		Page: pg,
-		Form: forms.New(nil),
+		Page:    pg,
+		Form:    forms.New(nil),
+		RowSets: rowSets,
 	})
 }
 
 // PostSubmitAssignment handles assignment submission
 func PostSubmitAssignment(w http.ResponseWriter, r *http.Request) {
-	authId := app.Session.GetInt(r.Context(), "userID")
+	userID := app.Session.GetInt(r.Context(), "userID")
 
-	w.Write([]byte(strconv.Itoa(authId)))
+	courseID, _ := strconv.Atoi(r.Form.Get("course_id"))
+
+	helpers.CreateDirIfNotExist("./ui/static/site-content/assignments/")
+	helpers.CreateDirIfNotExist(fmt.Sprintf("./ui/static/site-content/assignments/%d", userID))
+
+	fileName, displayName, err := helpers.UploadOneFileReturnSlugName(r, fmt.Sprintf("./ui/static/site-content/assignments/%d/", userID))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	assignment := clientmodels.Assignment{
+		FileNameDisplay: displayName,
+		FileName:        fileName,
+		UserID:          userID,
+		CourseID:        courseID,
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+	}
+
+	_, err = dbModel.InsertAssignment(assignment)
+	if err != nil {
+		session.Put(r.Context(), "error", "Error: assignment NOT received!")
+		http.Redirect(w, r, "/courses/assignments/submit-an-assignment", http.StatusNotAcceptable)
+		return
+	}
+
+	session.Put(r.Context(), "flash", "Assignment received!")
+	http.Redirect(w, r, "/courses/assignments/submit-an-assignment", http.StatusSeeOther)
 }
