@@ -479,3 +479,27 @@ func SaveCourse(w http.ResponseWriter, r *http.Request) {
 	app.Session.Put(r.Context(), "flash", "Lecture successfully updated!")
 	http.Redirect(w, r, fmt.Sprintf("/courses/overview/%d", id), http.StatusSeeOther)
 }
+
+// SubmitAssignment displays page to submit an assignment
+func SubmitAssignment(w http.ResponseWriter, r *http.Request) {
+	pg, err := repo.DB.GetPageBySlug("submit-assignment")
+	if err == models.ErrNoRecord {
+		helpers.NotFound(w)
+		return
+	} else if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	helpers.Render(w, r, "submit-assignment.page.tmpl", &templates.TemplateData{
+		Page: pg,
+		Form: forms.New(nil),
+	})
+}
+
+// PostSubmitAssignment handles assignment submission
+func PostSubmitAssignment(w http.ResponseWriter, r *http.Request) {
+	authId := app.Session.GetInt(r.Context(), "userID")
+
+	w.Write([]byte(strconv.Itoa(authId)))
+}
