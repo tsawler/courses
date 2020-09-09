@@ -40,6 +40,8 @@ type Assignment struct {
 	FileName        string
 	UserID          int
 	CourseID        int
+	Mark            int
+	TotalValue      int
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }
