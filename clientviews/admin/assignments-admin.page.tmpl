@@ -1,0 +1,54 @@
+{{template "admin-base" .}}
+
+{{define "title"}}All Assignments - vMaintain Admin{{end}}
+
+{{define "admin-title"}}All Assignments{{end}}
+{{define "content-title"}}All Assignments{{end}}
+{{define "css"}}
+{{end}}
+
+{{define "content"}}
+    <div class="table-responsive">
+        <table id="itable" class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Date Received</th>
+                <th class="text-center">Processed</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{$assignments := index .RowSets "assignments"}}
+            {{range $assignments}}
+                <tr>
+                    <td>{{.ID}}</td>
+                    <td><a href='/admin/courses/assignment/{{.ID}}'>{{.User.FirstName}} {{.User.LastName}}</a></td>
+                    <td>{{.Course.CourseName}}</td>
+                    <td>{{.CreatedAt}}</td>
+                    <td class="text-center">
+                        {{if eq .Processed 1}}
+                            <span class="badge badge-primary">Processed</span>
+                        {{else}}
+                            <span class="badge badge-danger">Not Processed</span>
+                        {{end}}
+                    </td>
+
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+{{end}}
+
+{{define "js"}}
+    <script>
+        $(document).ready(function () {
+            $('#itable').DataTable({
+                stateSave: true,
+                order: [[3, "desc"]],
+            });
+        });
+    </script>
+{{end}}

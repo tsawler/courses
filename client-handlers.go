@@ -541,3 +541,18 @@ func PostSubmitAssignment(w http.ResponseWriter, r *http.Request) {
 	session.Put(r.Context(), "flash", "Assignment received!")
 	http.Redirect(w, r, "/courses/assignments/submit-an-assignment", http.StatusSeeOther)
 }
+
+// Assignments displays assignments in admin tool
+func Assignments(w http.ResponseWriter, r *http.Request) {
+	a, err := dbModel.AllAssignments()
+	if err != nil {
+		errorLog.Print(err)
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["assignments"] = a
+
+	helpers.Render(w, r, "assignments-admin.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+	})
+}
