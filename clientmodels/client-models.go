@@ -42,6 +42,9 @@ type Assignment struct {
 	CourseID        int
 	Mark            int
 	TotalValue      int
+	Processed       int
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
+	User            models.User
+	Course          Course
 }

@@ -19,7 +19,7 @@ func (m *DBModel) AllCourses() ([]clientmodels.Course, error) {
 	defer cancel()
 	stmt := `SELECT id, course_name, active, 
 		prof_name, prof_email, teams_link,
-		created_at, updated_at FROM Courses ORDER BY course_name`
+		created_at, updated_at FROM courses ORDER BY course_name`
 
 	rows, err := m.DB.QueryContext(ctx, stmt)
 	if err != nil {
@@ -513,4 +513,82 @@ func (m *DBModel) InsertAssignment(c clientmodels.Assignment) (int, error) {
 	}
 
 	return newID, nil
+}
+
+// UpdateAssignment updates an assignment (grading)
+func (m *DBModel) UpdateAssignment(a clientmodels.Assignment) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		update assignments set 
+			mark = $1, 
+			total_value = $2,
+			updated_at = $3
+		where 
+			id = $3`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		a.Mark,
+		a.TotalValue,
+		time.Now(),
+		a.ID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *DBModel) AllAssignments() ([]clientmodels.Assignment, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var a []clientmodels.Assignment
+
+	stmt := `SELECT a.id, a.file_name_display, a.file_name, a.user_id, a.course_id, 
+		a.mark, a.total_value, a.processed, a.created_at, a.updated_at,
+		u.id, u.first_name, u.last_name, u.email,
+		c.id, c.course_name
+		FROM 
+			assignments a 
+			left join users u on (a.user_id = u.id)
+			left join courses c on (a.course_id = c.id)
+		ORDER BY updated_at desc`
+
+	rows, err := m.DB.QueryContext(ctx, stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s clientmodels.Assignment
+		err = rows.Scan(
+			&s.ID,
+			&s.FileNameDisplay,
+			&s.FileName,
+			&s.UserID,
+			&s.CourseID,
+			&s.Mark,
+			&s.TotalValue,
+			&s.Processed,
+			&s.CreatedAt,
+			&s.UpdatedAt,
+			&s.User.ID,
+			&s.User.FirstName,
+			&s.User.LastName,
+			&s.User.Email,
+			&s.Course.ID,
+			&s.Course.CourseName)
+		if err != nil {
+			return nil, err
+		}
+		a = append(a, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return a, nil
 }

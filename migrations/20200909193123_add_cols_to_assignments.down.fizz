@@ -1,2 +1,3 @@
 drop_column("assignments", "mark")
 drop_column("assignments", "total_value")
+drop_column("assignments", "processed")
