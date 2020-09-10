@@ -15,6 +15,6 @@ func NewTemplateData(p *sql.DB) {
 
 // AddDefaultData adds default data for templates
 func AddDefaultData(td *templates.TemplateData) *templates.TemplateData {
-	td.ClientVersion = `<strong><a href="https://github.com/tsawler/courses/" target="_blank">Courses</a></strong> v1.0.2`
+	td.ClientVersion = `<strong><a href="https://github.com/tsawler/courses/" target="_blank">Courses</a></strong> v1.0.3`
 	return td
 }
