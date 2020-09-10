@@ -188,7 +188,11 @@
                         {{if eq .Active 1}}
                             <a class="list-group-item list-group-item-action" href="/courses/lecture/{{.ID}}">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">{{.LectureName}}</h6>
+                                    <h6 class="mb-1">{{.LectureName}}
+                                        {{if gt .Video.Duration 0}}
+                                        <small class="text-muted">({{secondsHuman .Video.Duration}})</small>
+                                        {{end}}
+                                    </h6>
                                     <small>{{relativeTime .PostedDate}}</small>
                                 </div>
                             </a>
