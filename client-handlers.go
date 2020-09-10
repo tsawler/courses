@@ -328,6 +328,12 @@ func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
 	videoID, _ := strconv.Atoi(r.Form.Get("video_id"))
 	active, _ := strconv.Atoi(r.Form.Get("active"))
 	lectureName := r.Form.Get("lecture_name")
+	pd := r.Form.Get("posted_date")
+	layout := "2006-01-02 15:04"
+	t, err := time.Parse(layout, pd)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	var lecture clientmodels.Lecture
 	if lectureID > 0 {
@@ -343,6 +349,7 @@ func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
 	lecture.LectureName = lectureName
 	lecture.Active = active
 	lecture.VideoID = videoID
+	lecture.PostedDate = t
 
 	if lectureID == 0 {
 		lecture.Notes = ""

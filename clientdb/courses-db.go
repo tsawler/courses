@@ -246,7 +246,7 @@ func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
 	var l clientmodels.Lecture
 
 	query := `select l.id, l.course_id, l.lecture_name, coalesce(l.video_id, 0), l.active, l.sort_order, l.notes, l.created_at,
-			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, '')
+			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, ''), l.posted_date
 			from lectures l
 			left join videos v on (l.video_id = v.id)
 			where l.id = $1`
@@ -266,6 +266,7 @@ func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
 		&l.Video.VideoName,
 		&l.Video.FileName,
 		&l.Video.Thumb,
+		&l.PostedDate,
 	)
 
 	if err != nil {
@@ -337,10 +338,10 @@ func (m *DBModel) InsertLecture(c clientmodels.Lecture) (int, error) {
 
 	if c.VideoID > 0 {
 
-		query := `insert into lectures (course_id, lecture_name, video_id, active, sort_order, notes, created_at, updated_at)
-			values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`
+		query := `insert into lectures (course_id, lecture_name, video_id, active, sort_order, notes, created_at, updated_at, posted_date)
+			values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id`
 
-		err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.VideoID, c.Active, c.SortOrder, c.Notes, time.Now(), time.Now()).Scan(&newID)
+		err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.VideoID, c.Active, c.SortOrder, c.Notes, time.Now(), time.Now(), c.PostedDate).Scan(&newID)
 
 		if err != nil {
 			fmt.Println("Error inserting new course lecture")
@@ -348,10 +349,10 @@ func (m *DBModel) InsertLecture(c clientmodels.Lecture) (int, error) {
 			return 0, err
 		}
 	} else {
-		query := `insert into lectures (course_id, lecture_name, active, sort_order, notes, created_at, updated_at)
-			values ($1, $2, $3, $4, $5, $6, $7) returning id`
+		query := `insert into lectures (course_id, lecture_name, active, sort_order, notes, created_at, updated_at, posted_date)
+			values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`
 
-		err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.Active, c.SortOrder, c.Notes, time.Now(), time.Now()).Scan(&newID)
+		err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.Active, c.SortOrder, c.Notes, time.Now(), time.Now(), c.PostedDate).Scan(&newID)
 
 		if err != nil {
 			fmt.Println("Error inserting new course lecture")
@@ -370,9 +371,9 @@ func (m *DBModel) UpdateLecture(c clientmodels.Lecture) error {
 
 	if c.VideoID > 0 {
 		query := `update lectures set lecture_name = $1, video_id = $2, active = $3, notes = $4,
-			updated_at = $5 where id = $6`
+			updated_at = $5, posted_date = $6 where id = $7`
 
-		_, err := m.DB.ExecContext(ctx, query, c.LectureName, c.VideoID, c.Active, c.Notes, time.Now(), c.ID)
+		_, err := m.DB.ExecContext(ctx, query, c.LectureName, c.VideoID, c.Active, c.Notes, time.Now(), c.PostedDate, c.ID)
 
 		if err != nil {
 			fmt.Println("Error updating course lecture")
@@ -381,9 +382,9 @@ func (m *DBModel) UpdateLecture(c clientmodels.Lecture) error {
 		}
 	} else {
 		query := `update lectures set lecture_name = $1, video_id = null, active = $2, notes = $3,
-			updated_at = $4 where id = $5`
+			updated_at = $4, posted_date = $5 where id = $6`
 
-		_, err := m.DB.ExecContext(ctx, query, c.LectureName, c.Active, c.Notes, time.Now(), c.ID)
+		_, err := m.DB.ExecContext(ctx, query, c.LectureName, c.Active, c.Notes, time.Now(), c.PostedDate, c.ID)
 
 		if err != nil {
 			fmt.Println("Error updating course lecture")
