@@ -43,6 +43,7 @@ type Assignment struct {
 	CourseID        int
 	Mark            int
 	TotalValue      int
+	Description     string
 	Processed       int
 	CreatedAt       time.Time
 	UpdatedAt       time.Time

@@ -19,6 +19,7 @@
                 <table id="itable" class="table table-striped table-bordered">
                     <thead>
                     <tr>
+                        <th>Description</th>
                         <th>Course</th>
                         <th>File Submitted</th>
                         <th>Date Received</th>
@@ -30,8 +31,9 @@
                     {{$auth := .Auth}}
                     {{range $assignments}}
                         <tr>
+                            <td>{{.Description}}</td>
                             <td>{{.Course.CourseName}}</td>
-                            <td>Download: <a href="/static/site-content/assignments/{{$auth.ID}}/{{.FileName}}">{{.FileNameDisplay}}</td>
+                            <td>Download: <a href="/static/site-content/assignments/{{$auth.ID}}/{{.FileName}}">{{.FileNameDisplay}}</a></td>
                             <td>{{humanDateTime .CreatedAt}}</td>
                             <td>
                                 {{if and (gt .Mark 0) (gt .TotalValue 0)}}
@@ -45,7 +47,6 @@
                     </tbody>
                 </table>
             </div>
-
         </div>
 
     </div>

@@ -521,6 +521,7 @@ func PostSubmitAssignment(w http.ResponseWriter, r *http.Request) {
 	userID := app.Session.GetInt(r.Context(), "userID")
 
 	courseID, _ := strconv.Atoi(r.Form.Get("course_id"))
+	description := r.Form.Get("description")
 
 	helpers.CreateDirIfNotExist("./ui/static/site-content/assignments/")
 	helpers.CreateDirIfNotExist(fmt.Sprintf("./ui/static/site-content/assignments/%d", userID))
@@ -533,6 +534,7 @@ func PostSubmitAssignment(w http.ResponseWriter, r *http.Request) {
 	assignment := clientmodels.Assignment{
 		FileNameDisplay: displayName,
 		FileName:        fileName,
+		Description:     description,
 		UserID:          userID,
 		CourseID:        courseID,
 		CreatedAt:       time.Now(),

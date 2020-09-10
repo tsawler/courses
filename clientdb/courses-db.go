@@ -500,14 +500,15 @@ func (m *DBModel) InsertAssignment(c clientmodels.Assignment) (int, error) {
 
 	var newID int
 
-	query := `insert into assignments (file_name_display, file_name, user_id, course_id, created_at, updated_at)
-			values ($1, $2, $3, $4, $5, $6) returning id`
+	query := `insert into assignments (file_name_display, file_name, user_id, course_id, description, created_at, updated_at)
+			values ($1, $2, $3, $4, $5, $6, $7) returning id`
 
 	err := m.DB.QueryRowContext(ctx, query,
 		c.FileNameDisplay,
 		c.FileName,
 		c.UserID,
 		c.CourseID,
+		c.Description,
 		time.Now(),
 		time.Now()).Scan(&newID)
 
@@ -558,7 +559,7 @@ func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 	stmt := fmt.Sprintf(`SELECT a.id, a.file_name_display, a.file_name, a.user_id, a.course_id, 
 		a.mark, a.total_value, a.processed, a.created_at, a.updated_at,
 		u.id, u.first_name, u.last_name, u.email,
-		c.id, c.course_name
+		c.id, c.course_name, a.description
 		FROM 
 			assignments a 
 			left join users u on (a.user_id = u.id)
@@ -590,7 +591,8 @@ func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 			&s.User.LastName,
 			&s.User.Email,
 			&s.Course.ID,
-			&s.Course.CourseName)
+			&s.Course.CourseName,
+			&s.Description)
 		if err != nil {
 			return nil, err
 		}
