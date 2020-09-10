@@ -73,7 +73,7 @@
                                required
                                autocomplete="off" type='datetime'
                                name='posted_date'
-                               value='{{humanDateTime $lecture.PostedDate}}'>
+                               value='{{formatDateWithLayout $lecture.PostedDate "2006-01-02 15:05"}}'>
                         <div class="invalid-feedback">
                             Please enter a value
                         </div>
