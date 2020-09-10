@@ -171,7 +171,7 @@
                 <form id="assignment_form" method="post" action="/courses/assignments/submit-an-assignment" enctype="multipart/form-data" class="needs-validation" novalidate="">
                     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                     <div class="form-row">
-                        <div class="form-group col-md-6 col-xs-12">
+                        <div class="form-group col-md-4 col-xs-12">
                             <label for="course_id">For what course?</label>
                             <select class="custom-select" id="course_id" name="course_id" required="">
                                 <option value="" selected="">Choose one...</option>
@@ -182,7 +182,19 @@
                             </select>
 
                         </div>
-                        <div class="form-group col-md-6 col-xs-12">
+
+                        <div class="form-group col-md-4 col-xs-12">
+                            <label for="description">Type</label>
+                            <select class="custom-select" id="description" name="description" required="">
+                                <option value="" selected="">Choose one...</option>
+                                <option value="Reading Journal">Weekly Journal</option>
+                                <option value="Essay #1">Essay #1 (shorter)</option>
+                                <option value="Essay #2">Essay #2 (longer)</option>
+                            </select>
+
+                        </div>
+
+                        <div class="form-group col-md-4 col-xs-12">
                             <label>Choose file</label>
                             <div class="custom-file">
                                 <input type="file" name="assignment" class="custom-file-input" id="customFile" required="" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
