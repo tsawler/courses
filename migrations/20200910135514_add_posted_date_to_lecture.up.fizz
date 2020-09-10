@@ -1,0 +1,2 @@
+add_column("lectures", "posted_date", "timestamp", {"null": true})
+sql(`update lectures set posted_date = created_at`)

@@ -29,6 +29,7 @@ type Lecture struct {
 	SortOrder   int
 	Active      int
 	Notes       string
+	PostedDate  time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

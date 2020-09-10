@@ -125,7 +125,7 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 
 	// get lectures, if any
 	query = `select l.id, l.course_id, l.lecture_name, coalesce(l.video_id, 0), l.active, l.sort_order, l.notes, l.created_at,
-			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, '')
+			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, ''), l.posted_date
 			from lectures l
 			left join videos v on (l.video_id = v.id)
 			where l.course_id = $1 order by l.sort_order`
@@ -152,6 +152,7 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 			&l.Video.VideoName,
 			&l.Video.FileName,
 			&l.Video.Thumb,
+			&l.PostedDate,
 		)
 		if err != nil {
 			return course, err
