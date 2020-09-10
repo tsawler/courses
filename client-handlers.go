@@ -296,6 +296,7 @@ func AdminLecture(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		lecture.CourseID = courseID
+		lecture.PostedDate = time.Now()
 	}
 
 	rowSets := make(map[string]interface{})
