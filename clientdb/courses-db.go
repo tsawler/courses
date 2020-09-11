@@ -545,6 +545,7 @@ func (m *DBModel) UpdateAssignment(a clientmodels.Assignment) error {
 	return nil
 }
 
+// AllAssignments gets assignments
 func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -604,4 +605,73 @@ func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 	}
 
 	return a, nil
+}
+
+// GetAssignment gets one assignment
+func (m *DBModel) GetAssignment(id int) (clientmodels.Assignment, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var s clientmodels.Assignment
+
+	stmt := `SELECT a.id, a.file_name_display, a.file_name, a.user_id, a.course_id, 
+		a.mark, a.total_value, a.processed, a.created_at, a.updated_at,
+		u.id, u.first_name, u.last_name, u.email,
+		c.id, c.course_name, a.description
+		FROM 
+			assignments a 
+			left join users u on (a.user_id = u.id)
+			left join courses c on (a.course_id = c.id)
+		where a.id = $1`
+
+	row := m.DB.QueryRowContext(ctx, stmt, id)
+
+	err := row.Scan(
+		&s.ID,
+		&s.FileNameDisplay,
+		&s.FileName,
+		&s.UserID,
+		&s.CourseID,
+		&s.Mark,
+		&s.TotalValue,
+		&s.Processed,
+		&s.CreatedAt,
+		&s.UpdatedAt,
+		&s.User.ID,
+		&s.User.FirstName,
+		&s.User.LastName,
+		&s.User.Email,
+		&s.Course.ID,
+		&s.Course.CourseName,
+		&s.Description)
+	if err != nil {
+		return s, err
+	}
+
+	return s, nil
+}
+
+// UpdateLectureSortOrder updates sort order
+func (m *DBModel) GradeAssignment(a clientmodels.Assignment) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		update assignments set 
+			mark = $1, 
+			total_value = $2,
+			processed = 1,
+			updated_at = $3
+		where 
+			id = $4`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		a.Mark,
+		a.TotalValue,
+		time.Now(),
+		a.ID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

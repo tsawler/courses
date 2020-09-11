@@ -567,6 +567,40 @@ func Assignments(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// Assignment displays assignment in admin tool
+func Assignment(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
+	a, err := dbModel.GetAssignment(id)
+	if err != nil {
+		errorLog.Print(err)
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["assignment"] = a
+
+	helpers.Render(w, r, "assignment-admin.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+		Form:    forms.New(nil),
+	})
+}
+
+// GradeAssignment grades an assignment
+func GradeAssignment(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
+	a, err := dbModel.GetAssignment(id)
+	if err != nil {
+		errorLog.Print(err)
+	}
+
+	a.Mark, _ = strconv.Atoi(r.Form.Get("mark"))
+	a.TotalValue, _ = strconv.Atoi(r.Form.Get("total_value"))
+
+	err = dbModel.GradeAssignment(a)
+
+	app.Session.Put(r.Context(), "flash", "Changes saved")
+	http.Redirect(w, r, "/admin/courses/assignments", http.StatusSeeOther)
+}
+
 // StudentAssignments displays assignments in admin tool for a given student
 func StudentAssignments(w http.ResponseWriter, r *http.Request) {
 	userID := app.Session.GetInt(r.Context(), "userID")

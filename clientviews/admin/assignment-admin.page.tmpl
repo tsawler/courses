@@ -1,0 +1,85 @@
+{{template "admin-base" .}}
+
+{{define "title"}}Assignment - vMaintain Admin{{end}}
+
+{{define "admin-title"}}Assignment{{end}}
+{{define "content-title"}}Assignment{{end}}
+{{define "css"}}
+{{end}}
+
+{{define "content"}}
+
+    {{$a := index .RowSets "assignment"}}
+
+    <form method="post" action="/admin/courses/assignment/{{$a.ID}}" novalidate
+          class="needs-validation"
+          id="a-form">
+
+        <input type="hidden" name="csrf_token" id="csrf_token" value="{{.CSRFToken}}">
+        <input type="hidden" name="user_id" id="user_id" value="{{$a.UserID}}">
+
+
+        <h3>{{$a.User.FirstName}} {{$a.User.LastName}}</h3>
+        <h4>{{$a.Course.CourseName}} - {{$a.Description}}</h4>
+        <p>Received: {{humanDateTime $a.CreatedAt}}</p>
+
+        <p>Download: <a href="/static/site-content/assignments/{{$a.UserID}}/{{$a.FileName}}">{{$a.FileNameDisplay}}</a>
+        </p>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="course_name">Mark:</label>
+                {{with .Form.Errors.Get "mark"}}
+                    <label class='text-danger'>{{.}}</label>
+                {{end}}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
+                    </div>
+                    <input class="form-control required {{with .Form.Errors.Get "mark"}} is-invalid {{end}}"
+                           id="mark"
+                           required
+                           autocomplete="off" type='text'
+                           name='mark'
+                           value='{{$a.Mark}}'>
+                    <div class="invalid-feedback">
+                        Please enter a value
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="total_value">Out of:</label>
+                {{with .Form.Errors.Get "total_value"}}
+                    <label class='text-danger'>{{.}}</label>
+                {{end}}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
+                    </div>
+                    <input class="form-control required {{with .Form.Errors.Get "total_value"}} is-invalid {{end}}"
+                           id="total_value"
+                           required
+                           autocomplete="off" type='text'
+                           name='total_value'
+                           value='{{$a.TotalValue}}'>
+                    <div class="invalid-feedback">
+                        Please enter a value
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <input type="submit" class="btn btn-primary" value="Save">
+        <a class="btn btn-info" href="/admin/courses/assignments">Cancel</a>
+    </form>
+
+{{end}}
+
+{{define "js"}}
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+{{end}}
