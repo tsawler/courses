@@ -595,7 +595,7 @@ func GradeAssignment(w http.ResponseWriter, r *http.Request) {
 	a.Mark, _ = strconv.Atoi(r.Form.Get("mark"))
 	a.TotalValue, _ = strconv.Atoi(r.Form.Get("total_value"))
 
-	err = dbModel.GradeAssignment(a)
+	_ = dbModel.GradeAssignment(a)
 
 	app.Session.Put(r.Context(), "flash", "Changes saved")
 	http.Redirect(w, r, "/admin/courses/assignments", http.StatusSeeOther)
