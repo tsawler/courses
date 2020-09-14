@@ -8,6 +8,17 @@
 
 An extension to GoBlender that allows for delivery of video based online courses.
 
+## Core Functionality
+
+- Video lectures
+- Create as many courses as needed
+- Static page lectures
+- Drag & drop page creation
+- Track student progress
+- All for submission of assignments
+- Allow for grading of assignments
+- Integration with MS Teams
+
 ## Setup
 
 First, install [goblender](https://github.com/tsawler/goblender).
@@ -60,7 +71,7 @@ For public pages:
 {{define "title"}}Some title{{end}}
 
 {{define "body"}}
-    <p>Put whatever you want here</a>
+    <p>Put whatever you want here</p>
 {{end}}
 ```
 
