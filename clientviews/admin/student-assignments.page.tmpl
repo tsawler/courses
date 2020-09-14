@@ -37,7 +37,7 @@
                             <td>{{humanDateTime .CreatedAt}}</td>
                             <td>
                                 {{if and (gt .Mark 0) (gt .TotalValue 0)}}
-
+                                    {{.Mark}} / {{.TotalValue}}
                                 {{else}}
                                     Not yet marked
                                 {{end}}
