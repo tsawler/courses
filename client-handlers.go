@@ -616,3 +616,17 @@ func StudentAssignments(w http.ResponseWriter, r *http.Request) {
 		RowSets: rowSets,
 	})
 }
+
+func StudentStartedLecture(w http.ResponseWriter, r *http.Request) {
+	lectureID, _ := strconv.Atoi(r.Form.Get("lecture_id"))
+	userID := app.Session.GetInt(r.Context(), "userID")
+
+	app.InfoLog.Println("Student", userID, "started lecture", lectureID)
+}
+
+func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
+	lectureID, _ := strconv.Atoi(r.Form.Get("lecture_id"))
+	userID := app.Session.GetInt(r.Context(), "userID")
+
+	app.InfoLog.Println("Student", userID, "left lecture", lectureID)
+}
