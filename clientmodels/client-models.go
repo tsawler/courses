@@ -60,4 +60,7 @@ type CourseAccess struct {
 	Duration  int
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Student   models.User
+	Course    Course
+	Lecture   Lecture
 }

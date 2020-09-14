@@ -40,6 +40,7 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	mux.Get("/admin/courses/lecture/:courseID/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(AdminLecture))
 	mux.Post("/admin/courses/lecture/:courseID/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(PostAdminLecture))
 
+	mux.Get("/admin/courses/:ID/accesses", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(CourseAccessHistory))
 	// public folder
 	fileServer := http.FileServer(http.Dir("./client/clienthandlers/public/"))
 	mux.Get("/client/static/", http.StripPrefix("/client/static", fileServer))

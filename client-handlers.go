@@ -623,8 +623,6 @@ func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 	duration, _ := strconv.Atoi(r.Form.Get("duration"))
 	userID := app.Session.GetInt(r.Context(), "userID")
 
-	app.InfoLog.Println("Duration is", duration)
-
 	// only record if 1 second or longer
 	if duration > 0 {
 		access := clientmodels.CourseAccess{
@@ -636,4 +634,22 @@ func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 		}
 		_ = dbModel.RecordCourseAccess(access)
 	}
+}
+
+// CourseAccessHistory shows history of student access to course
+func CourseAccessHistory(w http.ResponseWriter, r *http.Request) {
+	courseID, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
+	app.InfoLog.Println("course id", courseID)
+	accesses, _ := dbModel.CourseAccessHistory(courseID)
+
+	rowSets := make(map[string]interface{})
+	rowSets["access"] = accesses
+
+	intMap := make(map[string]int)
+	intMap["course_id"] = courseID
+
+	helpers.Render(w, r, "course-access-admin.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+		IntMap:  intMap,
+	})
 }

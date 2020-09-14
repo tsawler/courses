@@ -699,3 +699,52 @@ func (m *DBModel) RecordCourseAccess(a clientmodels.CourseAccess) error {
 	}
 	return nil
 }
+
+func (m *DBModel) CourseAccessHistory(courseID int) ([]clientmodels.CourseAccess, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var a []clientmodels.CourseAccess
+
+	query := `select ca.id, ca.user_id, ca.lecture_id, ca.course_id, ca.duration, ca.created_at, ca.updated_at,
+		u.first_name, u.last_name, l.lecture_name
+		from course_accesses ca 
+		left join users u on (ca.user_id = u.id)
+		left join lectures l on (ca.lecture_id = l.id)
+		where ca.course_id = $1 order by ca.created_at desc`
+
+	rows, err := m.DB.QueryContext(ctx, query, courseID)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s clientmodels.CourseAccess
+		err = rows.Scan(
+			&s.ID,
+			&s.UserID,
+			&s.LectureID,
+			&s.CourseID,
+			&s.Duration,
+			&s.CreatedAt,
+			&s.UpdatedAt,
+			&s.Student.FirstName,
+			&s.Student.LastName,
+			&s.Lecture.LectureName,
+		)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+
+		a = append(a, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return a, nil
+}
