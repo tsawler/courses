@@ -21,7 +21,7 @@ An extension to GoBlender that allows for delivery of video based online courses
 
 ## Setup
 
-First, install [goblender](https://github.com/tsawler/goblender).
+First, install [GoBlender](https://github.com/tsawler/goblender).
 
 All client specific code lives in `./client/clienthandlers`, and is its own 
 git repository. When working in JetBrains Goland, you must create 
@@ -61,7 +61,7 @@ soda migrate -c ../../migrations-pg/database.yml
 ## Using custom templates
 
 Inside of `clientviews` there are two folders: `public` and `private`. If you wish to use the base templates
-from goBlender to create templates, do it like this:
+from GoBlender to create templates, do it like this:
 
 For public pages:
 
