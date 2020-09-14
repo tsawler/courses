@@ -641,6 +641,8 @@ func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 	duration, _ := strconv.Atoi(r.Form.Get("duration"))
 	userID := app.Session.GetInt(r.Context(), "userID")
 
+	app.InfoLog.Println("Duration is", duration)
+
 	access := clientmodels.CourseAccess{
 		UserID:    userID,
 		LectureID: lectureID,

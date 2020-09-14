@@ -268,12 +268,14 @@
     {{ .Page.JS}}
     {{$lecture := index .RowSets "lecture"}}
     <script>
+        let start;
         document.addEventListener("DOMContentLoaded", function (event) {
             recordStarting();
             window.addEventListener("unload", recordLeaving, false);
         });
 
         function recordStarting() {
+            start = new Date();
             let formData = new FormData();
             formData.append("lecture_id", {{$lecture.ID}});
             formData.append("csrf_token", '{{.CSRFToken}}');
@@ -281,9 +283,14 @@
         }
 
         function recordLeaving() {
+            let end = new Date();
+            let df = end - start;
+            let seconds = Math.round(df / 1000);
             let formData = new FormData();
+            console.log("duration is " + seconds);
             formData.append("lecture_id", {{$lecture.ID}});
             formData.append("csrf_token", '{{.CSRFToken}}');
+            formData.append("duration", seconds.toString());
             navigator.sendBeacon("/courses/lecture/log/record-leaving", formData);
         }
     </script>
