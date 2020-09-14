@@ -651,7 +651,7 @@ func (m *DBModel) GetAssignment(id int) (clientmodels.Assignment, error) {
 	return s, nil
 }
 
-// UpdateLectureSortOrder updates sort order
+// GradeAssignment assigns a grade
 func (m *DBModel) GradeAssignment(a clientmodels.Assignment) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -676,7 +676,7 @@ func (m *DBModel) GradeAssignment(a clientmodels.Assignment) error {
 	return nil
 }
 
-// RecordStartLecture records a student starting/leaving a lecture
+// RecordCourseAccess records a student starting/leaving a lecture
 func (m *DBModel) RecordCourseAccess(a clientmodels.CourseAccess) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -700,6 +700,7 @@ func (m *DBModel) RecordCourseAccess(a clientmodels.CourseAccess) error {
 	return nil
 }
 
+// CourseAccessHistory gets access history for a course by id
 func (m *DBModel) CourseAccessHistory(courseID int) ([]clientmodels.CourseAccess, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
