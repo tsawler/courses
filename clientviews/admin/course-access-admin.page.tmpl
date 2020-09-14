@@ -23,7 +23,7 @@
             {{range $access}}
                 <tr>
                     <td>{{.Student.FirstName}} {{.Student.LastName}}</td>
-                    <td><a href='/admin/courses/{{.ID}}'>{{.Lecture.LectureName}}</a></td>
+                    <td>{.Lecture.LectureName}}</td>
                     <td>{{humanDateTime .CreatedAt}}</td>
                     <td>{{secondsHuman .Duration}}</td>
                 </tr>
