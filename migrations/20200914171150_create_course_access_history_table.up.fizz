@@ -1,0 +1,26 @@
+create_table("course_accesses") {
+  t.Column("id", "integer", {primary: true})
+  t.Column("user_id", "integer", {"unsigned": true})
+  t.Column("lecture_id", "integer", {"unsigned": true})
+  t.Column("is_entered", "integer", {"default": 0})
+  t.Column("is_left", "integer", {"default": 0})
+  t.Column("duration", "integer", {"default": 0})
+}
+
+add_foreign_key("course_accesses", "user_id", {"users": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+add_foreign_key("course_accesses", "lecture_id", {"lectures": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+sql("alter table course_accesses alter column created_at set default now();")
+sql("alter table course_accesses alter column updated_at set default now();")
+
+sql(`CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON course_accesses
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();`)

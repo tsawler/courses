@@ -677,13 +677,13 @@ func (m *DBModel) GradeAssignment(a clientmodels.Assignment) error {
 }
 
 // RecordStartLecture records a student starting a lecture
-func (m *DBModel) RecordStartLecture(userID, lectureID int) error {
+func (m *DBModel) RecordStartLecture(a clientmodels.CourseAccess) error {
 
 	return nil
 }
 
 // RecordLeaveLecture records a student leaving a lecture
-func (m *DBModel) RecordLeaveLecture(userID, lectureID int) error {
+func (m *DBModel) RecordLeaveLecture(a clientmodels.CourseAccess) error {
 
 	return nil
 }

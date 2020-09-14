@@ -50,3 +50,15 @@ type Assignment struct {
 	User            models.User
 	Course          Course
 }
+
+// CourseAccess records course access
+type CourseAccess struct {
+	ID        int
+	UserID    int
+	LectureID int
+	IsEntered int
+	IsLeft    int
+	Duration  int
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}

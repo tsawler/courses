@@ -617,16 +617,39 @@ func StudentAssignments(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// StudentStartedLecture records student starting lecture
 func StudentStartedLecture(w http.ResponseWriter, r *http.Request) {
 	lectureID, _ := strconv.Atoi(r.Form.Get("lecture_id"))
 	userID := app.Session.GetInt(r.Context(), "userID")
 
-	app.InfoLog.Println("Student", userID, "started lecture", lectureID)
+	access := clientmodels.CourseAccess{
+		UserID:    userID,
+		LectureID: lectureID,
+		IsEntered: 1,
+		IsLeft:    0,
+		Duration:  0,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	_ = dbModel.RecordStartLecture(access)
 }
 
+// StudentLeftLecture records student leaving lecture
 func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 	lectureID, _ := strconv.Atoi(r.Form.Get("lecture_id"))
+	duration, _ := strconv.Atoi(r.Form.Get("duration"))
 	userID := app.Session.GetInt(r.Context(), "userID")
 
-	app.InfoLog.Println("Student", userID, "left lecture", lectureID)
+	access := clientmodels.CourseAccess{
+		UserID:    userID,
+		LectureID: lectureID,
+		IsEntered: 0,
+		IsLeft:    1,
+		Duration:  duration,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	_ = dbModel.RecordLeaveLecture(access)
 }
