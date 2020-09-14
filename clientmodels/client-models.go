@@ -56,8 +56,7 @@ type CourseAccess struct {
 	ID        int
 	UserID    int
 	LectureID int
-	IsEntered int
-	IsLeft    int
+	CourseID  int
 	Duration  int
 	CreatedAt time.Time
 	UpdatedAt time.Time

@@ -21,7 +21,6 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	mux.Get("/courses/lecture/:ID", dynamicMiddleware.Append(mw.Auth).ThenFunc(ShowLecture))
 
 	// record access
-	mux.Post("/courses/lecture/log/record-entering", dynamicMiddleware.Append(mw.Auth).ThenFunc(StudentStartedLecture))
 	mux.Post("/courses/lecture/log/record-leaving", dynamicMiddleware.Append(mw.Auth).ThenFunc(StudentLeftLecture))
 
 	// assignments (admin)

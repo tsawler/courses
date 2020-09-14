@@ -268,19 +268,10 @@
     {{ .Page.JS}}
     {{$lecture := index .RowSets "lecture"}}
     <script>
-        let start;
+        let start = new Date();
         document.addEventListener("DOMContentLoaded", function (event) {
-            recordStarting();
             window.addEventListener("unload", recordLeaving, false);
         });
-
-        function recordStarting() {
-            start = new Date();
-            let formData = new FormData();
-            formData.append("lecture_id", {{$lecture.ID}});
-            formData.append("csrf_token", '{{.CSRFToken}}');
-            navigator.sendBeacon("/courses/lecture/log/record-entering", formData);
-        }
 
         function recordLeaving() {
             let end = new Date();

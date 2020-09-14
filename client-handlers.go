@@ -617,24 +617,6 @@ func StudentAssignments(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// StudentStartedLecture records student starting lecture
-func StudentStartedLecture(w http.ResponseWriter, r *http.Request) {
-	lectureID, _ := strconv.Atoi(r.Form.Get("lecture_id"))
-	userID := app.Session.GetInt(r.Context(), "userID")
-
-	access := clientmodels.CourseAccess{
-		UserID:    userID,
-		LectureID: lectureID,
-		IsEntered: 1,
-		IsLeft:    0,
-		Duration:  0,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	_ = dbModel.RecordStartLecture(access)
-}
-
 // StudentLeftLecture records student leaving lecture
 func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 	lectureID, _ := strconv.Atoi(r.Form.Get("lecture_id"))
@@ -643,15 +625,15 @@ func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 
 	app.InfoLog.Println("Duration is", duration)
 
-	access := clientmodels.CourseAccess{
-		UserID:    userID,
-		LectureID: lectureID,
-		IsEntered: 0,
-		IsLeft:    1,
-		Duration:  duration,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+	// only record if 1 second or longer
+	if duration > 0 {
+		access := clientmodels.CourseAccess{
+			UserID:    userID,
+			LectureID: lectureID,
+			Duration:  duration,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+		_ = dbModel.RecordCourseAccess(access)
 	}
-
-	_ = dbModel.RecordLeaveLecture(access)
 }

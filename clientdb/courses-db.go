@@ -676,14 +676,26 @@ func (m *DBModel) GradeAssignment(a clientmodels.Assignment) error {
 	return nil
 }
 
-// RecordStartLecture records a student starting a lecture
-func (m *DBModel) RecordStartLecture(a clientmodels.CourseAccess) error {
+// RecordStartLecture records a student starting/leaving a lecture
+func (m *DBModel) RecordCourseAccess(a clientmodels.CourseAccess) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 
-	return nil
-}
+	query := `insert into course_accesses (user_id, lecture_id, course_id, duration, created_at,
+			updated_at) values ($1, $2, (select course_id from lectures where id = $3), $4, $5, $6)`
 
-// RecordLeaveLecture records a student leaving a lecture
-func (m *DBModel) RecordLeaveLecture(a clientmodels.CourseAccess) error {
+	_, err := m.DB.ExecContext(ctx, query,
+		a.UserID,
+		a.LectureID,
+		a.LectureID,
+		a.Duration,
+		a.CreatedAt,
+		a.UpdatedAt,
+	)
 
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 	return nil
 }
