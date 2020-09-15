@@ -653,3 +653,37 @@ func CourseAccessHistory(w http.ResponseWriter, r *http.Request) {
 		IntMap:  intMap,
 	})
 }
+
+// MemberEdit displays the user for add/edit
+func MemberEdit(w http.ResponseWriter, r *http.Request) {
+	var u models.User
+	id, err := strconv.Atoi(r.URL.Query().Get(":id"))
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+	if id > 0 {
+		u, err = repo.DB.GetUserById(id)
+		if err != nil {
+			app.ErrorLog.Println(err)
+			return
+		}
+	}
+
+	ca, err := dbModel.CourseAccessHistoryForStudent(id)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["access"] = ca
+
+	helpers.Render(w, r, "member.page.tmpl", &templates.TemplateData{
+		Form:      forms.New(nil),
+		AdminUser: u,
+		RowSets:   rowSets,
+	})
+
+}
