@@ -233,6 +233,13 @@
             }, false);
         })();
 
+        $(document).ready(function () {
+            $('#itable').DataTable({
+                stateSave: true,
+                order: [[2, "desc"]],
+            });
+        });
+
         document.getElementById('lockout-user').addEventListener('click', async function () {
             attention.confirm({
                 html: "This will log the user out of all devices, and set the account to inactive. "
