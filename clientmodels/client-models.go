@@ -64,3 +64,25 @@ type CourseAccess struct {
 	Course    Course
 	Lecture   Lecture
 }
+
+// Student holds a student
+type Student struct {
+	ID              int
+	FirstName       string
+	LastName        string
+	UserActive      int
+	AccessLevel     int
+	Email           string
+	Password        []byte
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	Google2faSecret string
+	UseTfa          int
+	LoginTypesId    int
+	DeletedAt       time.Time
+	EmailVerifiedAt time.Time
+	Roles           map[string]int
+	Avatar          string
+	Preferences     map[string]string
+	TimeInCourse    int
+}

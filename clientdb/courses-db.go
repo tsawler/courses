@@ -801,3 +801,40 @@ func (m *DBModel) CourseAccessHistoryForStudent(userID int) ([]clientmodels.Cour
 
 	return a, nil
 }
+
+// AllStudents returns all students
+func (m *DBModel) AllStudents() ([]clientmodels.Student, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var a []clientmodels.Student
+
+	stmt := `
+		SELECT id, last_name, first_name, email, user_active, created_at, updated_at, 
+		(select coalesce(sum(duration), 0) from course_accesses where user_id = u.id)
+		FROM users u
+		where access_level < 3
+    	ORDER BY last_name
+		`
+
+	rows, err := m.DB.QueryContext(ctx, stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s clientmodels.Student
+		err = rows.Scan(&s.ID, &s.LastName, &s.FirstName, &s.Email, &s.UserActive, &s.CreatedAt, &s.UpdatedAt, &s.TimeInCourse)
+		if err != nil {
+			return nil, err
+		}
+		// Append it to the slice
+		a = append(a, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return a, nil
+}

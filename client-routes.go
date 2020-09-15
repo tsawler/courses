@@ -3,7 +3,6 @@ package clienthandlers
 import (
 	"github.com/bmizerany/pat"
 	"github.com/justinas/alice"
-	"github.com/tsawler/goblender/pkg/handlers"
 	mw "github.com/tsawler/goblender/pkg/middleware"
 	"net/http"
 )
@@ -41,7 +40,7 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	mux.Get("/admin/courses/lecture/:courseID/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(AdminLecture))
 	mux.Post("/admin/courses/lecture/:courseID/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(PostAdminLecture))
 
-	mux.Get("/admin/members/all", dynamicMiddleware.Append(mw.Auth).Append(mw.UsersRole).ThenFunc(handlers.Repo.MembersAll(app)))
+	mux.Get("/admin/members/all", dynamicMiddleware.Append(mw.Auth).Append(mw.UsersRole).ThenFunc(MembersAll))
 	mux.Get("/admin/members/:id", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(MemberEdit))
 
 	mux.Get("/admin/courses/:ID/accesses", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(CourseAccessHistory))

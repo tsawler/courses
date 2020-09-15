@@ -687,3 +687,18 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 	})
 
 }
+
+func MembersAll(w http.ResponseWriter, r *http.Request) {
+	users, err := dbModel.AllStudents()
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	myMap := make(map[string]interface{})
+	myMap["users"] = users
+
+	helpers.Render(w, r, "members-all.page.tmpl", &templates.TemplateData{
+		RowSets: myMap,
+	})
+}
