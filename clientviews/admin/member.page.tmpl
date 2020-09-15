@@ -197,7 +197,7 @@
                             {{$access := index .RowSets "access"}}
                             {{range $access}}
                                 <tr>
-                                    <td>{{.Course.CourseName}}}</td>
+                                    <td>{{.Course.CourseName}}</td>
                                     <td>{{.Lecture.LectureName}}</td>
                                     <td>{{humanDateTime .CreatedAt}}</td>
                                     <td>{{secondsHuman .Duration}}</td>
