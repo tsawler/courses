@@ -267,6 +267,7 @@
 
     {{ .Page.JS}}
     {{$lecture := index .RowSets "lecture"}}
+    <script src="https://unpkg.com/navigator.sendbeacon"></script>
     <script>
         let start = new Date();
         document.addEventListener("DOMContentLoaded", function (event) {
