@@ -164,11 +164,11 @@
                                 <hr>
 
                                 <input type="submit" class="btn btn-primary" value="Save Changes">
-                                <a class="btn btn-warning" href="/admin/users/all">Cancel</a>
+                                <a class="btn btn-warning" href="/admin/members/all">Cancel</a>
 
                             </form>
 
-                            {{if ne .Auth.ID .AdminUser.ID}}
+                            {{if and (ne .Auth.ID .AdminUser.ID) (gt .AdminUser.ID 0)}}
                                 <hr>
 
                                 <a class="btn btn-danger" href="#!" id="lockout-user">Log this user out and set
