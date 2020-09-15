@@ -92,7 +92,7 @@ For admin pages:
 
 **Note**
 
-You can override anything in the base templates, or specific pages/partials, but putting a file in 
+You can override anything in the base templates, or specific pages/partials, by putting a file in 
 `client/clientviews/public`, `client/clientviews/public/partials`, `client/clientviews/admin`, or 
 `client/clientviews/admin/partials`.
 
