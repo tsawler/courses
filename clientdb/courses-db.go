@@ -711,7 +711,7 @@ func (m *DBModel) CourseAccessHistory(courseID int) ([]clientmodels.CourseAccess
 		from course_accesses ca 
 		left join users u on (ca.user_id = u.id)
 		left join lectures l on (ca.lecture_id = l.id)
-		where ca.course_id = $1 order by ca.created_at desc`
+		where ca.course_id = $1 and ca.user_id <> 1 order by ca.created_at desc`
 
 	rows, err := m.DB.QueryContext(ctx, query, courseID)
 	if err != nil {
