@@ -23,10 +23,12 @@
 
             <ul class="nav nav-tabs" id="studentTabs">
                 <li class="nav-item">
-                    <a class="nav-link active" id="general-tab" data-toggle="tab" href="#user-tab-content">Student Information</a>
+                    <a class="nav-link active" id="general-tab" data-toggle="tab" href="#user-tab-content">Student
+                        Information</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="activity-tab" href="#access-tab-content" data-toggle="tab">Course Activity</a>
+                    <a class="nav-link" id="activity-tab" href="#access-tab-content" data-toggle="tab">Course
+                        Activity</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="assignment-tab" href="#assignments-tab-content" data-toggle="tab">Assignments</a>
@@ -230,16 +232,20 @@
                             {{$studentID := .AdminUser.ID}}
                             {{range $assignments}}
                                 <tr>
-                                    <td><a href='/admin/courses/assignment/{{.ID}}?src={{$studentID}}'>{{.Description}}</a></td>
+                                    <td>
+                                        <a href='/admin/courses/assignment/{{.ID}}?src={{$studentID}}'>{{.Description}}</a>
+                                    </td>
                                     <td>{{.User.FirstName}} {{.User.LastName}}</td>
                                     <td>{{.Course.CourseName}}</td>
                                     <td>{{humanDateTime .CreatedAt}}</td>
                                     <td class="text-center">
-                                        {{if eq .Processed 1}}
-                                            <span class="badge badge-primary">Processed</span>
-                                        {{else}}
-                                            <span class="badge badge-danger">Not Processed</span>
-                                        {{end}}
+                                        <a href='/admin/courses/assignment/{{.ID}}'>
+                                            {{if eq .Processed 1}}
+                                                <span class="badge badge-primary">Processed</span>
+                                            {{else}}
+                                                <span class="badge badge-danger">Not Processed</span>
+                                            {{end}}
+                                        </a>
                                     </td>
                                     <td class="text-center">
                                         {{if gt .TotalValue 0}}

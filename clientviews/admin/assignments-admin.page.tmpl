@@ -29,11 +29,13 @@
                     <td>{{.Course.CourseName}}</td>
                     <td>{{humanDateTime .CreatedAt}}</td>
                     <td class="text-center">
-                        {{if eq .Processed 1}}
-                            <span class="badge badge-primary">Processed</span>
-                        {{else}}
-                            <span class="badge badge-danger">Not Processed</span>
-                        {{end}}
+                        <a href='/admin/courses/assignment/{{.ID}}'>
+                            {{if eq .Processed 1}}
+                                <span class="badge badge-primary">Processed</span>
+                            {{else}}
+                                <span class="badge badge-danger">Not Processed</span>
+                            {{end}}
+                        </a>
                     </td>
                     <td class="text-center">
                         {{if gt .TotalValue 0}}
