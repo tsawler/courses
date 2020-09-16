@@ -19,7 +19,7 @@
         <input type="hidden" name="user_id" id="user_id" value="{{$a.UserID}}">
 
 
-        <h3>{{$a.User.FirstName}} {{$a.User.LastName}}</h3>
+        <h3><a href="/admin/members/{{$a.User.ID}}">{{$a.User.FirstName}} {{$a.User.LastName}}</a></h3>
         <h4>{{$a.Course.CourseName}} - {{$a.Description}}</h4>
         <p>Received: {{humanDateTime $a.CreatedAt}}</p>
 
