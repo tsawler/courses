@@ -35,6 +35,7 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	mux.Get("/admin/courses/course/get-content/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(GetCourseContentJSON))
 	mux.Post("/admin/courses/course/ajax/savecourse", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(SaveCourse))
 
+	mux.Post("/admin/courses/ajax/save-lecture-sort-order", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(SaveLectureSortOrder))
 	mux.Get("/admin/courses/lecture/get-content/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(GetLectureContentJSON))
 	mux.Post("/admin/courses/lecture/ajax/savelecture", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(SaveLecture))
 	mux.Get("/admin/courses/lecture/:courseID/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(AdminLecture))

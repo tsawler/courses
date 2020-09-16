@@ -702,3 +702,31 @@ func MembersAll(w http.ResponseWriter, r *http.Request) {
 		RowSets: myMap,
 	})
 }
+
+type jsonResponse struct {
+	OK      bool   `json:"ok"`
+	Message string `json:"message"`
+	Content string `json:"content"`
+	ID      int    `json:"id"`
+}
+
+func SaveLectureSortOrder(w http.ResponseWriter, r *http.Request) {
+	courseID, _ := strconv.Atoi(r.Form.Get("course_id"))
+	app.InfoLog.Println("Course id", courseID)
+
+	resp := jsonResponse{
+		OK: true,
+	}
+
+	out, err := json.MarshalIndent(resp, "", "    ")
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(out)
+	if err != nil {
+		app.ErrorLog.Println(err)
+	}
+}

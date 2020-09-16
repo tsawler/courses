@@ -225,6 +225,7 @@
             });
         }
 
+        {{$course := index .RowSets "course"}}
         function performSort() {
             let items = componentList.toArray();
             let obj = [];
@@ -232,6 +233,23 @@
                 obj.push({id: items[i], order: (i + 1)});
             }
             document.getElementById("sort-list").value = JSON.stringify(obj);
+            console.log("performing sort");
+            let fd = new FormData();
+            fd.append("csrf_token", "{{.CSRFToken}}");
+            fd.append("sort_order", document.getElementById("sort-list").value);
+            fd.append("course_id", {{$course.ID}});
+
+            fetch("/admin/courses/ajax/save-lecture-sort-order", {
+                method: 'POST',
+                body: fd,
+            })
+                .then((response) => {
+                    return response.json();
+                })
+                .then((response) => {
+                    console.log(response.ok);
+                });
+
         }
 
     </script>
