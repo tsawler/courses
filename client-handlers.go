@@ -653,7 +653,6 @@ func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 // CourseAccessHistory shows history of student access to course
 func CourseAccessHistory(w http.ResponseWriter, r *http.Request) {
 	courseID, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
-	app.InfoLog.Println("course id", courseID)
 	accesses, _ := dbModel.CourseAccessHistory(courseID)
 
 	rowSets := make(map[string]interface{})

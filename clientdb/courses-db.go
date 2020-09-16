@@ -707,7 +707,7 @@ func (m *DBModel) CourseAccessHistory(courseID int) ([]clientmodels.CourseAccess
 	var a []clientmodels.CourseAccess
 
 	query := `select ca.id, ca.user_id, ca.lecture_id, ca.course_id, ca.duration, ca.created_at, ca.updated_at,
-		u.first_name, u.last_name, l.lecture_name
+		u.first_name, u.last_name, l.lecture_name, u.id
 		from course_accesses ca 
 		left join users u on (ca.user_id = u.id)
 		left join lectures l on (ca.lecture_id = l.id)
@@ -733,6 +733,7 @@ func (m *DBModel) CourseAccessHistory(courseID int) ([]clientmodels.CourseAccess
 			&s.Student.FirstName,
 			&s.Student.LastName,
 			&s.Lecture.LectureName,
+			&s.Student.ID,
 		)
 		if err != nil {
 			fmt.Println(err)

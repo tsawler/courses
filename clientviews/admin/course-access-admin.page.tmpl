@@ -22,7 +22,7 @@
             {{$access := index .RowSets "access"}}
             {{range $access}}
                 <tr>
-                    <td>{{.Student.FirstName}} {{.Student.LastName}}</td>
+                    <td><a href="/admin/members/{{.Student.ID}}">{{.Student.FirstName}} {{.Student.LastName}}</a></td>
                     <td>{{.Lecture.LectureName}}</td>
                     <td>{{humanDateTime .CreatedAt}}</td>
                     <td>{{secondsHuman .Duration}}</td>
