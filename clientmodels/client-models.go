@@ -85,4 +85,5 @@ type Student struct {
 	Avatar          string
 	Preferences     map[string]string
 	TimeInCourse    int
+	Assignments     []Assignment
 }

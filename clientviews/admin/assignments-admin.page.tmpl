@@ -17,6 +17,7 @@
                 <th>Course</th>
                 <th>Date Received</th>
                 <th class="text-center">Processed</th>
+                <th class="text-center">Grade</th>
             </tr>
             </thead>
             <tbody>
@@ -34,7 +35,13 @@
                             <span class="badge badge-danger">Not Processed</span>
                         {{end}}
                     </td>
-
+                    <td class="text-center">
+                        {{if gt .TotalValue 0}}
+                            {{.Mark}}/{{.TotalValue}}
+                        {{else}}
+                            N/A
+                        {{end}}
+                    </td>
                 </tr>
             {{end}}
             </tbody>

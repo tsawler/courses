@@ -575,12 +575,19 @@ func Assignment(w http.ResponseWriter, r *http.Request) {
 		errorLog.Print(err)
 	}
 
+	intMap := make(map[string]int)
+
+	if r.URL.Query().Get("src") != "" {
+		intMap["student_id"], _ = strconv.Atoi(r.URL.Query().Get("src"))
+	}
+
 	rowSets := make(map[string]interface{})
 	rowSets["assignment"] = a
 
 	helpers.Render(w, r, "assignment-admin.page.tmpl", &templates.TemplateData{
 		RowSets: rowSets,
 		Form:    forms.New(nil),
+		IntMap:  intMap,
 	})
 }
 
@@ -598,6 +605,13 @@ func GradeAssignment(w http.ResponseWriter, r *http.Request) {
 	_ = dbModel.GradeAssignment(a)
 
 	app.Session.Put(r.Context(), "flash", "Changes saved")
+
+	fromMember, _ := strconv.Atoi(r.Form.Get("from_member"))
+
+	if fromMember > 0 {
+		http.Redirect(w, r, fmt.Sprintf("/admin/members/%d", fromMember), http.StatusSeeOther)
+		return
+	}
 	http.Redirect(w, r, "/admin/courses/assignments", http.StatusSeeOther)
 }
 
@@ -679,6 +693,9 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 
 	rowSets := make(map[string]interface{})
 	rowSets["access"] = ca
+
+	assignments, _ := dbModel.AllAssignments(id)
+	rowSets["assignments"] = assignments
 
 	helpers.Render(w, r, "member.page.tmpl", &templates.TemplateData{
 		Form:      forms.New(nil),

@@ -828,6 +828,10 @@ func (m *DBModel) AllStudents() ([]clientmodels.Student, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// get assignments, if any
+		assignments, _ := m.AllAssignments(s.ID)
+		s.Assignments = assignments
 		// Append it to the slice
 		a = append(a, s)
 	}

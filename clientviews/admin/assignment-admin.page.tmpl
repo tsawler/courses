@@ -71,7 +71,12 @@
         </div>
         <hr>
         <input type="submit" class="btn btn-primary" value="Save">
-        <a class="btn btn-info" href="/admin/courses/assignments">Cancel</a>
+        {{if gt (index .IntMap "student_id") 0}}
+            <a class="btn btn-info" href="/admin/members/{{index .IntMap "student_id"}}">Cancel</a>
+        {{else}}
+         <a class="btn btn-info" href="/admin/courses/assignments">Cancel</a>
+        {{end}}
+        <input type="hidden" name="from_member" value="{{index .IntMap "student_id"}}">
     </form>
 
 {{end}}
