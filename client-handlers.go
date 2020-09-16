@@ -688,6 +688,7 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// MembersAll overrides default function to include access time
 func MembersAll(w http.ResponseWriter, r *http.Request) {
 	users, err := dbModel.AllStudents()
 	if err != nil {
@@ -710,13 +711,31 @@ type jsonResponse struct {
 	ID      int    `json:"id"`
 }
 
+// SaveLectureSortOrder saves lecture sort order on drag/drop
 func SaveLectureSortOrder(w http.ResponseWriter, r *http.Request) {
-	courseID, _ := strconv.Atoi(r.Form.Get("course_id"))
-	app.InfoLog.Println("Course id", courseID)
+	//Save sort order
+	var sorted []SortOrder
+	sortList := r.Form.Get("sort_list")
 
-	resp := jsonResponse{
-		OK: true,
+	var resp jsonResponse
+
+	err := json.Unmarshal([]byte(sortList), &sorted)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		resp.OK = false
 	}
+
+	ok := true
+	for _, v := range sorted {
+		lectureID, _ := strconv.Atoi(v.ID)
+		err := dbModel.UpdateLectureSortOrder(lectureID, v.Order)
+		if err != nil {
+			app.ErrorLog.Println(err)
+			ok = false
+		}
+	}
+
+	resp.OK = ok
 
 	out, err := json.MarshalIndent(resp, "", "    ")
 	if err != nil {
