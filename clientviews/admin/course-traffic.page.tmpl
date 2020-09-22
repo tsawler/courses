@@ -15,7 +15,7 @@
                 <label for="active">Course</label>
                 <select id="active" name="active" class="custom-select">
                     {{range (index .RowSets "courses")}}
-                    <option value="{{.ID}}" {{if eq .ID $courseID}} selected {{end}}>{{.CourseName}}</option>
+                        <option value="{{.ID}}" {{if eq .ID $courseID}} selected {{end}}>{{.CourseName}}</option>
                     {{end}}
                 </select>
             </div>
