@@ -11,6 +11,7 @@ import (
 func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddleware alice.Chain) (*pat.PatternServeMux, error) {
 
 	// assignments
+	mux.Get("/admin/users/profile", dynamicMiddleware.Append(mw.Auth).ThenFunc(StudentProfile))
 	mux.Get("/admin/assignments-for-student", dynamicMiddleware.Append(mw.Auth).ThenFunc(StudentAssignments))
 	mux.Get("/courses/assignments/submit-an-assignment", dynamicMiddleware.Append(mw.Auth).ThenFunc(SubmitAssignment))
 	mux.Post("/courses/assignments/submit-an-assignment", dynamicMiddleware.Append(mw.Auth).ThenFunc(PostSubmitAssignment))

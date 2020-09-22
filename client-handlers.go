@@ -615,6 +615,39 @@ func GradeAssignment(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/courses/assignments", http.StatusSeeOther)
 }
 
+// StudentProfile shows profile page
+func StudentProfile(w http.ResponseWriter, r *http.Request) {
+	id := app.Session.GetInt(r.Context(), "userID")
+
+	user, err := repo.DB.GetUserById(id)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		return
+	}
+
+	a, err := dbModel.AllAssignments(id)
+	if err != nil {
+		errorLog.Print(err)
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["assignments"] = a
+
+	ca, err := dbModel.CourseAccessHistoryForStudent(id)
+	if err != nil {
+		app.ErrorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+	rowSets["access"] = ca
+
+	helpers.Render(w, r, "profile.page.tmpl", &templates.TemplateData{
+		Form:      forms.New(nil),
+		AdminUser: user,
+		RowSets:   rowSets,
+	})
+}
+
 // StudentAssignments displays assignments in admin tool for a given student
 func StudentAssignments(w http.ResponseWriter, r *http.Request) {
 	userID := app.Session.GetInt(r.Context(), "userID")
