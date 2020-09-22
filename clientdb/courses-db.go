@@ -844,3 +844,45 @@ func (m *DBModel) AllStudents() ([]clientmodels.Student, error) {
 
 	return a, nil
 }
+
+// GetTrafficForCourse
+func (m *DBModel) GetTrafficForCourse(id int) ([]clientmodels.CourseTraffic, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var a []clientmodels.CourseTraffic
+
+	stmt := `
+		select l.lecture_name, 
+		coalesce ((select sum(duration) from course_accesses where lecture_id = l.id and user_id > 1), 0) as total_time,
+		coalesce ((select count(id) from course_accesses where lecture_id = l.id and user_id > 1), 0) as total_views
+		from lectures l
+		where l.course_id = $1
+		order by sort_order
+		`
+
+	rows, err := m.DB.QueryContext(ctx, stmt, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s clientmodels.CourseTraffic
+		err = rows.Scan(
+			&s.LectureName,
+			&s.TotalTime,
+			&s.TotalViews)
+		if err != nil {
+			return nil, err
+		}
+
+		// Append it to the slice
+		a = append(a, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return a, nil
+}

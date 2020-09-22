@@ -1,0 +1,96 @@
+{{template "admin-base" .}}
+
+{{define "title"}}Course Traffic - vMaintain Admin{{end}}
+
+{{define "admin-title"}}Course Traffic{{end}}
+{{define "content-title"}}Course Traffic{{end}}
+{{define "css"}}
+{{end}}
+
+{{define "content"}}
+    {{$courseID := index .IntMap "course_id"}}
+    <div class="row">
+        <div class="offset-4 col-md-4">
+            <div class="form-group ">
+                <label for="active">Course</label>
+                <select id="active" name="active" class="custom-select">
+                    {{range (index .RowSets "courses")}}
+                    <option value="{{.ID}}" {{if eq .ID $courseID}} selected {{end}}>{{.CourseName}}</option>
+                    {{end}}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <canvas id="trafficChart"></canvas>
+        </div>
+    </div>
+{{end}}
+
+
+{{define "js"}}
+    <script>
+
+        $.ajax({
+            url: "/admin/courses/course/ajax/traffic-data?course_id=2",
+            method: "GET",
+            success: function (data) {
+                let url = [];
+                let views = [];
+                let duration = [];
+
+                for (let i in data) {
+                    url.push(data[i].y);
+                    views.push(data[i].views);
+                    duration.push(data[i].time);
+                }
+
+                let chartdata = {
+                    labels: url,
+                    datasets: [
+                        {
+                            label: 'Duration (s)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255,99,132,1)',
+                            hoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
+                            hoverBorderColor: 'rgba(200, 200, 200, 1)',
+                            borderWidth: 1,
+                            data: duration,
+                        }
+                    ]
+                };
+
+
+
+                let ctx = document.getElementById("trafficChart").getContext('2d');
+
+                let barGraph = new Chart(ctx, {
+                    type: 'horizontalBar',
+                    data: chartdata,
+                    options: {
+                        legend: {
+                            display: false,
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Course Traffic',
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }],
+                        }
+                    }
+                });
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    </script>
+
+{{end}}

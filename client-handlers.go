@@ -798,3 +798,54 @@ func SaveLectureSortOrder(w http.ResponseWriter, r *http.Request) {
 		app.ErrorLog.Println(err)
 	}
 }
+
+// CourseTraffic displays a chart of course traffic (views)
+func CourseTraffic(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.URL.Query().Get(":id"))
+
+	rowSets := make(map[string]interface{})
+	intMap := make(map[string]int)
+	intMap["course_id"] = id
+
+	courses, err := dbModel.AllActiveCourses()
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets["courses"] = courses
+
+	helpers.Render(w, r, "course-traffic.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+	})
+}
+
+// CourseTrafficData sends data for chart
+func CourseTrafficData(w http.ResponseWriter, r *http.Request) {
+	courseID, err := strconv.Atoi(r.URL.Query().Get("course_id"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	infoLog.Println("course id is", courseID)
+
+	traffic, err := dbModel.GetTrafficForCourse(courseID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	out, err := json.MarshalIndent(traffic, "", "    ")
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(out)
+	if err != nil {
+		app.ErrorLog.Println(err)
+	}
+
+}

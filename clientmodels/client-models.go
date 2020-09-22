@@ -87,3 +87,10 @@ type Student struct {
 	TimeInCourse    int
 	Assignments     []Assignment
 }
+
+// CourseTraffic holds traffic data
+type CourseTraffic struct {
+	LectureName string `json:"y"`
+	TotalTime   int    `json:"time"`
+	TotalViews  int    `json:"views"`
+}
