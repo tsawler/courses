@@ -34,16 +34,18 @@
 
 {{define "js"}}
     <script>
+        let viewChart;
+        let timeChart;
 
         function showCourse(x) {
             $.ajax({
                 url: "/admin/courses/course/ajax/traffic-data?course_id=" + x,
                 method: "GET",
                 success: function (data) {
-                    let url = [];
-                    let views = [];
-                    let duration = [];
-                    let hms = [];
+                    var url = [];
+                    var views = [];
+                    var duration = [];
+                    var hms = [];
 
                     for (let i in data) {
                         url.push(data[i].y);
@@ -52,7 +54,7 @@
                         hms.push(new Date(data[i].time * 1000).toISOString().substr(11, 8));
                     }
 
-                    let chartdata = {
+                    var chartdata = {
                         labels: url,
                         datasets: [
                             {
@@ -67,9 +69,9 @@
                         ],
                     };
 
-                    let ctx = document.getElementById("durationChart").getContext('2d');
+                    var ctx = document.getElementById("durationChart").getContext('2d');
 
-                    let barGraph = new Chart(ctx, {
+                    viewChart= new Chart(ctx, {
                         type: 'horizontalBar',
                         data: chartdata,
                         options: {
@@ -97,12 +99,12 @@
             });
 
             $.ajax({
-                url: "/admin/courses/course/ajax/traffic-data?course_id=1",
+                url: "/admin/courses/course/ajax/traffic-data?course_id=" + x,
                 method: "GET",
                 success: function (data) {
-                    let url = [];
-                    let duration = [];
-                    let hms = [];
+                    var url = [];
+                    var duration = [];
+                    var hms = [];
 
                     for (let i in data) {
                         url.push(data[i].y);
@@ -110,7 +112,7 @@
                         hms.push(new Date(data[i].time * 1000).toISOString().substr(11, 8));
                     }
 
-                    let chartdata = {
+                    var chartdata = {
                         labels: url,
                         datasets: [
                             {
@@ -125,9 +127,9 @@
                         ],
                     };
 
-                    let ctx = document.getElementById("viewsChart").getContext('2d');
+                    var ctx = document.getElementById("viewsChart").getContext('2d');
 
-                    let barGraph = new Chart(ctx, {
+                    timeChart = new Chart(ctx, {
                         type: 'horizontalBar',
                         data: chartdata,
                         options: {
@@ -171,6 +173,8 @@
 
 
         function showCourseData() {
+            viewChart.destroy();
+            timeChart.destroy();
             showCourse(document.getElementById("course_id").value)
         }
 
