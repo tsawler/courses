@@ -33,30 +33,41 @@
     <script>
 
         $.ajax({
-            url: "/admin/courses/course/ajax/traffic-data?course_id=2",
+            url: "/admin/courses/course/ajax/traffic-data?course_id=1",
             method: "GET",
             success: function (data) {
                 let url = [];
                 let views = [];
                 let duration = [];
+                let hms = [];
 
                 for (let i in data) {
                     url.push(data[i].y);
                     views.push(data[i].views);
-                    duration.push(data[i].time);
+                    duration.push(Math.round(data[i].time / 3600 * 100) / 100);
+                    hms.push(new Date(data[i].time * 1000).toISOString().substr(11, 8))
                 }
 
                 let chartdata = {
                     labels: url,
                     datasets: [
                         {
-                            label: 'Duration (s)',
+                            label: 'Hours',
                             backgroundColor: 'rgba(255, 99, 132, 0.5)',
                             borderColor: 'rgba(255,99,132,1)',
                             hoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
                             hoverBorderColor: 'rgba(200, 200, 200, 1)',
                             borderWidth: 1,
                             data: duration,
+                        },
+                        {
+                            label: 'Views',
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 0.5)',
+                            hoverBackgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            hoverBorderColor: 'rgba(54, 162, 235, 0.5)',
+                            borderWidth: 1,
+                            data: views,
                         }
                     ]
                 };
