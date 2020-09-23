@@ -249,7 +249,8 @@ func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
 	var l clientmodels.Lecture
 
 	query := `select l.id, l.course_id, l.lecture_name, coalesce(l.video_id, 0), l.active, l.sort_order, l.notes, l.created_at,
-			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, ''), l.posted_date
+			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, ''), 
+			coalesce(v.duration, 0), l.posted_date
 			from lectures l
 			left join videos v on (l.video_id = v.id)
 			where l.id = $1`
@@ -269,6 +270,7 @@ func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
 		&l.Video.VideoName,
 		&l.Video.FileName,
 		&l.Video.Thumb,
+		&l.Video.Duration,
 		&l.PostedDate,
 	)
 
@@ -680,6 +682,21 @@ func (m *DBModel) GradeAssignment(a clientmodels.Assignment) error {
 func (m *DBModel) RecordCourseAccess(a clientmodels.CourseAccess) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
+
+	// if the lecture has a video, duration cannot be longer than the video duration
+	lecture, _ := m.GetLecture(a.LectureID)
+	if lecture.VideoID > 0 {
+		// has a video
+		if a.Duration > lecture.Video.Duration {
+			a.Duration = lecture.Video.Duration
+		}
+	} else {
+		// if the duration > 300 seconds, and the lecture does not have a video,
+		// the set duration to 300 seconds
+		if a.Duration > 300 {
+			a.Duration = 300
+		}
+	}
 
 	query := `insert into course_accesses (user_id, lecture_id, course_id, duration, created_at,
 			updated_at) values ($1, $2, (select course_id from lectures where id = $3), $4, $5, $6)`
