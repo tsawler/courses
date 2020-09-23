@@ -23,10 +23,11 @@
     </div>
     <div class="row">
         <div class="col-md-6 col-xs-12">
-            <canvas id="durationChart"></canvas>
+            <canvas id="viewsChart"></canvas>
         </div>
         <div class="col-md-6 col-xs-12">
-            <canvas id="viewsChart"></canvas>
+            <canvas id="durationChart"></canvas>
+            <div id="chartjs-tooltip"></div>
         </div>
     </div>
 {{end}}
@@ -44,14 +45,10 @@
                 success: function (data) {
                     var url = [];
                     var views = [];
-                    var duration = [];
-                    var hms = [];
 
                     for (let i in data) {
                         url.push(data[i].y);
                         views.push(data[i].views);
-                        duration.push(data[i].time);
-                        hms.push(new Date(data[i].time * 1000).toISOString().substr(11, 8));
                     }
 
                     var chartdata = {
@@ -69,7 +66,7 @@
                         ],
                     };
 
-                    var ctx = document.getElementById("durationChart").getContext('2d');
+                    var ctx = document.getElementById("viewsChart").getContext('2d');
 
                     viewChart= new Chart(ctx, {
                         type: 'horizontalBar',
@@ -98,6 +95,18 @@
                 }
             });
 
+
+            function formatTime(seconds) {
+                const h = Math.floor(seconds / 3600);
+                const m = Math.floor((seconds % 3600) / 60);
+                const s = Math.round(seconds % 60);
+                return  [
+                    h,
+                    m > 9 ? m : (h ? '0' + m : m || '0'),
+                    s > 9 ? s : '0' + s
+                ].filter(Boolean).join(':');
+            }
+
             $.ajax({
                 url: "/admin/courses/course/ajax/traffic-data?course_id=" + x,
                 method: "GET",
@@ -109,7 +118,11 @@
                     for (let i in data) {
                         url.push(data[i].y);
                         duration.push(data[i].time);
-                        hms.push(new Date(data[i].time * 1000).toISOString().substr(11, 8));
+                        var secs = Number(data[i].time);
+                        console.log('secs', secs);
+                        var timeString = formatTime(secs);
+                        console.log("got", timeString);
+                        hms.push(timeString);
                     }
 
                     var chartdata = {
@@ -127,7 +140,7 @@
                         ],
                     };
 
-                    var ctx = document.getElementById("viewsChart").getContext('2d');
+                    var ctx = document.getElementById("durationChart").getContext('2d');
 
                     timeChart = new Chart(ctx, {
                         type: 'horizontalBar',
@@ -148,20 +161,22 @@
                                     }
                                 }],
                             },
-                            tooltips: {
-                                mode: 'index',
-                                callbacks: {
-                                    footer: function (toolTipItems, data) {
-                                        var t = "";
-                                        toolTipItems.forEach(function (tooltipItem) {
-                                            t = hms[tooltipItem.datasetIndex];
-                                        });
+                            // tooltips: {
+                            //     mode: 'index',
+                            //     callbacks: {
+                            //         footer: function (toolTipItems, data) {
+                            //             var t = "";
+                            //             toolTipItems.forEach(function (tooltipItem) {
+                            //                 // t = formatTime(tooltipItem.time);
+                            //                 t = formatTime(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].time)
+                            //             });
+                            //
+                            //             return "Time: " + t;
+                            //         }
+                            //     },
+                            //     footerFontStyle: 'normal'
+                            // }
 
-                                        return "Time: " + t;
-                                    }
-                                },
-                                footerFontStyle: 'normal'
-                            }
                         }
                     });
                 },
