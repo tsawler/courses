@@ -22,8 +22,11 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12 col-xs-12">
-            <canvas id="trafficChart"></canvas>
+        <div class="col-md-6 col-xs-12">
+            <canvas id="durationChart"></canvas>
+        </div>
+        <div class="col-md-6 col-xs-12">
+            <canvas id="viewsChart"></canvas>
         </div>
     </div>
 {{end}}
@@ -52,15 +55,6 @@
                     labels: url,
                     datasets: [
                         {
-                            label: 'Seconds',
-                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                            borderColor: 'rgba(255,99,132,1)',
-                            hoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
-                            hoverBorderColor: 'rgba(200, 200, 200, 1)',
-                            borderWidth: 1,
-                            data: duration,
-                        },
-                        {
                             label: 'Views',
                             backgroundColor: 'rgba(54, 162, 235, 0.5)',
                             borderColor: 'rgba(54, 162, 235, 0.5)',
@@ -72,19 +66,77 @@
                     ],
                 };
 
-                let ctx = document.getElementById("trafficChart").getContext('2d');
+                let ctx = document.getElementById("durationChart").getContext('2d');
 
                 let barGraph = new Chart(ctx, {
                     type: 'horizontalBar',
                     data: chartdata,
                     options: {
                         legend: {
-                            display: true,
+                            display: false,
                             position: 'top',
                         },
                         title: {
                             display: true,
-                            text: 'Course Traffic',
+                            text: 'Lecture Views',
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }],
+                        },
+                    }
+                });
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+
+        $.ajax({
+            url: "/admin/courses/course/ajax/traffic-data?course_id=1",
+            method: "GET",
+            success: function (data) {
+                let url = [];
+                let duration = [];
+                let hms = [];
+
+                for (let i in data) {
+                    url.push(data[i].y);
+                    duration.push(data[i].time);
+                    hms.push(new Date(data[i].time * 1000).toISOString().substr(11, 8));
+                }
+
+                let chartdata = {
+                    labels: url,
+                    datasets: [
+                        {
+                            label: 'Seconds',
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255,99,132,1)',
+                            hoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
+                            hoverBorderColor: 'rgba(200, 200, 200, 1)',
+                            borderWidth: 1,
+                            data: duration,
+                        },
+                    ],
+                };
+
+                let ctx = document.getElementById("viewsChart").getContext('2d');
+
+                let barGraph = new Chart(ctx, {
+                    type: 'horizontalBar',
+                    data: chartdata,
+                    options: {
+                        legend: {
+                            display: false,
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time spent in lecture',
                         },
                         scales: {
                             yAxes: [{
