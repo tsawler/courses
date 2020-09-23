@@ -44,7 +44,7 @@
                 for (let i in data) {
                     url.push(data[i].y);
                     views.push(data[i].views);
-                    duration.push(Math.round(data[i].time / 3600 * 100) / 100);
+                    duration.push(data[i].time);
                     hms.push(new Date(data[i].time * 1000).toISOString().substr(11, 8));
                 }
 
@@ -52,7 +52,7 @@
                     labels: url,
                     datasets: [
                         {
-                            label: 'Hours',
+                            label: 'Seconds',
                             backgroundColor: 'rgba(255, 99, 132, 0.5)',
                             borderColor: 'rgba(255,99,132,1)',
                             hoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
