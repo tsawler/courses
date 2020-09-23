@@ -738,6 +738,15 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 	assignments, _ := dbModel.AllAssignments(id)
 	rowSets["assignments"] = assignments
 
+	courses, err := dbModel.AllActiveCourses()
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets["courses"] = courses
+
 	helpers.Render(w, r, "member.page.tmpl", &templates.TemplateData{
 		Form:      forms.New(nil),
 		AdminUser: u,
@@ -883,5 +892,35 @@ func CourseTrafficDataForStudent(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.ErrorLog.Println(err)
 	}
+}
 
+// CourseTrafficDataForStudentAdmin sends data for chart
+func CourseTrafficDataForStudentAdmin(w http.ResponseWriter, r *http.Request) {
+	courseID, err := strconv.Atoi(r.URL.Query().Get("course_id"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	userID, err := strconv.Atoi(r.URL.Query().Get("student_id"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	traffic, err := dbModel.GetTrafficForCourseForStudent(courseID, userID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	out, err := json.MarshalIndent(traffic, "", "    ")
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(out)
+	if err != nil {
+		app.ErrorLog.Println(err)
+	}
 }
