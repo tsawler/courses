@@ -828,8 +828,6 @@ func CourseTrafficData(w http.ResponseWriter, r *http.Request) {
 		errorLog.Println(err)
 	}
 
-	infoLog.Println("course id is", courseID)
-
 	traffic, err := dbModel.GetTrafficForCourse(courseID)
 	if err != nil {
 		errorLog.Println(err)
