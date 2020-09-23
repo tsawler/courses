@@ -95,18 +95,6 @@
                 }
             });
 
-
-            function formatTime(seconds) {
-                const h = Math.floor(seconds / 3600);
-                const m = Math.floor((seconds % 3600) / 60);
-                const s = Math.round(seconds % 60);
-                return  [
-                    h,
-                    m > 9 ? m : (h ? '0' + m : m || '0'),
-                    s > 9 ? s : '0' + s
-                ].filter(Boolean).join(':');
-            }
-
             $.ajax({
                 url: "/admin/courses/course/ajax/traffic-data?course_id=" + x,
                 method: "GET",
@@ -117,19 +105,14 @@
 
                     for (let i in data) {
                         url.push(data[i].y);
-                        duration.push(data[i].time);
-                        var secs = Number(data[i].time);
-                        console.log('secs', secs);
-                        var timeString = formatTime(secs);
-                        console.log("got", timeString);
-                        hms.push(timeString);
+                        duration.push(Math.round(data[i].time / 60));
                     }
 
                     var chartdata = {
                         labels: url,
                         datasets: [
                             {
-                                label: 'Seconds',
+                                label: 'Minutes',
                                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
                                 borderColor: 'rgba(255,99,132,1)',
                                 hoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
@@ -161,22 +144,6 @@
                                     }
                                 }],
                             },
-                            // tooltips: {
-                            //     mode: 'index',
-                            //     callbacks: {
-                            //         footer: function (toolTipItems, data) {
-                            //             var t = "";
-                            //             toolTipItems.forEach(function (tooltipItem) {
-                            //                 // t = formatTime(tooltipItem.time);
-                            //                 t = formatTime(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].time)
-                            //             });
-                            //
-                            //             return "Time: " + t;
-                            //         }
-                            //     },
-                            //     footerFontStyle: 'normal'
-                            // }
-
                         }
                     });
                 },
