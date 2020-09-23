@@ -39,7 +39,12 @@
 
             <li class="nav-item">
                 <a class="nav-link" id="progress-tab" data-toggle="tab" href="#progress-tab-content" role="tab"
-                   aria-controls="Logo" aria-selected="false">My Progress</a>
+                   aria-controls="Logo" aria-selected="false">Course Accesses</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" id="chart-tab" data-toggle="tab" href="#chart-tab-content" role="tab"
+                   aria-controls="Logo" aria-selected="false">Progress</a>
             </li>
 
         </ul>
@@ -239,7 +244,7 @@
             </div>
 
             <div class="tab-pane fade" role="tabpanel" aria-labelledby="progress-tab" id="progress-tab-content">
-                <h3 class="mt-4">My Progress</h3>
+                <h3 class="mt-4">My Course Access History</h3>
 
                 <div class="table-responsive">
                     <table id="progresstable" class="table table-striped table-bordered">
@@ -267,6 +272,33 @@
 
             </div>
 
+            <div class="tab-pane fade" role="tabpanel" aria-labelledby="chart-tab" id="chart-tab-content">
+                <h3 class="mt-4">My Progress</h3>
+
+                <div class="row">
+                    <div class="offset-4 col-md-4">
+                        <div class="form-group ">
+                            <label for="course_id">Course</label>
+                            <select id="course_id" name="active" class="custom-select" onchange="showCourseData()">
+                                {{range (index .RowSets "courses")}}
+                                    <option value="{{.ID}}">{{.CourseName}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-xs-12">
+                        <canvas id="viewsChart"></canvas>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
+                        <canvas id="durationChart"></canvas>
+                        <div id="chartjs-tooltip"></div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </div>
 
@@ -275,6 +307,9 @@
 
 {{define "js"}}
     <script>
+        let viewChart;
+        let timeChart;
+
         (function () {
             'use strict';
             window.addEventListener('load', function () {
@@ -362,6 +397,132 @@
             if(window.location.hash !== "") {
                 $('a[href="' + window.location.hash + '"]').tab('show');
             }
+        });
+
+        function showCourse(x) {
+            $.ajax({
+                url: "/admin/courses/course/ajax/traffic-data-for-student?student_id={{.Auth.ID}}&course_id=" + x,
+                method: "GET",
+                success: function (data) {
+                    var url = [];
+                    var views = [];
+
+                    for (let i in data) {
+                        url.push(data[i].y);
+                        views.push(data[i].views);
+                    }
+
+                    var chartdata = {
+                        labels: url,
+                        datasets: [
+                            {
+                                label: 'Views',
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                borderColor: 'rgba(54, 162, 235, 0.5)',
+                                hoverBackgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                hoverBorderColor: 'rgba(54, 162, 235, 0.5)',
+                                borderWidth: 1,
+                                data: views,
+                            }
+                        ],
+                    };
+
+                    var ctx = document.getElementById("viewsChart").getContext('2d');
+
+                    viewChart= new Chart(ctx, {
+                        type: 'horizontalBar',
+                        data: chartdata,
+                        options: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Lecture Views',
+                            },
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }],
+                            },
+                        }
+                    });
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+
+            $.ajax({
+                url: "/admin/courses/course/ajax/traffic-data-for-student?student_id={{.Auth.ID}}&course_id=" + x,
+                method: "GET",
+                success: function (data) {
+                    var url = [];
+                    var duration = [];
+                    var hms = [];
+
+                    for (let i in data) {
+                        url.push(data[i].y);
+                        duration.push(Math.round(data[i].time / 60));
+                    }
+
+                    var chartdata = {
+                        labels: url,
+                        datasets: [
+                            {
+                                label: 'Minutes',
+                                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                borderColor: 'rgba(255,99,132,1)',
+                                hoverBackgroundColor: 'rgba(255, 99, 132, 0.8)',
+                                hoverBorderColor: 'rgba(200, 200, 200, 1)',
+                                borderWidth: 1,
+                                data: duration,
+                            },
+                        ],
+                    };
+
+                    var ctx = document.getElementById("durationChart").getContext('2d');
+
+                    timeChart = new Chart(ctx, {
+                        type: 'horizontalBar',
+                        data: chartdata,
+                        options: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time spent in lecture',
+                            },
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }],
+                            },
+                        }
+                    });
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+
+
+        function showCourseData() {
+            viewChart.destroy();
+            timeChart.destroy();
+            showCourse(document.getElementById("course_id").value)
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            showCourse(document.getElementById("course_id").value)
         });
 
     </script>

@@ -633,6 +633,15 @@ func StudentProfile(w http.ResponseWriter, r *http.Request) {
 	rowSets := make(map[string]interface{})
 	rowSets["assignments"] = a
 
+	courses, err := dbModel.AllActiveCourses()
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets["courses"] = courses
+
 	ca, err := dbModel.CourseAccessHistoryForStudent(id)
 	if err != nil {
 		app.ErrorLog.Println(err)
@@ -829,6 +838,35 @@ func CourseTrafficData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	traffic, err := dbModel.GetTrafficForCourse(courseID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	out, err := json.MarshalIndent(traffic, "", "    ")
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(out)
+	if err != nil {
+		app.ErrorLog.Println(err)
+	}
+
+}
+
+// CourseTrafficDataForStudent sends data for chart
+func CourseTrafficDataForStudent(w http.ResponseWriter, r *http.Request) {
+	courseID, err := strconv.Atoi(r.URL.Query().Get("course_id"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	userID := app.Session.GetInt(r.Context(), "userID")
+
+	traffic, err := dbModel.GetTrafficForCourseForStudent(courseID, userID)
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)

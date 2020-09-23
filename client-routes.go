@@ -32,6 +32,7 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	// traffic
 	mux.Get("/admin/courses/traffic", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(CourseTraffic))
 	mux.Get("/admin/courses/course/ajax/traffic-data", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(CourseTrafficData))
+	mux.Get("/admin/courses/course/ajax/traffic-data-for-student", dynamicMiddleware.Append(mw.Auth).ThenFunc(CourseTrafficDataForStudent))
 
 	// course admin
 	mux.Get("/admin/courses/all", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(AdminAllCourses))
