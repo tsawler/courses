@@ -45,7 +45,7 @@
                     url.push(data[i].y);
                     views.push(data[i].views);
                     duration.push(Math.round(data[i].time / 3600 * 100) / 100);
-                    hms.push(new Date(data[i].time * 1000).toISOString().substr(11, 8))
+                    hms.push(new Date(data[i].time * 1000).toISOString().substr(11, 8));
                 }
 
                 let chartdata = {
@@ -69,7 +69,7 @@
                             borderWidth: 1,
                             data: views,
                         }
-                    ]
+                    ],
                 };
 
                 let ctx = document.getElementById("trafficChart").getContext('2d');
@@ -92,6 +92,20 @@
                                     beginAtZero: true
                                 }
                             }],
+                        },
+                        tooltips: {
+                            mode: 'index',
+                            callbacks: {
+                                footer: function(toolTipItems, data) {
+                                    var t = "";
+                                    toolTipItems.forEach(function(tooltipItem) {
+                                        t = hms[tooltipItem.datasetIndex];
+                                    });
+
+                                    return "Time: " + t;
+                                }
+                            },
+                            footerFontStyle: 'normal'
                         }
                     }
                 });
