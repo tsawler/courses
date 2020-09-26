@@ -182,8 +182,18 @@
 
                             {{if and (ne .Auth.ID .AdminUser.ID) (gt .AdminUser.ID 0)}}
                                 <hr>
-                                <a class="btn btn-danger" href="#!" id="lockout-user">Log this user out and set
-                                    inactive</a>
+                                {{if eq (dateAfterYearOne .AdminUser.DeletedAt) true}}
+                                    <a class="btn btn-danger" href="#!" id="undelete-user">Undelete this user</a>
+                                {{else}}
+                                    <div class="float-left">
+                                        <a class="btn btn-danger" href="#!" id="lockout-user">Log this user out and set
+                                            inactive</a>
+                                    </div>
+                                    <div class="float-right">
+                                        <a class="btn btn-danger" href="#!" id="delete-user">Delete this user</a>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                {{end}}
                             {{end}}
 
                         </div>
@@ -343,6 +353,7 @@
             }
         });
 
+        {{if eq (dateAfterYearOne .AdminUser.DeletedAt) false}}
         document.getElementById('lockout-user').addEventListener('click', async function () {
             attention.confirm({
                 html: "This will log the user out of all devices, and set the account to inactive. "
@@ -357,6 +368,38 @@
                 }
             })
         });
+
+
+        document.getElementById('delete-user').addEventListener('click', async function () {
+            attention.confirm({
+                html: "This will delete the user. Are you sure?",
+                showCancelButton: true,
+                confirmButtonText: 'Delete User',
+                icon: 'warning',
+                callback: function (result) {
+                    if (result !== false) {
+                        window.location.href = '/admin/users/security/delete-user?id={{.AdminUser.ID}}'
+                    }
+                }
+            })
+        });
+        {{end}}
+
+        {{if eq (dateAfterYearOne .AdminUser.DeletedAt) true}}
+        document.getElementById('undelete-user').addEventListener('click', async function () {
+            attention.confirm({
+                html: "This will undelete the user, and set the account to active. Are you sure?",
+                showCancelButton: true,
+                confirmButtonText: 'Undelete User',
+                icon: 'warning',
+                callback: function (result) {
+                    if (result !== false) {
+                        window.location.href = '/admin/users/security/undelete-user?id={{.AdminUser.ID}}'
+                    }
+                }
+            })
+        });
+        {{end}}
 
         let tfaCheckBox = document.getElementById("use_tfa");
 
