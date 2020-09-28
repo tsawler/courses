@@ -11,6 +11,20 @@
                 <li><a href="/admin/courses/traffic">Traffic</a></li>
             </ul>
         </li>
+
+        <li id="users" {{if eq .CurrentSegment "members"}} class="active" {{end}}>
+            <a href="javascript:"><i class="fa fa-users fa-fw"></i> <span
+                        class="nav-label">Students</span>
+                <span
+                        class="fa arrow"></span></a>
+            <ul id="users-second" class="nav nav-second-level collapse">
+                <li><a href="/admin/members/all">All Students</a></li>
+                <li><a href="/admin/members/0">Add Students</a></li>
+                {{if hasRole "users" .Auth.ID}}
+                    <li><a href="/admin/members/all-deleted">Deleted Students</a></li>
+                {{end}}
+            </ul>
+        </li>
     {{end}}
 
 
