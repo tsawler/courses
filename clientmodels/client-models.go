@@ -94,3 +94,14 @@ type CourseTraffic struct {
 	TotalTime   int    `json:"time"`
 	TotalViews  int    `json:"views"`
 }
+
+// Section holds a section and associated course
+type Section struct {
+	ID          int
+	CourseID    int
+	SectionName string
+	Active      int
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Course      Course
+}

@@ -1,7 +1,7 @@
 create_table("course_sections") {
   t.Column("id", "integer", {primary: true})
   t.Column("course_id", "integer", {"unsigned": true})
-  t.Column("course_name", "string", {"size": 512})
+  t.Column("section_name", "string", {"size": 512})
   t.Column("active", "integer", {"default": 1})
 }
 
