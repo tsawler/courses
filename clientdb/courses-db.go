@@ -110,6 +110,21 @@ func (m *DBModel) InsertSection(c clientmodels.Section) (int, error) {
 	return id, nil
 }
 
+// DeleteSection deletes a course section
+func (m *DBModel) DeleteSection(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `delete from course_sections where id = $1`
+
+	_, err := m.DB.ExecContext(ctx, query, id)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}
+
 // GetSection gets a section
 func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
