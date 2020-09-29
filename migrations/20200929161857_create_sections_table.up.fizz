@@ -1,0 +1,19 @@
+create_table("course_sections") {
+  t.Column("id", "integer", {primary: true})
+  t.Column("course_id", "integer", {"unsigned": true})
+  t.Column("course_name", "string", {"size": 512})
+  t.Column("active", "integer", {"default": 1})
+}
+
+add_foreign_key("course_sections", "course_id", {"courses": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+sql("alter table course_sections alter column created_at set default now();")
+sql("alter table course_sections alter column updated_at set default now();")
+
+sql(`CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON course_sections
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();`)
