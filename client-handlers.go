@@ -924,3 +924,46 @@ func CourseTrafficDataForStudentAdmin(w http.ResponseWriter, r *http.Request) {
 		app.ErrorLog.Println(err)
 	}
 }
+
+// AdminAllSections shows list of all sections for admin
+func AdminAllSections(w http.ResponseWriter, r *http.Request) {
+	sections, err := dbModel.AllSections()
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["sections"] = sections
+
+	helpers.Render(w, r, "sections-all-admin.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+	})
+}
+
+// AdminSection shows list of all sections for admin
+func AdminSection(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	section, err := dbModel.GetSection(id)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["section"] = section
+
+	courses, err := dbModel.AllCourses()
+	rowSets["courses"] = courses
+
+	helpers.Render(w, r, "section.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+		Form:    forms.New(nil),
+	})
+}

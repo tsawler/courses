@@ -1,0 +1,83 @@
+{{template "admin-base" .}}
+
+{{define "title"}}Section - vMaintain Admin{{end}}
+
+{{define "admin-title"}}Section{{end}}
+{{define "content-title"}}Section{{end}}
+{{define "css"}}
+{{end}}
+
+{{define "content"}}
+
+    {{$s := index .RowSets "section"}}
+
+    <form method="post" action="/admin/sections/{{$s.ID}}" novalidate
+          class="needs-validation"
+          id="s-form">
+
+        <input type="hidden" name="csrf_token" id="csrf_token" value="{{.CSRFToken}}">
+
+        <div class="row">
+
+            <div class="col-md-6 col-xs-12">
+                <div class="form-group mt-3">
+                    <label for="section_name">Section Name</label>
+                    {{with .Form.Errors.Get "section_name"}}
+                        <label class='text-danger'>{{.}}</label>
+                    {{end}}
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
+                        </div>
+                        <input class="form-control required {{with .Form.Errors.Get "section_name"}} is-invalid {{end}}"
+                               id="section_name"
+                               required
+                               autocomplete="off" type='text'
+                               name='section_name'
+                               value='{{$s.SectionName}}'>
+                        <div class="invalid-feedback">
+                            Please enter a value
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="course_id">Course</label>
+                    <select id="course_id" name="course_id" class="custom-select" required>
+                        <option>Choose...</option>
+                        {{$courses := index .RowSets "courses"}}
+                        {{range $courses}}
+                            <option value="0" {{if eq $s.CourseID .ID}} selected {{end}}>{{.CourseName}}</option>
+                        {{end}}
+                    </select>
+                </div>
+
+                <div class="form-group ">
+                    <label for="active">Active</label>
+                    <select id="active" name="active" class="custom-select">
+                        <option value="0" {{if eq $s.Active 0}} selected {{end}}>No</option>
+                        <option value="1" {{if eq $s.Active 1}} selected {{end}}>Yes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 col-xs-12">
+                <hr>
+                <input type="submit" class="btn btn-primary" value="Save">
+
+                <a class="btn btn-info" href="/admin/sections/all">Cancel</a>
+            </div>
+        </div>
+    </form>
+
+{{end}}
+
+{{define "js"}}
+    <script>
+        $(document).ready(function () {
+
+        });
+    </script>
+{{end}}

@@ -13,6 +13,100 @@ type DBModel struct {
 	DB *sql.DB
 }
 
+// AllSections returns slice of all sections
+func (m *DBModel) AllSections() ([]clientmodels.Section, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `SELECT s.id, s.section_name, s.active, 
+		s.course_id, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
+		c.prof_name, c.prof_email, c.teams_link,
+		c.created_at as course_created_at, c.updated_at as course_updated_at
+		FROM course_sections s
+		left join courses c on (s.course_id = c.id)
+		ORDER BY s.created_at desc`
+
+	rows, err := m.DB.QueryContext(ctx, stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sections []clientmodels.Section
+
+	for rows.Next() {
+		var s clientmodels.Section
+		err = rows.Scan(
+			&s.ID,
+			&s.SectionName,
+			&s.Active,
+			&s.CourseID,
+			&s.CreatedAt,
+			&s.UpdatedAt,
+			&s.Course.ID,
+			&s.Course.CourseName,
+			&s.Course.Active,
+			&s.Course.ProfName,
+			&s.Course.ProfEmail,
+			&s.Course.TeamsLink,
+			&s.Course.CreatedAt,
+			&s.Course.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		sections = append(sections, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return sections, nil
+}
+
+// GetSection gets a section
+func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var s clientmodels.Section
+
+	query := `SELECT s.id, s.section_name, s.active, 
+		s.course_id, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
+		c.prof_name, c.prof_email, c.teams_link,
+		c.created_at as course_created_at, c.updated_at as course_updated_at
+		FROM course_sections s
+		left join courses c on (s.course_id = c.id)
+		where s.id = $1`
+
+	row := m.DB.QueryRowContext(ctx, query, id)
+
+	err := row.Scan(
+		&s.ID,
+		&s.SectionName,
+		&s.Active,
+		&s.CourseID,
+		&s.CreatedAt,
+		&s.UpdatedAt,
+		&s.Course.ID,
+		&s.Course.CourseName,
+		&s.Course.Active,
+		&s.Course.ProfName,
+		&s.Course.ProfEmail,
+		&s.Course.TeamsLink,
+		&s.Course.CreatedAt,
+		&s.Course.UpdatedAt,
+	)
+
+	if err != nil {
+		return s, err
+	}
+
+	return s, nil
+
+}
+
 // AllCourses returns slice of courses (without lectures)
 func (m *DBModel) AllCourses() ([]clientmodels.Course, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

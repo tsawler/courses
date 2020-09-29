@@ -1,6 +1,16 @@
 {{define "top-of-menu"}}
 
     {{if hasRole "pages" .Auth.ID}}
+
+        <li id="pages" {{if eq .CurrentSegment "sections"}} class="active" {{end}}>
+            <a href="#!"><i class="fa fa-info fa-fw"></i> <span class="nav-label">Sections</span> <span
+                        class="fa arrow"></span></a>
+            <ul class="nav nav-second-level collapse">
+                <li><a href="/admin/sections/all">All Sections</a></li>
+                <li><a href="/admin/sections/0">New Section</a></li>
+            </ul>
+        </li>
+
         <li id="pages" {{if eq .CurrentSegment "courses"}} class="active" {{end}}>
             <a href="#!"><i class="fa fa-briefcase fa-fw"></i> <span class="nav-label">Courses</span> <span
                         class="fa arrow"></span></a>
