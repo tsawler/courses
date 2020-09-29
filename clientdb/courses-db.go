@@ -164,6 +164,27 @@ func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 	}
 
 	// get students, if any
+	var students []clientmodels.Student
+	query2 := `select u.id, u.first_name, u.last_name 
+		from users u 
+		where u.id in (select user_id from student_sections where section_id = $1)`
+
+	rows, err := m.DB.QueryContext(ctx, query2)
+	if err != nil {
+		return s, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var u clientmodels.Student
+		err = rows.Scan(
+			&u.ID,
+			&u.FirstName,
+			&u.LastName,
+		)
+		students = append(students, u)
+	}
+	s.Students = students
 
 	return s, nil
 
