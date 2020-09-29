@@ -1164,6 +1164,7 @@ func (m *DBModel) StudentsForSection(id int) ([]clientmodels.Student, error) {
 	return students, nil
 }
 
+// UpdateEnrollmentForSection manages student enrollment
 func (m *DBModel) UpdateEnrollmentForSection(id int, students []string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
