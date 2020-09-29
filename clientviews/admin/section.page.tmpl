@@ -72,6 +72,13 @@
                 <input type="submit" class="btn btn-primary" value="Save">
 
                 <a class="btn btn-info" href="/admin/sections/all">Cancel</a>
+
+                {{if gt $s.ID 0}}
+                    <div class="float-right">
+                        <a class="btn btn-danger" href="#!" id="delete-section">Delete Section</a>
+                    </div>
+                    <div class="clearfix"></div>
+                {{end}}
             </div>
         </div>
     </form>
@@ -95,5 +102,22 @@
                 });
             }, false);
         })();
+
+        {{$s := index .RowSets "section"}}
+        {{if gt $s.ID 0}}
+        document.getElementById('delete-section').addEventListener('click', async function () {
+            attention.confirm({
+                html: "This delete the section, and all information associated with it (e.g. enrolled students). Are you sure?",
+                showCancelButton: true,
+                confirmButtonText: 'Delete Section',
+                icon: 'warning',
+                callback: function (result) {
+                    if (result !== false) {
+                        window.location.href = '/admin/sections/delete/{{$s.ID}}'
+                    }
+                }
+            })
+        });
+        {{end}}
     </script>
 {{end}}

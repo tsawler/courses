@@ -1016,3 +1016,22 @@ func PostAdminSection(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/sections/all", http.StatusSeeOther)
 
 }
+
+// DeleteSection deletes a section
+func DeleteSection(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	err = dbModel.DeleteSection(id)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	session.Put(r.Context(), "flash", "Section deleted")
+	http.Redirect(w, r, "/admin/sections/all", http.StatusSeeOther)
+
+}
