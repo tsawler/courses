@@ -2,7 +2,10 @@
 
 {{define "title"}}Section - vMaintain Admin{{end}}
 
-{{define "admin-title"}}Section{{end}}
+{{define "admin-title"}}
+    {{$s := index .RowSets "section"}}
+    Section {{if gt $s.ID 0}}- {{$s.SectionName}} {{end}}
+{{end}}
 {{define "content-title"}}Section{{end}}
 {{define "css"}}
 {{end}}
