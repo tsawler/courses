@@ -163,6 +163,8 @@ func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 		return s, err
 	}
 
+	// get students, if any
+
 	return s, nil
 
 }

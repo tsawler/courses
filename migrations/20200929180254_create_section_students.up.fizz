@@ -1,0 +1,23 @@
+create_table("section_students") {
+  t.Column("id", "integer", {primary: true})
+  t.Column("section_id", "integer", {"unsigned": true})
+  t.Column("user_id", "integer", {"unsigned": true})
+}
+
+add_foreign_key("section_students", "section_id", {"course_sections": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+add_foreign_key("section_students", "user_id", {"users": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+sql("alter table section_students alter column created_at set default now();")
+sql("alter table section_students alter column updated_at set default now();")
+
+sql(`CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON section_students
+    FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();`)
