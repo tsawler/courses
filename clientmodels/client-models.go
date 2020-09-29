@@ -87,6 +87,7 @@ type Student struct {
 	TimeInCourse    int
 	Assignments     []Assignment
 	Courses         []Section
+	IsRegistered    int
 }
 
 // CourseTraffic holds traffic data

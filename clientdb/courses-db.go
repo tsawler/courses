@@ -1122,3 +1122,42 @@ func (m *DBModel) GetTrafficForCourseForStudent(id, studentID int) ([]clientmode
 
 	return a, nil
 }
+
+// StudentsForSection returns slice of all students, and whether registered or not
+func (m *DBModel) StudentsForSection(id int) ([]clientmodels.Student, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var students []clientmodels.Student
+
+	query := `select id, first_name, last_name, 
+				case when (select count(user_id) from section_students where section_id = $1) = 0 then 0
+				else 1 end as is_registered 
+				from users u order by last_name`
+
+	rows, err := m.DB.QueryContext(ctx, query, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s clientmodels.Student
+		err = rows.Scan(
+			&s.ID,
+			&s.FirstName,
+			&s.LastName,
+			&s.IsRegistered,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		students = append(students, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return students, nil
+}

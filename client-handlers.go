@@ -1035,3 +1035,35 @@ func DeleteSection(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/sections/all", http.StatusSeeOther)
 
 }
+
+// SectionStudents allows for enrollment of students in section
+func SectionStudents(w http.ResponseWriter, r *http.Request) {
+	sectionID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	students, err := dbModel.StudentsForSection(sectionID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets := make(map[string]interface{})
+	rowSets["students"] = students
+
+	section, err := dbModel.GetSection(sectionID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	rowSets["section"] = section
+
+	helpers.Render(w, r, "section-students.page.tmpl", &templates.TemplateData{
+		RowSets: rowSets,
+		Form:    forms.New(nil),
+	})
+}
