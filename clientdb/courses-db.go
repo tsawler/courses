@@ -1132,7 +1132,7 @@ func (m *DBModel) StudentsForSection(id int) ([]clientmodels.Student, error) {
 	var students []clientmodels.Student
 
 	query := `select id, first_name, last_name, 
-				case when (select count(user_id) from section_students where section_id = $1) = 0 then 0
+				case when (select count(user_id) from section_students where section_id = $1 and user_id = u.id) = 0 then 0
 				else 1 end as is_registered 
 				from users u order by last_name`
 
@@ -1175,23 +1175,21 @@ func (m *DBModel) UpdateEnrollmentForSection(id int, students []string) error {
 	// first delete all unchecked students (they will not be in the slice)
 	stmt := fmt.Sprintf(`delete from section_students where user_id not in (%s) and section_id = $1`, strings.Join(students, ","))
 
-	fmt.Println(stmt)
-
 	_, err := m.DB.ExecContext(ctx, stmt, id)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error deleting", err)
 		return err
 	}
 
-	// add in students again
+	// add in new students
 	for _, x := range students {
 		stmt = fmt.Sprintf(`insert into section_students (section_id, user_id, created_at, updated_at)
-		values ($1, %s, $2, $3) where not exists (select id from section_students 
+		select $1, %s, $2, $3 where not exists (select id from section_students 
 		where user_id = %s and section_id = $4)`, x, x)
 
 		_, err := m.DB.ExecContext(ctx, stmt, id, time.Now(), time.Now(), id)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error inserting", err)
 			return err
 		}
 	}
