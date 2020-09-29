@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/tsawler/goblender/client/clienthandlers/clientmodels"
+	"strings"
 	"time"
 )
 
@@ -925,6 +926,7 @@ func (m *DBModel) CourseAccessHistory(courseID int) ([]clientmodels.CourseAccess
 			&s.CreatedAt,
 			&s.UpdatedAt,
 			&s.Student.FirstName,
+			&s.Student.FirstName,
 			&s.Student.LastName,
 			&s.Lecture.LectureName,
 			&s.Student.ID,
@@ -1160,4 +1162,39 @@ func (m *DBModel) StudentsForSection(id int) ([]clientmodels.Student, error) {
 	}
 
 	return students, nil
+}
+
+func (m *DBModel) UpdateEnrollmentForSection(id int, students []string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	if len(students) == 0 {
+		students = append(students, "0")
+	}
+
+	// first delete all unchecked students (they will not be in the slice)
+	stmt := fmt.Sprintf(`delete from section_students where user_id not in (%s) and section_id = $1`, strings.Join(students, ","))
+
+	fmt.Println(stmt)
+
+	_, err := m.DB.ExecContext(ctx, stmt, id)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	// add in students again
+	for _, x := range students {
+		stmt = fmt.Sprintf(`insert into section_students (section_id, user_id, created_at, updated_at)
+		values ($1, %s, $2, $3) where not exists (select id from section_students 
+		where user_id = %s and section_id = $4)`, x, x)
+
+		_, err := m.DB.ExecContext(ctx, stmt, id, time.Now(), time.Now(), id)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+	}
+
+	return nil
 }

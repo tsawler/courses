@@ -1067,3 +1067,21 @@ func SectionStudents(w http.ResponseWriter, r *http.Request) {
 		Form:    forms.New(nil),
 	})
 }
+
+func PostSectionStudents(w http.ResponseWriter, r *http.Request) {
+	sectionID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	// get checked students
+	var students []string
+	for _, item := range r.PostForm["student"] {
+		students = append(students, item)
+	}
+
+	err = dbModel.UpdateEnrollmentForSection(sectionID, students)
+
+	session.Put(r.Context(), "flash", "Changs saved")
+	http.Redirect(w, r, fmt.Sprintf("/admin/sections/%d", sectionID), http.StatusSeeOther)
+}
