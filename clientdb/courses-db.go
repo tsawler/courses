@@ -65,6 +65,51 @@ func (m *DBModel) AllSections() ([]clientmodels.Section, error) {
 	return sections, nil
 }
 
+// UpdateSection updates a course section
+func (m *DBModel) UpdateSection(c clientmodels.Section) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `update course_sections set section_name = $1, active = $2, course_id = $3, updated_at = $4 where id = $5`
+
+	_, err := m.DB.ExecContext(ctx, query,
+		c.SectionName,
+		c.Active,
+		c.CourseID,
+		time.Now(),
+		c.ID)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}
+
+// InsertSection inserts a course section
+func (m *DBModel) InsertSection(c clientmodels.Section) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `insert into course_sections (section_name, course_id, active, created_at, updated_at) 
+			values ($1, $2, $3, $4, $5)
+			returning id`
+
+	var id int
+	err := m.DB.QueryRowContext(ctx, query,
+		c.SectionName,
+		c.CourseID,
+		c.Active,
+		time.Now(),
+		time.Now(),
+	).Scan(&id)
+
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+	return id, nil
+}
+
 // GetSection gets a section
 func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

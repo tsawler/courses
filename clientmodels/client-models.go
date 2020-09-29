@@ -86,6 +86,7 @@ type Student struct {
 	Preferences     map[string]string
 	TimeInCourse    int
 	Assignments     []Assignment
+	Courses         []Section
 }
 
 // CourseTraffic holds traffic data
@@ -104,4 +105,5 @@ type Section struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Course      Course
+	Students    []Student
 }

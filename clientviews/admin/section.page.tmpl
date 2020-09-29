@@ -50,7 +50,7 @@
                         <option value="">Choose...</option>
                         {{$courses := index .RowSets "courses"}}
                         {{range $courses}}
-                            <option value="0" {{if eq $s.CourseID .ID}} selected {{end}}>{{.CourseName}}</option>
+                            <option value="{{.ID}}" {{if eq $s.CourseID .ID}} selected {{end}}>{{.CourseName}}</option>
                         {{end}}
                     </select>
                 </div>

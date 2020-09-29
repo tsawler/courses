@@ -972,3 +972,47 @@ func AdminSection(w http.ResponseWriter, r *http.Request) {
 		Form:    forms.New(nil),
 	})
 }
+
+// PostAdminSection posts a section
+func PostAdminSection(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	var section clientmodels.Section
+
+	if id > 0 {
+		s, err := dbModel.GetSection(id)
+		if err != nil {
+			errorLog.Println(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+		section = s
+	}
+
+	section.SectionName = r.Form.Get("section_name")
+	section.Active, _ = strconv.Atoi(r.Form.Get("active"))
+	section.CourseID, _ = strconv.Atoi(r.Form.Get("course_id"))
+
+	if id > 0 {
+		err := dbModel.UpdateSection(section)
+		if err != nil {
+			errorLog.Println(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+	} else {
+		_, err := dbModel.InsertSection(section)
+		if err != nil {
+			errorLog.Println(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+	}
+
+	session.Put(r.Context(), "flash", "Changes saved")
+	http.Redirect(w, r, "/admin/sections/all", http.StatusSeeOther)
+
+}
