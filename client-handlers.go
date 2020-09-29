@@ -949,11 +949,16 @@ func AdminSection(w http.ResponseWriter, r *http.Request) {
 		errorLog.Println(err)
 	}
 
-	section, err := dbModel.GetSection(id)
-	if err != nil {
-		errorLog.Println(err)
-		helpers.ClientError(w, http.StatusBadRequest)
-		return
+	var section clientmodels.Section
+
+	if id > 0 {
+		s, err := dbModel.GetSection(id)
+		if err != nil {
+			errorLog.Println(err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+		section = s
 	}
 
 	rowSets := make(map[string]interface{})

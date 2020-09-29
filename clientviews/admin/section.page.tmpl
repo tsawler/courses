@@ -44,7 +44,7 @@
                 <div class="form-group">
                     <label for="course_id">Course</label>
                     <select id="course_id" name="course_id" class="custom-select" required>
-                        <option>Choose...</option>
+                        <option value="">Choose...</option>
                         {{$courses := index .RowSets "courses"}}
                         {{range $courses}}
                             <option value="0" {{if eq $s.CourseID .ID}} selected {{end}}>{{.CourseName}}</option>
@@ -77,8 +77,20 @@
 
 {{define "js"}}
     <script>
-        $(document).ready(function () {
-
-        });
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
     </script>
 {{end}}
