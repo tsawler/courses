@@ -40,7 +40,7 @@
 
         function showCourse(x) {
             $.ajax({
-                url: "/admin/courses/course/ajax/traffic-data?course_id=" + x,
+                url: "/admin/courses/course/ajax/traffic-data?section_id=" + x,
                 method: "GET",
                 success: function (data) {
                     var url = [];
@@ -96,12 +96,11 @@
             });
 
             $.ajax({
-                url: "/admin/courses/course/ajax/traffic-data?course_id=" + x,
+                url: "/admin/courses/course/ajax/traffic-data?section_id=" + x,
                 method: "GET",
                 success: function (data) {
                     var url = [];
                     var duration = [];
-                    var hms = [];
 
                     for (let i in data) {
                         url.push(data[i].y);

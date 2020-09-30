@@ -1245,21 +1245,30 @@ func (m *DBModel) AllStudents() ([]clientmodels.Student, error) {
 }
 
 // GetTrafficForCourse gets chart data
-func (m *DBModel) GetTrafficForCourse(id int) ([]clientmodels.CourseTraffic, error) {
+func (m *DBModel) GetTrafficForCourseSection(id int) ([]clientmodels.CourseTraffic, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var a []clientmodels.CourseTraffic
 
+	query := `select course_id from course_sections where id = $1`
+	row := m.DB.QueryRowContext(ctx, query, id)
+
+	var courseID int
+	err := row.Scan(&courseID)
+	if err != nil {
+		return nil, err
+	}
+
 	stmt := `
 		select l.lecture_name, 
-		coalesce ((select sum(duration) from course_accesses where lecture_id = l.id and user_id > 1), 0) as total_time,
-		coalesce ((select count(id) from course_accesses where lecture_id = l.id and user_id > 1), 0) as total_views
+		coalesce ((select sum(duration) from course_accesses where lecture_id = l.id and user_id > 1 and section_id = $1), 0) as total_time,
+		coalesce ((select count(id) from course_accesses where lecture_id = l.id and user_id > 1 and section_id = $1), 0) as total_views
 		from lectures l
-		where l.course_id = $1
+		where l.course_id = $2
 		order by sort_order
 		`
 
-	rows, err := m.DB.QueryContext(ctx, stmt, id)
+	rows, err := m.DB.QueryContext(ctx, stmt, id, courseID)
 	if err != nil {
 		return nil, err
 	}
