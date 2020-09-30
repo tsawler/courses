@@ -176,7 +176,7 @@
 
                     <div>
                         {{if gt (index .IntMap "previous") 0}}
-                            <a class="btn btn-outline-secondary text-dark" href="/courses/lecture/{{index .IntMap "previous"}}">&laquo;</a>
+                            <a class="btn btn-outline-secondary text-dark" href="/courses/lecture/{{$lecture.SectionID}}/{{index .IntMap "previous"}}">&laquo;</a>
                         {{else}}
                             &nbsp;
                         {{end}}
@@ -201,7 +201,7 @@
 
                     <div>
                         {{if gt (index .IntMap "next") 0}}
-                            <a class="btn btn-outline-secondary text-dark" href="/courses/lecture/{{index .IntMap "next"}}">&raquo;</a>
+                            <a class="btn btn-outline-secondary text-dark" href="/courses/lecture/{{$lecture.SectionID}}/{{index .IntMap "next"}}">&raquo;</a>
                         {{else}}
                             &nbsp;
                         {{end}}
@@ -211,7 +211,7 @@
 
                 <hr class="mt-3">
                 <div class="text-center">
-                    <a class="btn btn-outline-secondary text-dark" href="/courses/overview/{{$lecture.CourseID}}">Back
+                    <a class="btn btn-outline-secondary text-dark" href="/courses/overview/{{$lecture.SectionID}}">Back
                         to Course
                         Overview</a>
                 </div>

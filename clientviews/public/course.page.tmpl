@@ -1,8 +1,8 @@
 {{template "base" .}}
 
 {{define "title"}}
-    {{$course := index .RowSets "course"}}
-    {{$course.CourseName}}
+    {{$section := index .RowSets "section"}}
+    {{$section.Course.CourseName}}
 {{end}}
 
 {{define "css"}}
@@ -155,28 +155,28 @@
 {{end}}
 
 {{define "content"}}
-    {{$course := index .RowSets "course"}}
+    {{$section := index .RowSets "section"}}
     <div id="content_edit" class="is-wrapper">
-        {{safeHTML $course.Description}}
+        {{safeHTML $section.Course.Description}}
     </div>
 
 {{end}}
 
 {{define "body"}}
-    {{$course := index .RowSets "course"}}
+    {{$section := index .RowSets "section"}}
     <div class="clearfix"></div>
     <div class="container">
         <div class="row">
             <div class="col">
                 <p>&nbsp;</p>
-                {{if or (ne $course.TeamsLink "") (ne $course.ProfEmail "")}}
+                {{if or (ne $section.Course.TeamsLink "") (ne $section.Course.ProfEmail "")}}
                     <div class="text-center">
-                        {{if ne $course.TeamsLink ""}}
-                            <a class="btn btn-outline-secondary text-dark" target="_blank" href="{{$course.TeamsLink}}">Microsoft
+                        {{if ne $section.Course.TeamsLink ""}}
+                            <a class="btn btn-outline-secondary text-dark" target="_blank" href="{{$section.Course.TeamsLink}}">Microsoft
                                 Teams</a>
                         {{end}}
-                        {{if ne $course.ProfEmail ""}}
-                            <a class="btn btn-outline-secondary text-dark" href="mailto:{{$course.ProfEmail}}">Email
+                        {{if ne $section.Course.ProfEmail ""}}
+                            <a class="btn btn-outline-secondary text-dark" href="mailto:{{$section.Course.ProfEmail}}">Email
                                 Professor</a>
                         {{end}}
                     </div>
@@ -184,9 +184,9 @@
                 <h2 class="mt-3">Lectures</h2>
                 <div class="list-group">
 
-                    {{range $course.Lectures}}
+                    {{range $section.Course.Lectures}}
                         {{if eq .Active 1}}
-                            <a class="list-group-item list-group-item-action" href="/courses/lecture/{{.ID}}">
+                            <a class="list-group-item list-group-item-action" href="/courses/lecture/{{$section.ID}}/{{.ID}}">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1">{{.LectureName}}
                                         {{if gt .Video.Duration 0}}

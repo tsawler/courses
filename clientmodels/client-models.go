@@ -32,6 +32,7 @@ type Lecture struct {
 	PostedDate  time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	SectionID   int
 }
 
 // Assignment holds an assignment

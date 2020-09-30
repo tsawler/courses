@@ -67,6 +67,60 @@ func (m *DBModel) AllSections() ([]clientmodels.Section, error) {
 	return sections, nil
 }
 
+// AllActiveSections returns slice of all active sections
+func (m *DBModel) AllActiveSections() ([]clientmodels.Section, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `SELECT s.id, s.section_name, s.active, 
+		s.course_id, s.term, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
+		c.prof_name, c.prof_email, c.teams_link,
+		c.created_at as course_created_at, c.updated_at as course_updated_at
+		FROM course_sections s
+		left join courses c on (s.course_id = c.id)
+		where s.active = 1
+		ORDER BY s.created_at desc`
+
+	rows, err := m.DB.QueryContext(ctx, stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sections []clientmodels.Section
+
+	for rows.Next() {
+		var s clientmodels.Section
+		err = rows.Scan(
+			&s.ID,
+			&s.SectionName,
+			&s.Active,
+			&s.CourseID,
+			&s.Term,
+			&s.CreatedAt,
+			&s.UpdatedAt,
+			&s.Course.ID,
+			&s.Course.CourseName,
+			&s.Course.Active,
+			&s.Course.ProfName,
+			&s.Course.ProfEmail,
+			&s.Course.TeamsLink,
+			&s.Course.CreatedAt,
+			&s.Course.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		sections = append(sections, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return sections, nil
+}
+
 // UpdateSection updates a course section
 func (m *DBModel) UpdateSection(c clientmodels.Section) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -290,6 +344,95 @@ func (m *DBModel) AllActiveCourses() ([]clientmodels.Course, error) {
 	}
 
 	return courses, nil
+}
+
+// GetCourseSection gets a course (for admin) with all lectures
+func (m *DBModel) GetCourseSection(id int) (clientmodels.Section, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var section clientmodels.Section
+
+	//query := `select id, course_name, active, description,
+	//	prof_name, prof_email, teams_link,
+	//	created_at, updated_at from courses where id = $1`
+
+	query := `select s.id, s.course_id, s.section_name, s.active, s.term, s.created_at, s.updated_at,
+		c.id, c.course_name, c.active, c.description, 
+		c.prof_name, c.prof_email, c.teams_link,
+		c.created_at, c.updated_at 
+		from course_sections s 
+		left join courses c on (c.id = s.course_id)
+		where s.id = $1`
+
+	row := m.DB.QueryRowContext(ctx, query, id)
+
+	err := row.Scan(
+		&section.ID,
+		&section.CourseID,
+		&section.SectionName,
+		&section.Active,
+		&section.Term,
+		&section.CreatedAt,
+		&section.UpdatedAt,
+		&section.Course.ID,
+		&section.Course.CourseName,
+		&section.Course.Active,
+		&section.Course.Description,
+		&section.Course.ProfName,
+		&section.Course.ProfEmail,
+		&section.Course.TeamsLink,
+		&section.Course.CreatedAt,
+		&section.Course.UpdatedAt,
+	)
+	if err != nil {
+		fmt.Println("Error getting course section")
+		fmt.Println(err)
+		return section, err
+	}
+
+	// get lectures, if any
+	query = `select l.id, l.course_id, l.lecture_name, coalesce(l.video_id, 0), l.active, l.sort_order, l.notes, l.created_at,
+			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, ''), coalesce(v.duration, 0), l.posted_date at time zone 'America/Halifax'
+			from lectures l
+			left join videos v on (l.video_id = v.id)
+			where l.course_id = $1 order by l.sort_order`
+
+	rows, err := m.DB.QueryContext(ctx, query, &section.CourseID)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+
+	var lectures []clientmodels.Lecture
+	for rows.Next() {
+		var l clientmodels.Lecture
+		err = rows.Scan(
+			&l.ID,
+			&l.CourseID,
+			&l.LectureName,
+			&l.VideoID,
+			&l.Active,
+			&l.SortOrder,
+			&l.Notes,
+			&l.CreatedAt,
+			&l.UpdatedAt,
+			&l.Video.VideoName,
+			&l.Video.FileName,
+			&l.Video.Thumb,
+			&l.Video.Duration,
+			&l.PostedDate,
+		)
+		if err != nil {
+			return section, err
+		}
+
+		lectures = append(lectures, l)
+	}
+
+	section.Course.Lectures = lectures
+
+	return section, nil
 }
 
 // GetCourse gets a course (for admin) with all lectures

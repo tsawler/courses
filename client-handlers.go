@@ -24,7 +24,7 @@ func AllCourses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	courses, err := dbModel.AllActiveCourses()
+	courses, err := dbModel.AllActiveSections()
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
@@ -49,7 +49,7 @@ func ShowCourse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	course, err := dbModel.GetCourse(courseID)
+	section, err := dbModel.GetCourseSection(courseID)
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
@@ -57,10 +57,10 @@ func ShowCourse(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rowSets := make(map[string]interface{})
-	rowSets["course"] = course
+	rowSets["section"] = section
 
 	pg := models.Page{
-		ID:          course.ID,
+		ID:          section.ID,
 		AccessLevel: 2,
 		Active:      1,
 		SEOImage:    0,
@@ -68,8 +68,8 @@ func ShowCourse(w http.ResponseWriter, r *http.Request) {
 		MenuColor:   "navbar-light",
 		HasSlider:   0,
 		Immutable:   1,
-		Content:     course.Description,
-		PageTitle:   course.CourseName,
+		Content:     section.Course.Description,
+		PageTitle:   section.Course.CourseName,
 	}
 
 	helpers.Render(w, r, "course.page.tmpl", &templates.TemplateData{
@@ -87,12 +87,21 @@ func ShowLecture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sectionID, err := strconv.Atoi(r.URL.Query().Get(":SectionID"))
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
 	lecture, err := dbModel.GetLecture(lectureID)
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
 		return
 	}
+
+	lecture.SectionID = sectionID
 
 	course, err := dbModel.GetCourse(lecture.CourseID)
 	if err != nil {
