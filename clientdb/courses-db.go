@@ -188,7 +188,8 @@ func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 	var students []clientmodels.Student
 	query2 := `select u.id, u.first_name, u.last_name 
 		from users u 
-		where u.id in (select user_id from section_students where section_id = $1)`
+		where u.id in (select user_id from section_students where section_id = $1)
+		order by u.last_name`
 
 	rows, err := m.DB.QueryContext(ctx, query2, s.ID)
 	if err != nil {
