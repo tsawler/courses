@@ -126,6 +126,21 @@ func (m *DBModel) DeleteSection(id int) error {
 	return nil
 }
 
+// RemoveStudentFromSection deletes a student from a course section
+func (m *DBModel) RemoveStudentFromSection(id, sectionID int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `delete from section_students where user_id = $1 and section_id = $2`
+
+	_, err := m.DB.ExecContext(ctx, query, id, sectionID)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}
+
 // GetSection gets a section
 func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

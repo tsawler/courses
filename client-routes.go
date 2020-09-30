@@ -41,6 +41,7 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	mux.Get("/admin/sections/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(AdminSection))
 	mux.Post("/admin/sections/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(PostAdminSection))
 	mux.Get("/admin/sections/delete/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(DeleteSection))
+	mux.Get("/admin/sections/remove-student/:SectionID/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(UnenrolStudent))
 	mux.Get("/admin/sections/students/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(SectionStudents))
 	mux.Post("/admin/sections/students/:ID", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(PostSectionStudents))
 

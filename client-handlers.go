@@ -1036,6 +1036,30 @@ func DeleteSection(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// UnenrolStudent removes a student from a section
+func UnenrolStudent(w http.ResponseWriter, r *http.Request) {
+	sectionID, err := strconv.Atoi(r.URL.Query().Get(":SectionID"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	id, err := strconv.Atoi(r.URL.Query().Get(":ID"))
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	err = dbModel.RemoveStudentFromSection(id, sectionID)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	session.Put(r.Context(), "flash", "Section deleted")
+	http.Redirect(w, r, fmt.Sprintf("/admin/sections/%d", sectionID), http.StatusSeeOther)
+
+}
+
 // SectionStudents allows for enrollment of students in section
 func SectionStudents(w http.ResponseWriter, r *http.Request) {
 	sectionID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
