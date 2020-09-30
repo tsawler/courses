@@ -282,7 +282,7 @@
                     <h3 class="mt-4">My Progress</h3>
 
                     <div class="row">
-                        <div class="offset-4 col-md-4">
+                        <div class="offset-3 col-md-6">
                             <div class="form-group ">
                                 <label for="course_id">Course</label>
                                 <select id="course_id" name="active" class="custom-select" onchange="showCourseData()">
@@ -442,7 +442,7 @@
 
         function showCourse(x) {
             $.ajax({
-                url: "/admin/courses/course/ajax/traffic-data-for-student-admin?student_id={{.AdminUser.ID}}&course_id=" + x,
+                url: "/admin/courses/course/ajax/traffic-data-for-student-admin?student_id={{.AdminUser.ID}}&section_id=" + x,
                 method: "GET",
                 success: function (data) {
                     var url = [];
@@ -498,7 +498,7 @@
             });
 
             $.ajax({
-                url: "/admin/courses/course/ajax/traffic-data-for-student-admin?student_id={{.AdminUser.ID}}&course_id=" + x,
+                url: "/admin/courses/course/ajax/traffic-data-for-student-admin?student_id={{.AdminUser.ID}}&section_id=" + x,
                 method: "GET",
                 success: function (data) {
                     var url = [];

@@ -904,7 +904,7 @@ func CourseTrafficDataForStudent(w http.ResponseWriter, r *http.Request) {
 
 // CourseTrafficDataForStudentAdmin sends data for chart
 func CourseTrafficDataForStudentAdmin(w http.ResponseWriter, r *http.Request) {
-	courseID, err := strconv.Atoi(r.URL.Query().Get("course_id"))
+	sectionID, err := strconv.Atoi(r.URL.Query().Get("section_id"))
 	if err != nil {
 		errorLog.Println(err)
 	}
@@ -914,7 +914,7 @@ func CourseTrafficDataForStudentAdmin(w http.ResponseWriter, r *http.Request) {
 		errorLog.Println(err)
 	}
 
-	traffic, err := dbModel.GetTrafficForCourseForStudent(courseID, userID)
+	traffic, err := dbModel.GetTrafficForCourseForStudent(sectionID, userID)
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
