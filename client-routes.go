@@ -62,7 +62,7 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	mux.Get("/admin/members/all-deleted", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(handlers.Repo.DeletedMembersAll(app)))
 	mux.Get("/admin/members/:id", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(MemberEdit))
 
-	mux.Get("/admin/courses/:ID/accesses", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(CourseAccessHistory))
+	mux.Get("/admin/sections/:ID/accesses", dynamicMiddleware.Append(mw.Auth).Append(mw.PagesRole).ThenFunc(CourseSectionAccessHistory))
 
 	// public folder
 	fileServer := http.FileServer(http.Dir("./client/clienthandlers/public/"))

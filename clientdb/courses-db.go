@@ -1097,20 +1097,20 @@ func (m *DBModel) RecordCourseAccess(a clientmodels.CourseAccess) error {
 	return nil
 }
 
-// CourseAccessHistory gets access history for a course by id
-func (m *DBModel) CourseAccessHistory(courseID int) ([]clientmodels.CourseAccess, error) {
+// CourseSectionAccessHistory gets access history for a course by id
+func (m *DBModel) CourseSectionAccessHistory(sectionID int) ([]clientmodels.CourseAccess, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var a []clientmodels.CourseAccess
 
 	query := `select ca.id, ca.user_id, ca.lecture_id, ca.course_id, ca.duration, ca.created_at, ca.updated_at,
-		u.first_name, u.last_name, l.lecture_name, u.id
+		u.first_name, u.last_name, l.lecture_name, u.id, ca.section_id
 		from course_accesses ca 
 		left join users u on (ca.user_id = u.id)
 		left join lectures l on (ca.lecture_id = l.id)
-		where ca.course_id = $1 and ca.user_id <> 1 order by ca.created_at desc`
+		where ca.section_id = $1 and ca.user_id <> 1 order by ca.created_at desc`
 
-	rows, err := m.DB.QueryContext(ctx, query, courseID)
+	rows, err := m.DB.QueryContext(ctx, query, sectionID)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -1128,10 +1128,10 @@ func (m *DBModel) CourseAccessHistory(courseID int) ([]clientmodels.CourseAccess
 			&s.CreatedAt,
 			&s.UpdatedAt,
 			&s.Student.FirstName,
-			&s.Student.FirstName,
 			&s.Student.LastName,
 			&s.Lecture.LectureName,
 			&s.Student.ID,
+			&s.SectionID,
 		)
 		if err != nil {
 			fmt.Println(err)
@@ -1156,7 +1156,7 @@ func (m *DBModel) CourseAccessHistoryForStudent(userID int) ([]clientmodels.Cour
 	var a []clientmodels.CourseAccess
 
 	query := `select ca.id, ca.user_id, ca.lecture_id, ca.course_id, ca.duration, ca.created_at, ca.updated_at,
-		u.first_name, u.last_name, l.lecture_name, c.course_name
+		u.first_name, u.last_name, l.lecture_name, c.course_name, ca.section_id
 		from course_accesses ca 
 		left join users u on (ca.user_id = u.id)
 		left join lectures l on (ca.lecture_id = l.id)
@@ -1184,6 +1184,7 @@ func (m *DBModel) CourseAccessHistoryForStudent(userID int) ([]clientmodels.Cour
 			&s.Student.LastName,
 			&s.Lecture.LectureName,
 			&s.Course.CourseName,
+			&s.SectionID,
 		)
 		if err != nil {
 			fmt.Println(err)

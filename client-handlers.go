@@ -639,7 +639,7 @@ func StudentProfile(w http.ResponseWriter, r *http.Request) {
 	rowSets := make(map[string]interface{})
 	rowSets["assignments"] = a
 
-	courses, err := dbModel.AllActiveCourses()
+	courses, err := dbModel.AllActiveSections()
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
@@ -700,16 +700,16 @@ func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// CourseAccessHistory shows history of student access to course
-func CourseAccessHistory(w http.ResponseWriter, r *http.Request) {
-	courseID, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
-	accesses, _ := dbModel.CourseAccessHistory(courseID)
+// CourseSectionAccessHistory shows history of student access to course
+func CourseSectionAccessHistory(w http.ResponseWriter, r *http.Request) {
+	sectionID, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
+	accesses, _ := dbModel.CourseSectionAccessHistory(sectionID)
 
 	rowSets := make(map[string]interface{})
 	rowSets["access"] = accesses
 
 	intMap := make(map[string]int)
-	intMap["course_id"] = courseID
+	intMap["section_id"] = sectionID
 
 	helpers.Render(w, r, "course-access-admin.page.tmpl", &templates.TemplateData{
 		RowSets: rowSets,
@@ -746,7 +746,7 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 	assignments, _ := dbModel.AllAssignments(id)
 	rowSets["assignments"] = assignments
 
-	courses, err := dbModel.AllActiveCourses()
+	courses, err := dbModel.AllActiveSections()
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)

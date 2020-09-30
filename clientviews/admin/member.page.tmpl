@@ -287,7 +287,7 @@
                                 <label for="course_id">Course</label>
                                 <select id="course_id" name="active" class="custom-select" onchange="showCourseData()">
                                     {{range (index .RowSets "courses")}}
-                                        <option value="{{.ID}}">{{.CourseName}}</option>
+                                        <option value="{{.ID}}">{{.SectionName}}: {{.Course.CourseName}} - {{.Term}}</option>
                                     {{end}}
                                 </select>
                             </div>
