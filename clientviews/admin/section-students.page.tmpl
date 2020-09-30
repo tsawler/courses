@@ -1,18 +1,18 @@
 {{template "admin-base" .}}
 
-{{define "title"}}Section Enrollment - vMaintain Admin{{end}}
+{{define "title"}}Section Enrolment - vMaintain Admin{{end}}
 
 {{define "admin-title"}}
     {{$s := index .RowSets "section"}}
-    Section Enrollment: {{$s.SectionName}}
+    Section Enrolment: {{$s.SectionName}}
 {{end}}
-{{define "content-title"}}Section Enrollment{{end}}
+{{define "content-title"}}Section Enrolment{{end}}
 {{define "css"}}
 {{end}}
 
 {{define "content"}}
     {{$s := index .RowSets "section"}}
-    <form method="post" action="/admin/sections/students/{{$s.ID}}">
+    <form method="post" action="/admin/sections/students/{{$s.ID}}" name="enrol" id="enrol">
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
 
         <div class="table-responsive">
@@ -44,10 +44,28 @@
 
 {{define "js"}}
     <script>
+        let dt;
+
         $(document).ready(function () {
-            $('#itable').DataTable({
+            dt = $('#itable').DataTable({
                 stateSave: true,
                 order: [[0, "asc"]],
+            });
+        });
+
+        $('#enrol').on('submit', function(e){
+            let form = this;
+            dt.$('input[type="checkbox"]').each(function(){
+                if(!$.contains(document, this)){
+                    if(this.checked){
+                        $(form).append(
+                            $('<input>')
+                                .attr('type', 'hidden')
+                                .attr('name', this.name)
+                                .val(this.value)
+                        );
+                    }
+                }
             });
         });
     </script>
