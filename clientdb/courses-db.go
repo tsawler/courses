@@ -1151,7 +1151,7 @@ func (m *DBModel) StudentsForSection(id int) ([]clientmodels.Student, error) {
 	defer cancel()
 	var students []clientmodels.Student
 
-	query := `select id, first_name, last_name, 
+	query := `select id, first_name, last_name, user_active,
 				case when (select count(user_id) from section_students where section_id = $1 and user_id = u.id) = 0 then 0
 				else 1 end as is_registered 
 				from users u order by last_name`
@@ -1168,6 +1168,7 @@ func (m *DBModel) StudentsForSection(id int) ([]clientmodels.Student, error) {
 			&s.ID,
 			&s.FirstName,
 			&s.LastName,
+			&s.UserActive,
 			&s.IsRegistered,
 		)
 		if err != nil {

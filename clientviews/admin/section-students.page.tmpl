@@ -40,7 +40,12 @@
                         <td style="width: 25px !important;" class="text-center">
                             <input type="checkbox" name="student" value="{{.ID}}" {{if eq .IsRegistered 1}} checked {{end}}>
                         </td>
-                        <td>{{.LastName}}, {{.FirstName}}</td>
+                        <td>
+                            {{.LastName}}, {{.FirstName}}
+                            {{if eq .UserActive 0}}
+                                <span class="text-muted">(inactive)</span>
+                            {{end}}
+                        </td>
                     </tr>
                 {{end}}
                 </tbody>
