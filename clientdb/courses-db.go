@@ -95,7 +95,7 @@ func (m *DBModel) InsertSection(c clientmodels.Section) (int, error) {
 	defer cancel()
 
 	query := `insert into course_sections (section_name, course_id, active, term, created_at, updated_at) 
-			values ($1, $2, $3, $4, $5)
+			values ($1, $2, $3, $4, $5, $6)
 			returning id`
 
 	var id int
