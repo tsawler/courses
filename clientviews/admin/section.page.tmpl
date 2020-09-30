@@ -45,6 +45,7 @@
                     <div class="row">
 
                         <div class="col-md-6 col-xs-12">
+
                             <div class="form-group mt-3">
                                 <label for="section_name">Section Name</label>
                                 {{with .Form.Errors.Get "section_name"}}
@@ -75,6 +76,27 @@
                                         <option value="{{.ID}}" {{if eq $s.CourseID .ID}} selected {{end}}>{{.CourseName}}</option>
                                     {{end}}
                                 </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="term">Term</label>
+                                {{with .Form.Errors.Get "term"}}
+                                    <label class='text-danger'>{{.}}</label>
+                                {{end}}
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
+                                    </div>
+                                    <input class="form-control required {{with .Form.Errors.Get "term"}} is-invalid {{end}}"
+                                           id="term"
+                                           required
+                                           autocomplete="off" type='text'
+                                           name='term'
+                                           value='{{$s.Term}}'>
+                                    <div class="invalid-feedback">
+                                        Please enter a value
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group ">

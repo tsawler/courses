@@ -993,6 +993,7 @@ func PostAdminSection(w http.ResponseWriter, r *http.Request) {
 	}
 
 	section.SectionName = r.Form.Get("section_name")
+	section.Term = r.Form.Get("term")
 	section.Active, _ = strconv.Atoi(r.Form.Get("active"))
 	section.CourseID, _ = strconv.Atoi(r.Form.Get("course_id"))
 

@@ -103,6 +103,7 @@ type Section struct {
 	CourseID    int
 	SectionName string
 	Active      int
+	Term        string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Course      Course

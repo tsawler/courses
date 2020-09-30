@@ -20,7 +20,7 @@ func (m *DBModel) AllSections() ([]clientmodels.Section, error) {
 	defer cancel()
 
 	stmt := `SELECT s.id, s.section_name, s.active, 
-		s.course_id, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
+		s.course_id, s.term, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
 		c.prof_name, c.prof_email, c.teams_link,
 		c.created_at as course_created_at, c.updated_at as course_updated_at
 		FROM course_sections s
@@ -42,6 +42,7 @@ func (m *DBModel) AllSections() ([]clientmodels.Section, error) {
 			&s.SectionName,
 			&s.Active,
 			&s.CourseID,
+			&s.Term,
 			&s.CreatedAt,
 			&s.UpdatedAt,
 			&s.Course.ID,
@@ -71,12 +72,14 @@ func (m *DBModel) UpdateSection(c clientmodels.Section) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `update course_sections set section_name = $1, active = $2, course_id = $3, updated_at = $4 where id = $5`
+	query := `update course_sections set section_name = $1, active = $2, course_id = $3, term = $4, updated_at = $5 
+				where id = $6`
 
 	_, err := m.DB.ExecContext(ctx, query,
 		c.SectionName,
 		c.Active,
 		c.CourseID,
+		c.Term,
 		time.Now(),
 		c.ID)
 	if err != nil {
@@ -91,7 +94,7 @@ func (m *DBModel) InsertSection(c clientmodels.Section) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `insert into course_sections (section_name, course_id, active, created_at, updated_at) 
+	query := `insert into course_sections (section_name, course_id, active, term, created_at, updated_at) 
 			values ($1, $2, $3, $4, $5)
 			returning id`
 
@@ -100,6 +103,7 @@ func (m *DBModel) InsertSection(c clientmodels.Section) (int, error) {
 		c.SectionName,
 		c.CourseID,
 		c.Active,
+		c.Term,
 		time.Now(),
 		time.Now(),
 	).Scan(&id)
@@ -149,7 +153,7 @@ func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 	var s clientmodels.Section
 
 	query := `SELECT s.id, s.section_name, s.active, 
-		s.course_id, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
+		s.course_id, s.term, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
 		c.prof_name, c.prof_email, c.teams_link,
 		c.created_at as course_created_at, c.updated_at as course_updated_at
 		FROM course_sections s
@@ -163,6 +167,7 @@ func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 		&s.SectionName,
 		&s.Active,
 		&s.CourseID,
+		&s.Term,
 		&s.CreatedAt,
 		&s.UpdatedAt,
 		&s.Course.ID,

@@ -19,6 +19,7 @@
                 <th>ID</th>
                 <th>Section Name</th>
                 <th>Course Name</th>
+                <th>Term</th>
                 <th class="text-center">Status</th>
                 <th>Updated</th>
                 <th>Created</th>
@@ -31,7 +32,7 @@
                     <td>{{.ID}}</td>
                     <td><a href='/admin/sections/{{.ID}}' title="Edit section">{{.SectionName}}</a></td>
                     <td>{{.Course.CourseName}}</td>
-
+                    <td>{{.Term}}</td>
                     <td class="text-center">
                         {{if eq .Active 1}}
                             <span class="badge badge-primary">Active</span>
