@@ -12,9 +12,6 @@ type Course struct {
 	Active      int
 	Lectures    []Lecture
 	Description string
-	ProfName    string
-	ProfEmail   string
-	TeamsLink   string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -33,6 +30,7 @@ type Lecture struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	SectionID   int
+	Section     Section
 }
 
 // Assignment holds an assignment
@@ -58,6 +56,7 @@ type CourseAccess struct {
 	UserID    int
 	LectureID int
 	CourseID  int
+	SectionID int
 	Duration  int
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -105,6 +104,9 @@ type Section struct {
 	SectionName string
 	Active      int
 	Term        string
+	ProfName    string
+	ProfEmail   string
+	TeamsLink   string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Course      Course

@@ -182,16 +182,16 @@
                         {{end}}
                     </div>
 
-                    {{if or (ne $course.TeamsLink "") (ne $course.ProfEmail "")}}
+                    {{if or (ne $lecture.Section.TeamsLink "") (ne $lecture.Section.ProfEmail "")}}
                         <div class="text-center">
-                            {{if ne $course.TeamsLink ""}}
+                            {{if ne $lecture.Section.TeamsLink ""}}
                                 <a class="btn btn-outline-secondary text-dark" target="_blank"
-                                   href="{{$course.TeamsLink}}">Microsoft
+                                   href="{{$lecture.Section.TeamsLink}}">Microsoft
                                     Teams</a>
                             {{end}}
-                            {{if ne $course.ProfEmail ""}}
+                            {{if ne $lecture.Section.ProfEmail ""}}
                                 <a class="btn btn-outline-secondary text-dark"
-                                   href="mailto:{{$course.ProfEmail}}?subject={{$course.CourseName}}: {{$lecture.LectureName}}">Email
+                                   href="mailto:{{$lecture.Section.ProfEmail}}?subject={{$course.CourseName}}: {{$lecture.LectureName}}">Email
                                     Professor</a>
                             {{end}}
                         </div>
@@ -281,6 +281,7 @@
             let formData = new FormData();
             console.log("duration is " + seconds);
             formData.append("lecture_id", {{$lecture.ID}});
+            formData.append("section_id", {{$lecture.SectionID}});
             formData.append("csrf_token", '{{.CSRFToken}}');
             formData.append("duration", seconds.toString());
             navigator.sendBeacon("/courses/lecture/log/record-leaving", formData);

@@ -94,7 +94,7 @@ func ShowLecture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lecture, err := dbModel.GetLecture(lectureID)
+	lecture, err := dbModel.GetLectureForSection(lectureID, sectionID)
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
@@ -220,9 +220,6 @@ func PostAdminCourse(w http.ResponseWriter, r *http.Request) {
 		course.CourseName = r.Form.Get("course_name")
 		active, _ := strconv.Atoi(r.Form.Get("active"))
 		course.Active = active
-		course.ProfName = r.Form.Get("prof_name")
-		course.ProfEmail = r.Form.Get("prof_email")
-		course.TeamsLink = r.Form.Get("teams_link")
 		err = dbModel.UpdateCourse(course)
 		if err != nil {
 			errorLog.Println(err)
@@ -685,6 +682,7 @@ func StudentAssignments(w http.ResponseWriter, r *http.Request) {
 // StudentLeftLecture records student leaving lecture
 func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 	lectureID, _ := strconv.Atoi(r.Form.Get("lecture_id"))
+	sectionID, _ := strconv.Atoi(r.Form.Get("section_id"))
 	duration, _ := strconv.Atoi(r.Form.Get("duration"))
 	userID := app.Session.GetInt(r.Context(), "userID")
 
@@ -696,6 +694,7 @@ func StudentLeftLecture(w http.ResponseWriter, r *http.Request) {
 			Duration:  duration,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
+			SectionID: sectionID,
 		}
 		_ = dbModel.RecordCourseAccess(access)
 	}
@@ -1003,6 +1002,9 @@ func PostAdminSection(w http.ResponseWriter, r *http.Request) {
 
 	section.SectionName = r.Form.Get("section_name")
 	section.Term = r.Form.Get("term")
+	section.ProfEmail = r.Form.Get("prof_email")
+	section.ProfName = r.Form.Get("prof_name")
+	section.TeamsLink = r.Form.Get("teams_link")
 	section.Active, _ = strconv.Atoi(r.Form.Get("active"))
 	section.CourseID, _ = strconv.Atoi(r.Form.Get("course_id"))
 

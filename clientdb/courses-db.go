@@ -20,8 +20,8 @@ func (m *DBModel) AllSections() ([]clientmodels.Section, error) {
 	defer cancel()
 
 	stmt := `SELECT s.id, s.section_name, s.active, 
-		s.course_id, s.term, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
-		c.prof_name, c.prof_email, c.teams_link,
+		s.course_id, s.prof_name, s.prof_email, s.teams_link,
+		s.term, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
 		c.created_at as course_created_at, c.updated_at as course_updated_at
 		FROM course_sections s
 		left join courses c on (s.course_id = c.id)
@@ -43,14 +43,14 @@ func (m *DBModel) AllSections() ([]clientmodels.Section, error) {
 			&s.Active,
 			&s.CourseID,
 			&s.Term,
+			&s.ProfName,
+			&s.ProfEmail,
+			&s.TeamsLink,
 			&s.CreatedAt,
 			&s.UpdatedAt,
 			&s.Course.ID,
 			&s.Course.CourseName,
 			&s.Course.Active,
-			&s.Course.ProfName,
-			&s.Course.ProfEmail,
-			&s.Course.TeamsLink,
 			&s.Course.CreatedAt,
 			&s.Course.UpdatedAt,
 		)
@@ -73,8 +73,9 @@ func (m *DBModel) AllActiveSections() ([]clientmodels.Section, error) {
 	defer cancel()
 
 	stmt := `SELECT s.id, s.section_name, s.active, 
-		s.course_id, s.term, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
-		c.prof_name, c.prof_email, c.teams_link,
+		s.course_id, s.term, 
+		s.prof_name, s.prof_email, s.teams_link,
+		s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
 		c.created_at as course_created_at, c.updated_at as course_updated_at
 		FROM course_sections s
 		left join courses c on (s.course_id = c.id)
@@ -97,14 +98,14 @@ func (m *DBModel) AllActiveSections() ([]clientmodels.Section, error) {
 			&s.Active,
 			&s.CourseID,
 			&s.Term,
+			&s.ProfName,
+			&s.ProfEmail,
+			&s.TeamsLink,
 			&s.CreatedAt,
 			&s.UpdatedAt,
 			&s.Course.ID,
 			&s.Course.CourseName,
 			&s.Course.Active,
-			&s.Course.ProfName,
-			&s.Course.ProfEmail,
-			&s.Course.TeamsLink,
 			&s.Course.CreatedAt,
 			&s.Course.UpdatedAt,
 		)
@@ -126,8 +127,9 @@ func (m *DBModel) UpdateSection(c clientmodels.Section) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `update course_sections set section_name = $1, active = $2, course_id = $3, term = $4, updated_at = $5 
-				where id = $6`
+	query := `update course_sections set section_name = $1, active = $2, course_id = $3, term = $4, updated_at = $5,
+				prof_name = $6, prof_email = $7, teams_link = $8
+				where id = $9`
 
 	_, err := m.DB.ExecContext(ctx, query,
 		c.SectionName,
@@ -135,6 +137,9 @@ func (m *DBModel) UpdateSection(c clientmodels.Section) error {
 		c.CourseID,
 		c.Term,
 		time.Now(),
+		c.ProfName,
+		c.ProfEmail,
+		c.TeamsLink,
 		c.ID)
 	if err != nil {
 		fmt.Println(err)
@@ -148,8 +153,9 @@ func (m *DBModel) InsertSection(c clientmodels.Section) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `insert into course_sections (section_name, course_id, active, term, created_at, updated_at) 
-			values ($1, $2, $3, $4, $5, $6)
+	query := `insert into course_sections (section_name, course_id, active, term, created_at, updated_at,
+			prof_email, prof_name, teams_link) 
+			values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			returning id`
 
 	var id int
@@ -160,6 +166,9 @@ func (m *DBModel) InsertSection(c clientmodels.Section) (int, error) {
 		c.Term,
 		time.Now(),
 		time.Now(),
+		c.ProfEmail,
+		c.ProfName,
+		c.TeamsLink,
 	).Scan(&id)
 
 	if err != nil {
@@ -207,8 +216,9 @@ func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 	var s clientmodels.Section
 
 	query := `SELECT s.id, s.section_name, s.active, 
-		s.course_id, s.term, s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
-		c.prof_name, c.prof_email, c.teams_link,
+		s.course_id, s.term, 
+		s.prof_name, s.prof_email, s.teams_link,
+		s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
 		c.created_at as course_created_at, c.updated_at as course_updated_at
 		FROM course_sections s
 		left join courses c on (s.course_id = c.id)
@@ -222,14 +232,14 @@ func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 		&s.Active,
 		&s.CourseID,
 		&s.Term,
+		&s.ProfName,
+		&s.ProfEmail,
+		&s.TeamsLink,
 		&s.CreatedAt,
 		&s.UpdatedAt,
 		&s.Course.ID,
 		&s.Course.CourseName,
 		&s.Course.Active,
-		&s.Course.ProfName,
-		&s.Course.ProfEmail,
-		&s.Course.TeamsLink,
 		&s.Course.CreatedAt,
 		&s.Course.UpdatedAt,
 	)
@@ -271,7 +281,6 @@ func (m *DBModel) AllCourses() ([]clientmodels.Course, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	stmt := `SELECT id, course_name, active, 
-		prof_name, prof_email, teams_link,
 		created_at, updated_at FROM courses ORDER BY course_name`
 
 	rows, err := m.DB.QueryContext(ctx, stmt)
@@ -288,9 +297,6 @@ func (m *DBModel) AllCourses() ([]clientmodels.Course, error) {
 			&s.ID,
 			&s.CourseName,
 			&s.Active,
-			&s.ProfName,
-			&s.ProfEmail,
-			&s.TeamsLink,
 			&s.CreatedAt,
 			&s.UpdatedAt)
 		if err != nil {
@@ -311,7 +317,6 @@ func (m *DBModel) AllActiveCourses() ([]clientmodels.Course, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	stmt := `SELECT id, course_name, active, 
-		prof_name, prof_email, teams_link,
 		created_at, updated_at FROM courses where active = 1 ORDER BY course_name`
 
 	rows, err := m.DB.QueryContext(ctx, stmt)
@@ -328,9 +333,6 @@ func (m *DBModel) AllActiveCourses() ([]clientmodels.Course, error) {
 			&s.ID,
 			&s.CourseName,
 			&s.Active,
-			&s.ProfName,
-			&s.ProfEmail,
-			&s.TeamsLink,
 			&s.CreatedAt,
 			&s.UpdatedAt)
 		if err != nil {
@@ -353,13 +355,10 @@ func (m *DBModel) GetCourseSection(id int) (clientmodels.Section, error) {
 
 	var section clientmodels.Section
 
-	//query := `select id, course_name, active, description,
-	//	prof_name, prof_email, teams_link,
-	//	created_at, updated_at from courses where id = $1`
-
-	query := `select s.id, s.course_id, s.section_name, s.active, s.term, s.created_at, s.updated_at,
+	query := `select s.id, s.course_id, s.section_name, s.active, s.term, 
+		s.prof_name, s.prof_email, s.teams_link,
+		s.created_at, s.updated_at,
 		c.id, c.course_name, c.active, c.description, 
-		c.prof_name, c.prof_email, c.teams_link,
 		c.created_at, c.updated_at 
 		from course_sections s 
 		left join courses c on (c.id = s.course_id)
@@ -373,15 +372,15 @@ func (m *DBModel) GetCourseSection(id int) (clientmodels.Section, error) {
 		&section.SectionName,
 		&section.Active,
 		&section.Term,
+		&section.ProfName,
+		&section.ProfEmail,
+		&section.TeamsLink,
 		&section.CreatedAt,
 		&section.UpdatedAt,
 		&section.Course.ID,
 		&section.Course.CourseName,
 		&section.Course.Active,
 		&section.Course.Description,
-		&section.Course.ProfName,
-		&section.Course.ProfEmail,
-		&section.Course.TeamsLink,
 		&section.Course.CreatedAt,
 		&section.Course.UpdatedAt,
 	)
@@ -443,7 +442,6 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 	var course clientmodels.Course
 
 	query := `select id, course_name, active, description, 
-		prof_name, prof_email, teams_link,
 		created_at, updated_at from courses where id = $1`
 
 	row := m.DB.QueryRowContext(ctx, query, id)
@@ -453,9 +451,6 @@ func (m *DBModel) GetCourse(id int) (clientmodels.Course, error) {
 		&course.CourseName,
 		&course.Active,
 		&course.Description,
-		&course.ProfName,
-		&course.ProfEmail,
-		&course.TeamsLink,
 		&course.CreatedAt,
 		&course.UpdatedAt,
 	)
@@ -517,7 +512,6 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 	var course clientmodels.Course
 
 	query := `select id, course_name, active, 
-		prof_name, prof_email, teams_link,
 		description, created_at, updated_at from courses where id = $1`
 
 	row := m.DB.QueryRowContext(ctx, query, id)
@@ -527,9 +521,6 @@ func (m *DBModel) GetCourseForPublic(id int) (clientmodels.Course, error) {
 		&course.CourseName,
 		&course.Active,
 		&course.Description,
-		&course.ProfName,
-		&course.ProfEmail,
-		&course.TeamsLink,
 		&course.CreatedAt,
 		&course.UpdatedAt,
 	)
@@ -623,21 +614,70 @@ func (m *DBModel) GetLecture(id int) (clientmodels.Lecture, error) {
 	return l, nil
 }
 
+// GetLectureForSection returns one lecture with section info
+func (m *DBModel) GetLectureForSection(id, sectionID int) (clientmodels.Lecture, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var l clientmodels.Lecture
+
+	query := `select l.id, l.course_id, l.lecture_name, coalesce(l.video_id, 0), l.active, l.sort_order, l.notes, l.created_at,
+			l.updated_at, coalesce(v.video_name, ''), coalesce(v.file_name, ''), coalesce(v.thumb, ''), 
+			coalesce(v.duration, 0), l.posted_date,
+			s.id, s.section_name, s.active, s.prof_email, s.prof_name, s.teams_link, s.course_id, s.created_at, s.updated_at
+			from lectures l 
+			join course_sections s on (s.id = $1)
+			
+			left join videos v on (l.video_id = v.id)
+			where l.id = $2;`
+
+	row := m.DB.QueryRowContext(ctx, query, sectionID, id)
+
+	err := row.Scan(
+		&l.ID,
+		&l.CourseID,
+		&l.LectureName,
+		&l.VideoID,
+		&l.Active,
+		&l.SortOrder,
+		&l.Notes,
+		&l.CreatedAt,
+		&l.UpdatedAt,
+		&l.Video.VideoName,
+		&l.Video.FileName,
+		&l.Video.Thumb,
+		&l.Video.Duration,
+		&l.PostedDate,
+		&l.Section.ID,
+		&l.Section.SectionName,
+		&l.Section.Active,
+		&l.Section.ProfEmail,
+		&l.Section.ProfName,
+		&l.Section.TeamsLink,
+		&l.Section.CourseID,
+		&l.Section.CreatedAt,
+		&l.Section.UpdatedAt,
+	)
+
+	if err != nil {
+		return l, err
+	}
+
+	return l, nil
+}
+
 // UpdateCourse updates a course
 func (m *DBModel) UpdateCourse(c clientmodels.Course) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	query := `update courses set course_name = $1, active = $2, description = $3, 
-		prof_name = $4, prof_email = $5, teams_link = $6, updated_at = $7 where id = $8`
+		updated_at = $4 where id = $5`
 
 	_, err := m.DB.ExecContext(ctx, query,
 		c.CourseName,
 		c.Active,
 		c.Description,
-		c.ProfName,
-		c.ProfEmail,
-		c.TeamsLink,
 		time.Now(),
 		c.ID)
 	if err != nil {
@@ -654,16 +694,13 @@ func (m *DBModel) InsertCourse(c clientmodels.Course) (int, error) {
 
 	var newID int
 
-	query := `insert into courses (course_name, active, description, prof_name, prof_email, teams_link, created_at, updated_at)
-			values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`
+	query := `insert into courses (course_name, active, description, created_at, updated_at)
+			values ($1, $2, $3, $4, $5) returning id`
 
 	err := m.DB.QueryRowContext(ctx, query,
 		c.CourseName,
 		c.Active,
 		c.Description,
-		c.ProfName,
-		c.ProfEmail,
-		c.TeamsLink,
 		time.Now(),
 		time.Now()).Scan(&newID)
 
@@ -1041,7 +1078,7 @@ func (m *DBModel) RecordCourseAccess(a clientmodels.CourseAccess) error {
 	}
 
 	query := `insert into course_accesses (user_id, lecture_id, course_id, duration, created_at,
-			updated_at) values ($1, $2, (select course_id from lectures where id = $3), $4, $5, $6)`
+			updated_at, section_id) values ($1, $2, (select course_id from lectures where id = $3), $4, $5, $6, $7)`
 
 	_, err := m.DB.ExecContext(ctx, query,
 		a.UserID,
@@ -1050,6 +1087,7 @@ func (m *DBModel) RecordCourseAccess(a clientmodels.CourseAccess) error {
 		a.Duration,
 		a.CreatedAt,
 		a.UpdatedAt,
+		a.SectionID,
 	)
 
 	if err != nil {

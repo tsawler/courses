@@ -169,14 +169,14 @@
         <div class="row">
             <div class="col">
                 <p>&nbsp;</p>
-                {{if or (ne $section.Course.TeamsLink "") (ne $section.Course.ProfEmail "")}}
+                {{if or (ne $section.TeamsLink "") (ne $section.ProfEmail "")}}
                     <div class="text-center">
-                        {{if ne $section.Course.TeamsLink ""}}
-                            <a class="btn btn-outline-secondary text-dark" target="_blank" href="{{$section.Course.TeamsLink}}">Microsoft
+                        {{if ne $section.TeamsLink ""}}
+                            <a class="btn btn-outline-secondary text-dark" target="_blank" href="{{$section.TeamsLink}}">Microsoft
                                 Teams</a>
                         {{end}}
-                        {{if ne $section.Course.ProfEmail ""}}
-                            <a class="btn btn-outline-secondary text-dark" href="mailto:{{$section.Course.ProfEmail}}">Email
+                        {{if ne $section.ProfEmail ""}}
+                            <a class="btn btn-outline-secondary text-dark" href="mailto:{{$section.ProfEmail}}">Email
                                 Professor</a>
                         {{end}}
                     </div>
