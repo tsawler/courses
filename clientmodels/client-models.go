@@ -63,6 +63,7 @@ type CourseAccess struct {
 	Student   models.User
 	Course    Course
 	Lecture   Lecture
+	Section   Section
 }
 
 // Student holds a student

@@ -1156,11 +1156,12 @@ func (m *DBModel) CourseAccessHistoryForStudent(userID int) ([]clientmodels.Cour
 	var a []clientmodels.CourseAccess
 
 	query := `select ca.id, ca.user_id, ca.lecture_id, ca.course_id, ca.duration, ca.created_at, ca.updated_at,
-		u.first_name, u.last_name, l.lecture_name, c.course_name, ca.section_id
+		u.first_name, u.last_name, l.lecture_name, c.course_name, ca.section_id, s.id, s.section_name, s.term
 		from course_accesses ca 
 		left join users u on (ca.user_id = u.id)
 		left join lectures l on (ca.lecture_id = l.id)
 		left join courses c on (ca.course_id = c.id)
+		left join course_sections s on (ca.section_id = s.id)
 		where ca.user_id = $1 order by ca.created_at desc`
 
 	rows, err := m.DB.QueryContext(ctx, query, userID)
@@ -1185,6 +1186,9 @@ func (m *DBModel) CourseAccessHistoryForStudent(userID int) ([]clientmodels.Cour
 			&s.Lecture.LectureName,
 			&s.Course.CourseName,
 			&s.SectionID,
+			&s.Section.ID,
+			&s.Section.SectionName,
+			&s.Section.Term,
 		)
 		if err != nil {
 			fmt.Println(err)
