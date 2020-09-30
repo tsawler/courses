@@ -833,7 +833,7 @@ func CourseTraffic(w http.ResponseWriter, r *http.Request) {
 	intMap := make(map[string]int)
 	intMap["course_id"] = id
 
-	courses, err := dbModel.AllActiveCourses()
+	courses, err := dbModel.AllActiveSections()
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)

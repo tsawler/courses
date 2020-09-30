@@ -10,12 +10,12 @@
 {{define "content"}}
     {{$courseID := index .IntMap "course_id"}}
     <div class="row">
-        <div class="offset-4 col-md-4">
+        <div class="offset-3 col-md-6">
             <div class="form-group ">
                 <label for="course_id">Course</label>
                 <select id="course_id" name="active" class="custom-select" onchange="showCourseData()">
                     {{range (index .RowSets "courses")}}
-                        <option value="{{.ID}}" {{if eq .ID $courseID}} selected {{end}}>{{.CourseName}}</option>
+                        <option value="{{.ID}}" {{if eq .ID $courseID}} selected {{end}}>{{.SectionName}}: {{.Course.CourseName}} - {{.Term}}</option>
                     {{end}}
                 </select>
             </div>
