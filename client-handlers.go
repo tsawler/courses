@@ -94,11 +94,23 @@ func ShowLecture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lecture, err := dbModel.GetLectureForSection(lectureID, sectionID)
-	if err != nil {
-		errorLog.Println(err)
-		helpers.ClientError(w, http.StatusBadRequest)
-		return
+	var lecture clientmodels.Lecture
+	if sectionID > 0 {
+		l, err := dbModel.GetLectureForSection(lectureID, sectionID)
+		if err != nil {
+			errorLog.Println("Error getting section:", err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+		lecture = l
+	} else {
+		l, err := dbModel.GetLecture(lectureID)
+		if err != nil {
+			errorLog.Println("Error getting section:", err)
+			helpers.ClientError(w, http.StatusBadRequest)
+			return
+		}
+		lecture = l
 	}
 
 	lecture.SectionID = sectionID
@@ -415,6 +427,7 @@ func SaveLecture(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id, _ := strconv.Atoi(r.Form.Get("page_id"))
+	sectionID, _ := strconv.Atoi(r.Form.Get("section_id"))
 	pageContent := r.Form.Get("thedata")
 
 	lecture, err := dbModel.GetLecture(id)
@@ -434,7 +447,7 @@ func SaveLecture(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.Session.Put(r.Context(), "flash", "Lecture successfully updated!")
-	http.Redirect(w, r, fmt.Sprintf("/courses/lecture/%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/courses/lecture/%d/%d", sectionID, id), http.StatusSeeOther)
 }
 
 // GetCourseContentJSON gets html (description) for course on edit page

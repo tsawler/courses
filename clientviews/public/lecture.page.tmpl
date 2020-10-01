@@ -269,6 +269,7 @@
     {{$lecture := index .RowSets "lecture"}}
     <script src="https://unpkg.com/navigator.sendbeacon"></script>
     <script>
+        {{if gt $lecture.SectionID 0}}
         let start = new Date();
         document.addEventListener("DOMContentLoaded", function (event) {
             window.addEventListener("unload", recordLeaving, false);
@@ -286,6 +287,7 @@
             formData.append("duration", seconds.toString());
             navigator.sendBeacon("/courses/lecture/log/record-leaving", formData);
         }
+        {{end}}
     </script>
 
     {{if .IsAuthenticated}}
@@ -304,6 +306,7 @@
             <input type="hidden" name="page_js" id="hidden_page_js" value="{{ base64 .Page.JS }}">
             <input type="hidden" name="page_css" id="hidden_page_css" value="{{ base64 .Page.CSS }}">
             <input type="hidden" name="menu_bg_color" id="hidden_menu_bg_color" value="{{.Page.MenuColor }}">
+            <input type="hidden" name="section_id" value="{{$lecture.SectionID}}">
             <input type="hidden" name="menu_transparent" id="hidden_menu_transparent"
                    value="{{ .Page.MenuTransparent }}">
             <input type="hidden" name="seo_image" id="hidden_seo_image" value="{{ .Page.SEOImage }}">
