@@ -1,6 +1,6 @@
 {{define "top-of-menu"}}
 
-    {{if hasRole "pages" .Auth.ID}}
+    {{if hasRole "courses" .Auth.ID}}
 
         <li id="pages" {{if eq .CurrentSegment "sections"}} class="active" {{end}}>
             <a href="#!"><i class="fa fa-info fa-fw"></i> <span class="nav-label">Sections</span> <span
@@ -36,7 +36,5 @@
             </ul>
         </li>
     {{end}}
-
-
 
 {{end}}

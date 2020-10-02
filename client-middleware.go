@@ -25,11 +25,11 @@ func NewClientMiddleware(app config.AppConfig) {
 	inProduction = app.InProduction
 }
 
-// SomeRole is a sample role
-func SomeRole(next http.Handler) http.Handler {
+// CoursesRole is a sample role
+func CoursesRole(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userId := session.GetInt(r.Context(), "userID")
-		ok := checkRole("some-role", userId)
+		ok := checkRole("courses", userId)
 		if ok {
 			next.ServeHTTP(w, r)
 		} else {
