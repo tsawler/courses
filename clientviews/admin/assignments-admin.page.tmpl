@@ -24,7 +24,7 @@
             {{$assignments := index .RowSets "assignments"}}
             {{range $assignments}}
                 <tr>
-                    <td><a href='/admin/courses/assignment/{{.ID}}'>{{.Description}}</a></td>
+                    <td><a href='/admin/sections/assignment/{{.ID}}'>{{.Description}}</a></td>
                     <td>{{.User.FirstName}} {{.User.LastName}}</td>
                     <td>{{.Course.CourseName}}</td>
                     <td>{{humanDateTime .CreatedAt}}</td>
