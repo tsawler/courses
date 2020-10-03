@@ -172,8 +172,8 @@
                     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                     <div class="form-row">
                         <div class="form-group col-md-4 col-xs-12">
-                            <label for="course_id">For what course?</label>
-                            <select class="custom-select" id="course_id" name="course_id" required="">
+                            <label for="section_id">For what course?</label>
+                            <select class="custom-select" id="section_id" name="section_id" required="">
                                 <option value="" selected="">Choose one...</option>
                                 {{$sections := index .RowSets "sections"}}
                                 {{range $sections}}
@@ -192,7 +192,6 @@
                                 <option value="Essay #2">Essay #2 (longer)</option>
                                 <option value="Midterm">Midterm</option>
                                 <option value="Final Exam">Final Exam</option>
-
                             </select>
 
                         </div>

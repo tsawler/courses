@@ -1,0 +1,8 @@
+add_column("assignments", "section_id", "integer", {"unsigned": true, "null": true})
+
+sql(`update assignments set section_id = course_id`)
+
+add_foreign_key("assignments", "section_id", {"course_sections": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})

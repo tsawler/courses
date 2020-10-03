@@ -39,6 +39,7 @@ type Assignment struct {
 	FileNameDisplay string
 	FileName        string
 	UserID          int
+	SectionID       int
 	CourseID        int
 	Mark            int
 	TotalValue      int

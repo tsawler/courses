@@ -881,14 +881,14 @@ func (m *DBModel) InsertAssignment(c clientmodels.Assignment) (int, error) {
 
 	var newID int
 
-	query := `insert into assignments (file_name_display, file_name, user_id, course_id, description, created_at, updated_at)
-			values ($1, $2, $3, $4, $5, $6, $7) returning id`
+	query := `insert into assignments (file_name_display, file_name, user_id, section_id, course_id, description, created_at, updated_at)
+			values ($1, $2, $3, $4, (select course_id from course_sections where id = $4), $5, $6, $7) returning id`
 
 	err := m.DB.QueryRowContext(ctx, query,
 		c.FileNameDisplay,
 		c.FileName,
 		c.UserID,
-		c.CourseID,
+		c.SectionID,
 		c.Description,
 		time.Now(),
 		time.Now()).Scan(&newID)
