@@ -175,9 +175,9 @@
                             <label for="course_id">For what course?</label>
                             <select class="custom-select" id="course_id" name="course_id" required="">
                                 <option value="" selected="">Choose one...</option>
-                                {{$courses := index .RowSets "courses"}}
-                                {{range $courses}}
-                                <option value="{{.ID}}">{{.CourseName}}</option>
+                                {{$sections := index .RowSets "sections"}}
+                                {{range $sections}}
+                                <option value="{{.ID}}">{{.Course.CourseName}} - {{.SectionName}}</option>
                                 {{end}}
                             </select>
 
@@ -190,6 +190,9 @@
                                 <option value="Reading Journal">Weekly Journal</option>
                                 <option value="Essay #1">Essay #1 (shorter)</option>
                                 <option value="Essay #2">Essay #2 (longer)</option>
+                                <option value="Midterm">Midterm</option>
+                                <option value="Final Exam">Final Exam</option>
+
                             </select>
 
                         </div>

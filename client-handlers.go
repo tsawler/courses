@@ -519,7 +519,7 @@ func SubmitAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	courses, err := dbModel.AllActiveCourses()
+	sections, err := dbModel.AllActiveSections()
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
@@ -527,7 +527,7 @@ func SubmitAssignment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rowSets := make(map[string]interface{})
-	rowSets["courses"] = courses
+	rowSets["sections"] = sections
 	helpers.Render(w, r, "submit-assignment.page.tmpl", &templates.TemplateData{
 		Page:    pg,
 		Form:    forms.New(nil),
