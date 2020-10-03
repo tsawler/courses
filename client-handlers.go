@@ -519,7 +519,8 @@ func SubmitAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sections, err := dbModel.AllActiveSections()
+	userID := session.GetInt(r.Context(), "userID")
+	sections, err := dbModel.AllActiveSectionsForStudentID(userID)
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
@@ -652,7 +653,7 @@ func StudentProfile(w http.ResponseWriter, r *http.Request) {
 	rowSets := make(map[string]interface{})
 	rowSets["assignments"] = a
 
-	courses, err := dbModel.AllActiveSections()
+	courses, err := dbModel.AllActiveSectionsForStudentID(id)
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)
@@ -756,10 +757,13 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 	rowSets := make(map[string]interface{})
 	rowSets["access"] = ca
 
-	assignments, _ := dbModel.AllAssignments(id)
+	var assignments []clientmodels.Assignment
+	if id > 0 {
+		assignments, _ = dbModel.AllAssignments(id)
+	}
 	rowSets["assignments"] = assignments
 
-	courses, err := dbModel.AllActiveSections()
+	courses, err := dbModel.AllActiveSectionsForStudentID(id)
 	if err != nil {
 		errorLog.Println(err)
 		helpers.ClientError(w, http.StatusBadRequest)

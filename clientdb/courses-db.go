@@ -122,6 +122,62 @@ func (m *DBModel) AllActiveSections() ([]clientmodels.Section, error) {
 	return sections, nil
 }
 
+// AllActiveSectionsForStudentID returns slice of all active sections for a student
+func (m *DBModel) AllActiveSectionsForStudentID(id int) ([]clientmodels.Section, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `SELECT s.id, s.section_name, s.active, 
+		s.course_id, s.term, 
+		s.prof_name, s.prof_email, s.teams_link,
+		s.created_at, s.updated_at, c.id as course_id, c.course_name, c.active,
+		c.created_at as course_created_at, c.updated_at as course_updated_at
+		FROM course_sections s
+		left join courses c on (s.course_id = c.id)
+		where s.active = 1
+		and s.id in (select section_id from section_students where section_id = s.id and user_id = $1)
+		ORDER BY s.created_at desc`
+
+	rows, err := m.DB.QueryContext(ctx, stmt, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sections []clientmodels.Section
+
+	for rows.Next() {
+		var s clientmodels.Section
+		err = rows.Scan(
+			&s.ID,
+			&s.SectionName,
+			&s.Active,
+			&s.CourseID,
+			&s.Term,
+			&s.ProfName,
+			&s.ProfEmail,
+			&s.TeamsLink,
+			&s.CreatedAt,
+			&s.UpdatedAt,
+			&s.Course.ID,
+			&s.Course.CourseName,
+			&s.Course.Active,
+			&s.Course.CreatedAt,
+			&s.Course.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		sections = append(sections, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return sections, nil
+}
+
 // UpdateSection updates a course section
 func (m *DBModel) UpdateSection(c clientmodels.Section) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

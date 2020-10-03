@@ -226,7 +226,9 @@
                             <tr>
                                 <td>{{.Description}}</td>
                                 <td>{{.Course.CourseName}}</td>
-                                <td>Download: <a href="/static/site-content/assignments/{{$auth.ID}}/{{.FileName}}">{{.FileNameDisplay}}</a></td>
+                                <td>Download: <a
+                                            href="/static/site-content/assignments/{{$auth.ID}}/{{.FileName}}">{{.FileNameDisplay}}</a>
+                                </td>
                                 <td>{{humanDateTime .CreatedAt}}</td>
                                 <td>
                                     {{if and (gt .Mark 0) (gt .TotalValue 0)}}
@@ -275,28 +277,30 @@
             <div class="tab-pane fade" role="tabpanel" aria-labelledby="chart-tab" id="chart-tab-content">
                 <h3 class="mt-4">My Progress</h3>
 
-                <div class="row">
-                    <div class="offset-4 col-md-4">
-                        <div class="form-group ">
-                            <label for="course_id">Course</label>
-                            <select id="course_id" name="active" class="custom-select" onchange="showCourseData()">
-                                {{range (index .RowSets "courses")}}
-                                    <option value="{{.ID}}">{{.SectionName}}: {{.Course.CourseName}} - {{.Term}}</option>
-                                {{end}}
-                            </select>
+                {{if gt (len (index .RowSets "courses")) 0}}
+                    <div class="row">
+                        <div class="offset-3 col-md-6">
+                            <div class="form-group ">
+                                <label for="course_id">Course</label>
+                                <select id="course_id" name="active" class="custom-select" onchange="showCourseData()">
+                                    {{range (index .RowSets "courses")}}
+                                        <option value="{{.ID}}">{{.SectionName}}: {{.Course.CourseName}}
+                                            - {{.Term}}</option>
+                                    {{end}}
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 col-xs-12">
-                        <canvas id="viewsChart"></canvas>
+                    <div class="row">
+                        <div class="col-md-6 col-xs-12">
+                            <canvas id="viewsChart"></canvas>
+                        </div>
+                        <div class="col-md-6 col-xs-12">
+                            <canvas id="durationChart"></canvas>
+                            <div id="chartjs-tooltip"></div>
+                        </div>
                     </div>
-                    <div class="col-md-6 col-xs-12">
-                        <canvas id="durationChart"></canvas>
-                        <div id="chartjs-tooltip"></div>
-                    </div>
-                </div>
-
+                {{end}}
             </div>
 
         </div>
@@ -394,7 +398,7 @@
                 $('#profileTabs a[href="' + activeTab + '"]').tab('show');
             }
 
-            if(window.location.hash !== "") {
+            if (window.location.hash !== "") {
                 $('a[href="' + window.location.hash + '"]').tab('show');
             }
         });
@@ -429,7 +433,7 @@
 
                     var ctx = document.getElementById("viewsChart").getContext('2d');
 
-                    viewChart= new Chart(ctx, {
+                    viewChart = new Chart(ctx, {
                         type: 'horizontalBar',
                         data: chartdata,
                         options: {
