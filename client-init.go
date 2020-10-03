@@ -16,7 +16,7 @@ var parentDB *driver.DB
 var repo *handlers.DBRepo
 var dbModel *clientdb.DBModel
 
-const version = "1.4.2"
+const version = "1.5.0"
 
 // ClientInit  initializes client specific code
 func ClientInit(conf config.AppConfig, parentDriver *driver.DB, rep *handlers.DBRepo) {
