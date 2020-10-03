@@ -222,7 +222,7 @@
                             {{range $s.Students}}
                                 <tr>
                                     <td style="width: 25px !important;" class="text-center">{{.ID}}</td>
-                                    <td>{{.LastName}}, {{.FirstName}}</td>
+                                    <td><a href="/admin/members/{{.ID}}?src=/admin/sections/{{$s.ID}}">{{.LastName}}, {{.FirstName}}</a></td>
                                     <td style="width: 25px !important;" class="text-center">
                                         <a href="#!" onclick="removeStudent({{.ID}})"><i class="fa fa-trash"></i></a>
                                     </td>

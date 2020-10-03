@@ -746,6 +746,15 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	src := "all"
+	srcSlice := r.URL.Query()["src"]
+	if len(srcSlice) > 0 {
+		src = srcSlice[0]
+	} else {
+		src = "/admin/members/all"
+	}
+	stringMap := make(map[string]string)
+	stringMap["src"] = src
 
 	ca, err := dbModel.CourseAccessHistoryForStudent(id)
 	if err != nil {
@@ -776,8 +785,8 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 		Form:      forms.New(nil),
 		AdminUser: u,
 		RowSets:   rowSets,
+		StringMap: stringMap,
 	})
-
 }
 
 // MembersAll overrides default function to include access time

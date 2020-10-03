@@ -179,7 +179,7 @@
                                 <hr>
 
                                 <input type="submit" class="btn btn-primary" value="Save Changes">
-                                <a class="btn btn-warning" href="/admin/members/all">Cancel</a>
+                                <a class="btn btn-warning" href="{{index .StringMap "src"}}">Cancel</a>
 
                             </form>
 
@@ -283,7 +283,6 @@
                     </div>
 
                     <div class="tab-pane fade" role="tabpanel" aria-labelledby="chart-tab" id="chart-tab-content">
-
 
                         {{if gt (len (index .RowSets "courses")) 0}}
                             <div class="row">
