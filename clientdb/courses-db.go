@@ -997,7 +997,7 @@ func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 	stmt := fmt.Sprintf(`SELECT a.id, a.file_name_display, a.file_name, a.user_id, a.course_id, 
 		a.mark, a.total_value, a.processed, a.created_at, a.updated_at,
 		u.id, u.first_name, u.last_name, u.email,
-		c.id, c.course_name, a.description
+		c.id, c.course_name, a.description, a.graded_file, a.graded_file_display
 		FROM 
 			assignments a 
 			left join users u on (a.user_id = u.id)
@@ -1030,7 +1030,9 @@ func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 			&s.User.Email,
 			&s.Course.ID,
 			&s.Course.CourseName,
-			&s.Description)
+			&s.Description,
+			&s.GradedFile,
+			&s.GradedFileName)
 		if err != nil {
 			return nil, err
 		}
@@ -1054,7 +1056,7 @@ func (m *DBModel) GetAssignment(id int) (clientmodels.Assignment, error) {
 	stmt := `SELECT a.id, a.file_name_display, a.file_name, a.user_id, a.course_id, 
 		a.mark, a.total_value, a.processed, a.created_at, a.updated_at,
 		u.id, u.first_name, u.last_name, u.email,
-		c.id, c.course_name, a.description
+		c.id, c.course_name, a.description, a.graded_file, a.graded_file_display
 		FROM 
 			assignments a 
 			left join users u on (a.user_id = u.id)
@@ -1080,7 +1082,9 @@ func (m *DBModel) GetAssignment(id int) (clientmodels.Assignment, error) {
 		&s.User.Email,
 		&s.Course.ID,
 		&s.Course.CourseName,
-		&s.Description)
+		&s.Description,
+		&s.GradedFile,
+		&s.GradedFileName)
 	if err != nil {
 		return s, err
 	}

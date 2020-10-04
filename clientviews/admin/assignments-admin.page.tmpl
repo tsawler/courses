@@ -18,6 +18,7 @@
                 <th>Date Received</th>
                 <th class="text-center">Processed</th>
                 <th class="text-center">Grade</th>
+                <th class="text-center">Marked File</th>
             </tr>
             </thead>
             <tbody>
@@ -42,6 +43,13 @@
                             {{.Mark}}/{{.TotalValue}}
                         {{else}}
                             N/A
+                        {{end}}
+                    </td>
+                    <td class="text-center">
+                        {{if ne .GradedFile ""}}
+                            <a href="/static/site-content/assignments/{{.UserID}}/graded/{{.FileName}}"><i class="fa fa-download"></i></a>
+                        {{else}}
+                                N/A
                         {{end}}
                     </td>
                 </tr>
