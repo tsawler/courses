@@ -5,6 +5,12 @@
 {{define "admin-title"}}Student: {{.AdminUser.FirstName}} {{.AdminUser.LastName}}{{end}}
 {{define "content-title"}}Student: {{.AdminUser.FirstName}} {{.AdminUser.LastName}}{{end}}
 
+{{define "css"}}
+    <style>
+
+    </style>
+{{end}}
+
 {{define "content"}}
 
     {{if and (hasRole "super" .Auth.ID) (ne .Auth.ID .AdminUser.ID) (gt .AdminUser.ID 0)}}
@@ -287,7 +293,7 @@
                         {{if gt (len (index .RowSets "courses")) 0}}
                             <div class="row">
                                 <div class="offset-3 col-md-6 mt-3">
-                                    <div class="form-group ">
+                                    <div class="form-group">
                                         <label for="course_id">Course</label>
                                         <select id="course_id" name="active" class="custom-select"
                                                 onchange="showCourseData()">
@@ -300,10 +306,12 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-6 col-xs-12">
+                                <div class="col-md-12 col-xs-12">
                                     <canvas id="viewsChart"></canvas>
                                 </div>
-                                <div class="col-md-6 col-xs-12">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-xs-12">
                                     <canvas id="durationChart"></canvas>
                                     <div id="chartjs-tooltip"></div>
                                 </div>
