@@ -611,6 +611,46 @@ func Assignment(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// DownloadGradeAssignment downloads a graded assignment
+func DownloadGradeAssignment(w http.ResponseWriter, r *http.Request) {
+	userID, _ := strconv.Atoi(r.URL.Query().Get(":UserID"))
+	id, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
+
+	// get assignment
+	a, err := dbModel.GetAssignment(id)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusNotFound)
+		return
+	}
+
+	path := fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/", userID)
+	helpers.DownloadStaticFile(w, r, path, a.GradedFile, a.GradedFileDisplayName)
+}
+
+// DownloadGradeAssignmentForStudent downloads a graded assignment for a student (validating access rights)
+func DownloadGradeAssignmentForStudent(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
+	studentID := app.Session.GetInt(r.Context(), "userID")
+
+	// get assignment
+	a, err := dbModel.GetAssignment(id)
+	if err != nil {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusNotFound)
+		return
+	}
+
+	if studentID != a.UserID {
+		errorLog.Println(err)
+		helpers.ClientError(w, http.StatusForbidden)
+		return
+	}
+
+	path := fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/", a.UserID)
+	helpers.DownloadStaticFile(w, r, path, a.GradedFile, a.GradedFileDisplayName)
+}
+
 // GradeAssignment grades an assignment
 func GradeAssignment(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(r.URL.Query().Get(":ID"))
@@ -619,8 +659,29 @@ func GradeAssignment(w http.ResponseWriter, r *http.Request) {
 		errorLog.Print(err)
 	}
 
+	form := forms.New(r.PostForm)
+	hasGradedFile := form.HasFile("graded", r)
+	var fileName string
+	var displayName string
+
+	if hasGradedFile {
+		// uploading a graded file
+		_ = helpers.CreateDirIfNotExist("./ui/static/site-content/assignments/")
+		_ = helpers.CreateDirIfNotExist(fmt.Sprintf("./ui/static/site-content/assignments/%d", a.UserID))
+		_ = helpers.CreateDirIfNotExist(fmt.Sprintf("./ui/static/site-content/assignments/%d/graded", a.UserID))
+
+		f, d, err := helpers.UploadOneFileReturnSlugName(r, fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/", a.UserID))
+		if err != nil {
+			errorLog.Println(err)
+		}
+		fileName = f
+		displayName = d
+	}
+
 	a.Mark, _ = strconv.Atoi(r.Form.Get("mark"))
 	a.TotalValue, _ = strconv.Atoi(r.Form.Get("total_value"))
+	a.GradedFileDisplayName = displayName
+	a.GradedFile = fileName
 
 	_ = dbModel.GradeAssignment(a)
 

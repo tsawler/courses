@@ -47,7 +47,7 @@
                     </td>
                     <td class="text-center">
                         {{if ne .GradedFile ""}}
-                            <a href="/static/site-content/assignments/{{.UserID}}/graded/{{.FileName}}"><i class="fa fa-download"></i></a>
+                            <a href="/admin/sections/assignments/download-graded/{{.UserID}}/{{.ID}}"><i class="fa fa-download"></i></a>
                         {{else}}
                                 N/A
                         {{end}}

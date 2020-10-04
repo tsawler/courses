@@ -217,6 +217,7 @@
                             <th>File Submitted</th>
                             <th>Date Received</th>
                             <th>Grade</th>
+                            <th>Download Graded Paper</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -235,6 +236,13 @@
                                         {{.Mark}} / {{.TotalValue}}
                                     {{else}}
                                         Not yet marked
+                                    {{end}}
+                                </td>
+                                <td class="text-center">
+                                    {{if ne .GradedFile ""}}
+                                        <a href="/admin/sections/assignments/download-graded-for-student/{{.ID}}"><i class="fa fa-download"></i></a>
+                                    {{else}}
+                                        N/A
                                     {{end}}
                                 </td>
                             </tr>

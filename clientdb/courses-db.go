@@ -1032,7 +1032,7 @@ func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 			&s.Course.CourseName,
 			&s.Description,
 			&s.GradedFile,
-			&s.GradedFileName)
+			&s.GradedFileDisplayName)
 		if err != nil {
 			return nil, err
 		}
@@ -1084,7 +1084,7 @@ func (m *DBModel) GetAssignment(id int) (clientmodels.Assignment, error) {
 		&s.Course.CourseName,
 		&s.Description,
 		&s.GradedFile,
-		&s.GradedFileName)
+		&s.GradedFileDisplayName)
 	if err != nil {
 		return s, err
 	}
@@ -1102,14 +1102,18 @@ func (m *DBModel) GradeAssignment(a clientmodels.Assignment) error {
 			mark = $1, 
 			total_value = $2,
 			processed = 1,
-			updated_at = $3
+			updated_at = $3,
+			graded_file = $4,
+			graded_file_display = $5
 		where 
-			id = $4`
+			id = $6`
 
 	_, err := m.DB.ExecContext(ctx, stmt,
 		a.Mark,
 		a.TotalValue,
 		time.Now(),
+		a.GradedFile,
+		a.GradedFileDisplayName,
 		a.ID)
 	if err != nil {
 		return err

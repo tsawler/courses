@@ -35,22 +35,22 @@ type Lecture struct {
 
 // Assignment holds an assignment
 type Assignment struct {
-	ID              int
-	FileNameDisplay string
-	FileName        string
-	UserID          int
-	SectionID       int
-	CourseID        int
-	Mark            int
-	TotalValue      int
-	Description     string
-	Processed       int
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	User            models.User
-	Course          Course
-	GradedFile      string
-	GradedFileName  string
+	ID                    int
+	FileNameDisplay       string
+	FileName              string
+	UserID                int
+	SectionID             int
+	CourseID              int
+	Mark                  int
+	TotalValue            int
+	Description           string
+	Processed             int
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
+	User                  models.User
+	Course                Course
+	GradedFile            string
+	GradedFileDisplayName string
 }
 
 // CourseAccess records course access
