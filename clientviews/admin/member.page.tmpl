@@ -247,10 +247,10 @@
                                 <thead>
                                 <tr>
                                     <th>Description</th>
-                                    <th>Name</th>
                                     <th>Course</th>
                                     <th>Date Received</th>
                                     <th class="text-center">Processed</th>
+                                    <th class="text-center"><i class="fa fa-download"></i></th>
                                     <th class="text-center">Grade</th>
                                 </tr>
                                 </thead>
@@ -262,7 +262,6 @@
                                         <td>
                                             <a href='/admin/sections/assignment/{{.ID}}?src={{$studentID}}'>{{.Description}}</a>
                                         </td>
-                                        <td>{{.User.FirstName}} {{.User.LastName}}</td>
                                         <td>{{.Course.CourseName}}</td>
                                         <td>{{humanDateTime .CreatedAt}}</td>
                                         <td class="text-center">
@@ -273,6 +272,15 @@
                                                     <span class="badge badge-danger">Not Processed</span>
                                                 {{end}}
                                             </a>
+                                        </td>
+                                        <td class="text-center">
+                                            {{if ne .GradedFile ""}}
+                                                <a href="/admin/sections/assignments/download-graded/{{.UserID}}/{{.ID}}">
+                                                    <i class="fa fa-download"></i>
+                                                </a>
+                                            {{else}}
+                                               <span class="badge">N/A</span>
+                                            {{end}}
                                         </td>
                                         <td class="text-center">
                                             {{if gt .TotalValue 0}}
