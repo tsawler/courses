@@ -1,0 +1,2 @@
+drop_column("assignments", "graded_file")
+drop_column("assignments", "graded_file_display")
