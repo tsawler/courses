@@ -227,8 +227,9 @@
                             <tr>
                                 <td>{{.Description}}</td>
                                 <td>{{.Course.CourseName}}</td>
-                                <td>Download: <a
-                                            href="/static/site-content/assignments/{{$auth.ID}}/{{.FileName}}">{{.FileNameDisplay}}</a>
+                                <td>Download: <a href="/static/site-content/assignments/{{$auth.ID}}/{{.FileName}}">
+                                        {{.FileNameDisplay}}
+                                    </a>
                                 </td>
                                 <td>{{humanDateTime .CreatedAt}}</td>
                                 <td>
