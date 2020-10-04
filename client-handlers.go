@@ -624,7 +624,7 @@ func DownloadGradeAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/", userID)
+	path := fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/%d/", userID, a.ID)
 	helpers.DownloadStaticFile(w, r, path, a.GradedFile, a.GradedFileDisplayName)
 }
 
@@ -647,7 +647,7 @@ func DownloadGradeAssignmentForStudent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/", a.UserID)
+	path := fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/%d/", a.UserID, a.ID)
 	helpers.DownloadStaticFile(w, r, path, a.GradedFile, a.GradedFileDisplayName)
 }
 
@@ -669,8 +669,9 @@ func GradeAssignment(w http.ResponseWriter, r *http.Request) {
 		_ = helpers.CreateDirIfNotExist("./ui/static/site-content/assignments/")
 		_ = helpers.CreateDirIfNotExist(fmt.Sprintf("./ui/static/site-content/assignments/%d", a.UserID))
 		_ = helpers.CreateDirIfNotExist(fmt.Sprintf("./ui/static/site-content/assignments/%d/graded", a.UserID))
+		_ = helpers.CreateDirIfNotExist(fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/%d", a.UserID, a.ID))
 
-		f, d, err := helpers.UploadOneFileReturnSlugName(r, fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/", a.UserID))
+		f, d, err := helpers.UploadOneFileReturnSlugName(r, fmt.Sprintf("./ui/static/site-content/assignments/%d/graded/%d/", a.UserID, a.ID))
 		if err != nil {
 			errorLog.Println(err)
 		}
