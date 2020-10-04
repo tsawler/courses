@@ -49,6 +49,8 @@ type Assignment struct {
 	UpdatedAt       time.Time
 	User            models.User
 	Course          Course
+	GradedFile      string
+	GradedFileName  string
 }
 
 // CourseAccess records course access
