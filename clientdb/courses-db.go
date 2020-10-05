@@ -324,6 +324,9 @@ func (m *DBModel) GetSection(id int) (clientmodels.Section, error) {
 			&u.FirstName,
 			&u.LastName,
 		)
+		if err != nil {
+			return s, err
+		}
 		students = append(students, u)
 	}
 	s.Students = students

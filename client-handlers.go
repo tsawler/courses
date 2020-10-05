@@ -1062,6 +1062,9 @@ func AdminSection(w http.ResponseWriter, r *http.Request) {
 	rowSets["section"] = section
 
 	courses, err := dbModel.AllCourses()
+	if err != nil {
+		errorLog.Println(err)
+	}
 	rowSets["courses"] = courses
 
 	helpers.Render(w, r, "section.page.tmpl", &templates.TemplateData{
@@ -1207,6 +1210,9 @@ func PostSectionStudents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = dbModel.UpdateEnrollmentForSection(sectionID, students)
+	if err != nil {
+		errorLog.Println(err)
+	}
 
 	session.Put(r.Context(), "flash", "Changs saved")
 	http.Redirect(w, r, fmt.Sprintf("/admin/sections/%d", sectionID), http.StatusSeeOther)
