@@ -176,7 +176,8 @@
                             <div class="form-group">
                                 <label>Accesses</label>
                                 <div class="input-group">
-                                <a class="btn btn-outline-secondary" href="/admin/sections/{{$s.ID}}/accesses">View Student Access History</a>
+                                    <a class="btn btn-outline-secondary" href="/admin/sections/{{$s.ID}}/accesses">View
+                                        Student Access History</a>
                                 </div>
                             </div>
                         </div>
@@ -204,7 +205,8 @@
             {{if gt $s.ID 0}}
                 <div class="tab-pane fade" role="tabpanel" aria-labelledby="students-tab" id="students-tab-content">
                     <div class="float-right mt-4">
-                        <a class="btn btn-outline-secondary" href="/admin/sections/students/{{$s.ID}}">Manage enrolment</a>
+                        <a class="btn btn-outline-secondary" href="/admin/sections/students/{{$s.ID}}">Manage
+                            enrolment</a>
                     </div>
                     <div class="clearfix"></div>
                     <h3 class="mt-4">Students</h3>
@@ -222,7 +224,8 @@
                             {{range $s.Students}}
                                 <tr>
                                     <td style="width: 25px !important;" class="text-center">{{.ID}}</td>
-                                    <td><a href="/admin/members/{{.ID}}?src=/admin/sections/{{$s.ID}}">{{.LastName}}, {{.FirstName}}</a></td>
+                                    <td><a href="/admin/members/{{.ID}}?src=/admin/sections/{{$s.ID}}">{{.LastName}}
+                                            , {{.FirstName}}</a></td>
                                     <td style="width: 25px !important;" class="text-center">
                                         <a href="#!" onclick="removeStudent({{.ID}})"><i class="fa fa-trash"></i></a>
                                     </td>

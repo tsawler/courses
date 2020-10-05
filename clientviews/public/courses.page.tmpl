@@ -5,8 +5,7 @@
 
 {{define "css"}}
     <style>
-        a:link
-        {
+        a:link {
             color: #2A76C1;
             transition: color 0.5s ease;
             text-decoration: none;
@@ -14,30 +13,29 @@
 
         a:visited.h3,
         a:visited.read-more,
-        a:visited
-        {
+        a:visited {
             color: #2A76C1;
             transition: color 0.5s ease;
             text-decoration: none;
         }
+
         a:hover.h3,
         a:hover.read-more,
-        a:hover
-        {
+        a:hover {
             color: #2A76C1;
             text-decoration: 1;
             transition: color 0.5s ease;
         }
-        #content_edit h1
-        {
+
+        #content_edit h1 {
             font-size: 36pt
         }
-        #content_edit h2
-        {
+
+        #content_edit h2 {
             font-size: 30pt
         }
-        #content_edit h3
-        {
+
+        #content_edit h3 {
             font-size: 24pt
         }
     </style>
@@ -169,9 +167,10 @@
             <div class="col">
                 {{$courses := index .RowSets "courses"}}
                 <div class="list-group">
-                {{range $courses}}
-                    <a class="list-group-item list-group-item-action" href="/courses/overview/{{.ID}}">{{.SectionName}}: {{.Course.CourseName}} - {{.Term}}</a>
-                {{end}}
+                    {{range $courses}}
+                        <a class="list-group-item list-group-item-action"
+                           href="/courses/overview/{{.ID}}">{{.SectionName}}: {{.Course.CourseName}} - {{.Term}}</a>
+                    {{end}}
                 </div>
                 <div>&nbsp;</div>
             </div>

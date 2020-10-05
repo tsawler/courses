@@ -29,11 +29,11 @@
                     <td><a href='/admin/courses/{{.ID}}'>{{.CourseName}}</a></td>
 
                     <td class="text-center">
-                                {{if eq .Active 1}}
-                                    <span class="badge badge-primary">Active</span>
-                                {{else}}
-                                    <span class="badge badge-danger">Inactive</span>
-                                {{end}}
+                        {{if eq .Active 1}}
+                            <span class="badge badge-primary">Active</span>
+                        {{else}}
+                            <span class="badge badge-danger">Inactive</span>
+                        {{end}}
                     </td>
 
                 </tr>

@@ -172,7 +172,8 @@
                 {{if or (ne $section.TeamsLink "") (ne $section.ProfEmail "")}}
                     <div class="text-center">
                         {{if ne $section.TeamsLink ""}}
-                            <a class="btn btn-outline-secondary text-dark" target="_blank" href="{{$section.TeamsLink}}">Microsoft
+                            <a class="btn btn-outline-secondary text-dark" target="_blank"
+                               href="{{$section.TeamsLink}}">Microsoft
                                 Teams</a>
                         {{end}}
                         {{if ne $section.ProfEmail ""}}
@@ -186,11 +187,12 @@
 
                     {{range $section.Course.Lectures}}
                         {{if eq .Active 1}}
-                            <a class="list-group-item list-group-item-action" href="/courses/lecture/{{$section.ID}}/{{.ID}}">
+                            <a class="list-group-item list-group-item-action"
+                               href="/courses/lecture/{{$section.ID}}/{{.ID}}">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1">{{.LectureName}}
                                         {{if gt .Video.Duration 0}}
-                                        <small class="text-muted">({{secondsHuman .Video.Duration}})</small>
+                                            <small class="text-muted">({{secondsHuman .Video.Duration}})</small>
                                         {{end}}
                                     </h6>
                                     <small>{{relativeTime .PostedDate}}</small>

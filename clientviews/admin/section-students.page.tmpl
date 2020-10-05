@@ -9,13 +9,14 @@
 {{define "content-title"}}Section Enrolment{{end}}
 {{define "css"}}
     <style>
-        table{
+        table {
             margin: 0 auto;
             width: 100%;
             clear: both;
             border-collapse: collapse;
-            table-layout: fixed; // ***********add this
-        word-wrap:break-word; // ***********and this
+            table-layout: fixed;
+        / / * * * * * * * * * * * add this word-wrap: break-word;
+        / / * * * * * * * * * * * and this
         }
     </style>
 {{end}}
@@ -38,7 +39,8 @@
                 {{range $students}}
                     <tr>
                         <td style="width: 25px !important;" class="text-center">
-                            <input type="checkbox" name="student" value="{{.ID}}" {{if eq .IsRegistered 1}} checked {{end}}>
+                            <input type="checkbox" name="student"
+                                   value="{{.ID}}" {{if eq .IsRegistered 1}} checked {{end}}>
                         </td>
                         <td>
                             {{.LastName}}, {{.FirstName}}
@@ -68,11 +70,11 @@
             });
         });
 
-        $('#enrol').on('submit', function(e){
+        $('#enrol').on('submit', function (e) {
             let form = this;
-            dt.$('input[type="checkbox"]').each(function(){
-                if(!$.contains(document, this)){
-                    if(this.checked){
+            dt.$('input[type="checkbox"]').each(function () {
+                if (!$.contains(document, this)) {
+                    if (this.checked) {
                         $(form).append(
                             $('<input>')
                                 .attr('type', 'hidden')

@@ -23,7 +23,8 @@
         <h3><a href="/admin/members/{{$a.User.ID}}">{{$a.User.FirstName}} {{$a.User.LastName}}</a></h3>
         <p>{{$a.Course.CourseName}} - {{$a.Description}}</p>
         <p><strong>Received</strong>: {{humanDateTime $a.CreatedAt}}<br>
-        <strong>Download</strong>: <a href="/static/site-content/assignments/{{$a.UserID}}/{{$a.FileName}}">{{$a.FileNameDisplay}}</a>
+            <strong>Download</strong>: <a
+                    href="/static/site-content/assignments/{{$a.UserID}}/{{$a.FileName}}">{{$a.FileNameDisplay}}</a>
         </p>
 
         <div class="form-row">
@@ -78,10 +79,11 @@
             </div>
 
             {{if ne $a.GradedFile ""}}
-            <div class="form-group col-md-6">
-                <label>Graded Assignment</label><br>
-                <a href="/admin/sections/assignments/download-graded/{{$a.UserID}}/{{$a.ID}}" class="btn btn-outline-secondary"><i class="fa fa-download"></i> Download File</a>
-            </div>
+                <div class="form-group col-md-6">
+                    <label>Graded Assignment</label><br>
+                    <a href="/admin/sections/assignments/download-graded/{{$a.UserID}}/{{$a.ID}}"
+                       class="btn btn-outline-secondary"><i class="fa fa-download"></i> Download File</a>
+                </div>
             {{end}}
 
         </div>
@@ -90,7 +92,7 @@
         {{if gt (index .IntMap "student_id") 0}}
             <a class="btn btn-info" href="/admin/members/{{index .IntMap "student_id"}}">Cancel</a>
         {{else}}
-         <a class="btn btn-info" href="/admin/sections/assignments">Cancel</a>
+            <a class="btn btn-info" href="/admin/sections/assignments">Cancel</a>
         {{end}}
         <input type="hidden" name="from_member" value="{{index .IntMap "student_id"}}">
     </form>

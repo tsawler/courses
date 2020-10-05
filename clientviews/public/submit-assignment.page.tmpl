@@ -5,8 +5,7 @@
 
 {{define "css"}}
     <style>
-        a:link
-        {
+        a:link {
             color: #2A76C1;
             transition: color 0.5s ease;
             text-decoration: none;
@@ -14,30 +13,29 @@
 
         a:visited.h3,
         a:visited.read-more,
-        a:visited
-        {
+        a:visited {
             color: #2A76C1;
             transition: color 0.5s ease;
             text-decoration: none;
         }
+
         a:hover.h3,
         a:hover.read-more,
-        a:hover
-        {
+        a:hover {
             color: #2A76C1;
             text-decoration: 1;
             transition: color 0.5s ease;
         }
-        #content_edit h1
-        {
+
+        #content_edit h1 {
             font-size: 36pt
         }
-        #content_edit h2
-        {
+
+        #content_edit h2 {
             font-size: 30pt
         }
-        #content_edit h3
-        {
+
+        #content_edit h3 {
             font-size: 24pt
         }
     </style>
@@ -168,7 +166,8 @@
         <div class="row">
             <div class="col">
 
-                <form id="assignment_form" method="post" action="/courses/assignments/submit-an-assignment" enctype="multipart/form-data" class="needs-validation" novalidate="">
+                <form id="assignment_form" method="post" action="/courses/assignments/submit-an-assignment"
+                      enctype="multipart/form-data" class="needs-validation" novalidate="">
                     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                     <div class="form-row">
                         <div class="form-group col-md-4 col-xs-12">
@@ -177,7 +176,7 @@
                                 <option value="" selected="">Choose one...</option>
                                 {{$sections := index .RowSets "sections"}}
                                 {{range $sections}}
-                                <option value="{{.ID}}">{{.Course.CourseName}} - {{.SectionName}}</option>
+                                    <option value="{{.ID}}">{{.Course.CourseName}} - {{.SectionName}}</option>
                                 {{end}}
                             </select>
 
@@ -199,7 +198,9 @@
                         <div class="form-group col-md-4 col-xs-12">
                             <label>Choose file</label>
                             <div class="custom-file">
-                                <input type="file" name="assignment" class="custom-file-input" id="customFile" required="" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                                <input type="file" name="assignment" class="custom-file-input" id="customFile"
+                                       required=""
+                                       accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
                                 <label class="custom-file-label" for="customFile">Choose file</label>
                             </div>
                         </div>
