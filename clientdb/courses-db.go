@@ -1312,7 +1312,7 @@ func (m *DBModel) AllStudents() ([]clientmodels.Student, error) {
 	return a, nil
 }
 
-// GetTrafficForCourse gets chart data
+// GetTrafficForCourseSection gets chart data for section
 func (m *DBModel) GetTrafficForCourseSection(id int) ([]clientmodels.CourseTraffic, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

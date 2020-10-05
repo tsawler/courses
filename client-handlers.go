@@ -801,6 +801,7 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 		app.ErrorLog.Println(err)
 		return
 	}
+
 	if id > 0 {
 		u, err = repo.DB.GetUserById(id)
 		if err != nil {
@@ -808,13 +809,13 @@ func MemberEdit(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	src := "all"
+
+	src := "/admin/members/all"
 	srcSlice := r.URL.Query()["src"]
 	if len(srcSlice) > 0 {
 		src = srcSlice[0]
-	} else {
-		src = "/admin/members/all"
 	}
+
 	stringMap := make(map[string]string)
 	stringMap["src"] = src
 
@@ -1192,6 +1193,7 @@ func SectionStudents(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// PostSectionStudents handles post of students for section
 func PostSectionStudents(w http.ResponseWriter, r *http.Request) {
 	sectionID, err := strconv.Atoi(r.URL.Query().Get(":ID"))
 	if err != nil {
