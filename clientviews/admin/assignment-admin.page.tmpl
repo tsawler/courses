@@ -11,7 +11,7 @@
 
     {{$a := index .RowSets "assignment"}}
 
-    <form method="post" action="/admin/sections/assignment/{{$a.ID}}" novalidate
+    <form method="post" action="/admin/assignments/assignment/{{$a.ID}}" novalidate
           class="needs-validation"
           id="a-form"
           enctype="multipart/form-data">
@@ -92,7 +92,7 @@
         {{if gt (index .IntMap "student_id") 0}}
             <a class="btn btn-info" href="/admin/members/{{index .IntMap "student_id"}}">Cancel</a>
         {{else}}
-            <a class="btn btn-info" href="/admin/sections/assignments">Cancel</a>
+            <a class="btn btn-info" href="/admin/assignments/assignments">Cancel</a>
         {{end}}
         <input type="hidden" name="from_member" value="{{index .IntMap "student_id"}}">
     </form>

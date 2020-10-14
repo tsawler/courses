@@ -2,18 +2,25 @@
 
     {{if hasRole "courses" .Auth.ID}}
 
-        <li id="pages" {{if eq .CurrentSegment "sections"}} class="active" {{end}}>
+        <li id="sections" {{if eq .CurrentSegment "sections"}} class="active" {{end}}>
             <a href="#!"><i class="fa fa-info fa-fw"></i> <span class="nav-label">Sections</span> <span
                         class="fa arrow"></span></a>
             <ul class="nav nav-second-level collapse">
                 <li><a href="/admin/sections/all">All Sections</a></li>
                 <li><a href="/admin/sections/0">New Section</a></li>
                 <li><a href="/admin/sections/traffic">Student Accesses</a></li>
-                <li><a href="/admin/sections/assignments">Assignments</a></li>
             </ul>
         </li>
 
-        <li id="pages" {{if eq .CurrentSegment "courses"}} class="active" {{end}}>
+        <li id="assignments" {{if eq .CurrentSegment "assignments"}} class="active" {{end}}>
+            <a href="#!"><i class="fa fa-file-text fa-fw"></i> <span class="nav-label">Assignments</span> <span
+                        class="fa arrow"></span></a>
+            <ul class="nav nav-second-level collapse">
+                <li><a href="/admin/assignments/assignments">Assignments</a></li>
+            </ul>
+        </li>
+
+        <li id="courses" {{if eq .CurrentSegment "courses"}} class="active" {{end}}>
             <a href="#!"><i class="fa fa-briefcase fa-fw"></i> <span class="nav-label">Courses</span> <span
                         class="fa arrow"></span></a>
             <ul class="nav nav-second-level collapse">
@@ -22,7 +29,7 @@
             </ul>
         </li>
 
-        <li id="users" {{if eq .CurrentSegment "members"}} class="active" {{end}}>
+        <li id="members" {{if eq .CurrentSegment "members"}} class="active" {{end}}>
             <a href="javascript:"><i class="fa fa-users fa-fw"></i> <span
                         class="nav-label">Students</span>
                 <span

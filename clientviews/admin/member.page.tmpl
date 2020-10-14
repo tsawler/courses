@@ -260,12 +260,12 @@
                                 {{range $assignments}}
                                     <tr>
                                         <td>
-                                            <a href='/admin/sections/assignment/{{.ID}}?src={{$studentID}}'>{{.Description}}</a>
+                                            <a href='/admin/assignments/assignment/{{.ID}}?src={{$studentID}}'>{{.Description}}</a>
                                         </td>
                                         <td>{{.Course.CourseName}}</td>
                                         <td>{{humanDateTime .CreatedAt}}</td>
                                         <td class="text-center">
-                                            <a href='/admin/courses/assignment/{{.ID}}'>
+                                            <a href='/admin/assignments/assignment/{{.ID}}?src={{$studentID}}'>
                                                 {{if eq .Processed 1}}
                                                     <span class="badge badge-primary">Processed</span>
                                                 {{else}}
@@ -275,7 +275,7 @@
                                         </td>
                                         <td class="text-center">
                                             {{if ne .GradedFile ""}}
-                                                <a href="/admin/sections/assignments/download-graded/{{.UserID}}/{{.ID}}">
+                                                <a href="/admin/assignments/assignments/download-graded/{{.UserID}}/{{.ID}}">
                                                     <i class="fa fa-download"></i>
                                                 </a>
                                             {{else}}

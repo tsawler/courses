@@ -694,7 +694,7 @@ func GradeAssignment(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, fmt.Sprintf("/admin/members/%d", fromMember), http.StatusSeeOther)
 		return
 	}
-	http.Redirect(w, r, "/admin/sections/assignments", http.StatusSeeOther)
+	http.Redirect(w, r, "/admin/assignments/assignments", http.StatusSeeOther)
 }
 
 // StudentProfile shows profile page

@@ -27,10 +27,10 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	mux.Post("/courses/lecture/log/record-leaving", dynamicMiddleware.Append(mw.Auth).ThenFunc(StudentLeftLecture))
 
 	// assignments (admin)
-	mux.Get("/admin/sections/assignments", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(Assignments))
-	mux.Get("/admin/sections/assignment/:ID", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(Assignment))
-	mux.Post("/admin/sections/assignment/:ID", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(GradeAssignment))
-	mux.Get("/admin/sections/assignments/download-graded/:UserID/:ID", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(DownloadGradeAssignment))
+	mux.Get("/admin/assignments/assignments", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(Assignments))
+	mux.Get("/admin/assignments/assignment/:ID", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(Assignment))
+	mux.Post("/admin/assignments/assignment/:ID", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(GradeAssignment))
+	mux.Get("/admin/assignments/assignments/download-graded/:UserID/:ID", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(DownloadGradeAssignment))
 
 	// traffic
 	mux.Get("/admin/sections/traffic", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(CourseTraffic))

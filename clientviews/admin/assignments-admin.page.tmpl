@@ -25,12 +25,12 @@
             {{$assignments := index .RowSets "assignments"}}
             {{range $assignments}}
                 <tr>
-                    <td><a href='/admin/sections/assignment/{{.ID}}'>{{.Description}}</a></td>
+                    <td><a href='/admin/assignments/assignment/{{.ID}}'>{{.Description}}</a></td>
                     <td>{{.User.FirstName}} {{.User.LastName}}</td>
                     <td>{{.Course.CourseName}}</td>
                     <td>{{humanDateTime .CreatedAt}}</td>
                     <td class="text-center">
-                        <a href='/admin/courses/assignment/{{.ID}}'>
+                        <a href='/admin/assignments/assignment/{{.ID}}'>
                             {{if eq .Processed 1}}
                                 <span class="badge badge-primary">Processed</span>
                             {{else}}
