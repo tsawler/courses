@@ -37,9 +37,9 @@ func ClientInit(conf config.AppConfig, parentDriver *driver.DB, rep *handlers.DB
 
 	// We can access handlers from goBlender, but need to initialize them first.
 	if app.Database == "postgresql" {
-		handlers.NewPostgresqlHandlers(parentDB, app.ServerName, app.InProduction)
+		handlers.NewPostgresqlHandlers(parentDB, app.ServerName, app.InProduction, &app)
 	} else {
-		handlers.NewMysqlHandlers(parentDB, app.ServerName, app.InProduction)
+		handlers.NewMysqlHandlers(parentDB, app.ServerName, app.InProduction, &app)
 	}
 
 	infoLog.Printf("******************************************")

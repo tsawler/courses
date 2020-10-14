@@ -61,7 +61,7 @@ func ClientRoutes(mux *pat.PatternServeMux, standardMiddleWare, dynamicMiddlewar
 	mux.Post("/admin/courses/lecture/:courseID/:ID", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(PostAdminLecture))
 
 	mux.Get("/admin/members/all", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(MembersAll))
-	mux.Get("/admin/members/all-deleted", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(handlers.Repo.DeletedMembersAll(app)))
+	mux.Get("/admin/members/all-deleted", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(handlers.Repo.DeletedMembersAll()))
 	mux.Get("/admin/members/:id", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(MemberEdit))
 
 	mux.Get("/admin/sections/:ID/accesses", dynamicMiddleware.Append(mw.Auth).Append(CoursesRole).ThenFunc(CourseSectionAccessHistory))
