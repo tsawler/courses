@@ -1,0 +1,1 @@
+add_column("assignments", "letter_grade", "string", {"default": ""})

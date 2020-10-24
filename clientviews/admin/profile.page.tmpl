@@ -232,17 +232,19 @@
                                     </a>
                                 </td>
                                 <td>{{humanDateTime .CreatedAt}}</td>
-                                <td>
-                                    {{if and (gt .Mark 0) (gt .TotalValue 0)}}
-                                        {{.Mark}} / {{.TotalValue}}
+                                <td class="text-center">
+                                    {{if gt .TotalValue 0}}
+                                        {{.Mark}}/{{.TotalValue}}
+                                    {{else if ne "" .LetterGrade}}
+                                        {{.LetterGrade}}
                                     {{else}}
-                                        Not yet marked
+                                        N/A
                                     {{end}}
                                 </td>
                                 <td class="text-center">
                                     {{if ne .GradedFile ""}}
                                         <a href="/admin/sections/assignments/download-graded-for-student/{{.ID}}">
-                                            <i class="fa fa-download"></i>
+                                            <i class="fa fa-download"></i> Download
                                         </a>
                                     {{else}}
                                         <span class="badge">N/A</span>

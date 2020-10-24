@@ -941,7 +941,7 @@ func (m *DBModel) InsertAssignment(c clientmodels.Assignment) (int, error) {
 	var newID int
 
 	query := `insert into assignments (file_name_display, file_name, user_id, section_id, course_id, description, created_at, updated_at)
-			values ($1, $2, $3, $4, (select course_id from course_sections where id = $4), $5, $6, $7) returning id`
+			values ($1, $2, $3, $4, (select course_id from course_sections where id = $4), $5, $6, $7, $8) returning id`
 
 	err := m.DB.QueryRowContext(ctx, query,
 		c.FileNameDisplay,
@@ -950,7 +950,8 @@ func (m *DBModel) InsertAssignment(c clientmodels.Assignment) (int, error) {
 		c.SectionID,
 		c.Description,
 		time.Now(),
-		time.Now()).Scan(&newID)
+		time.Now(),
+		c.LetterGrade).Scan(&newID)
 
 	if err != nil {
 		fmt.Println("Error inserting new assignment")
@@ -1000,7 +1001,7 @@ func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 	stmt := fmt.Sprintf(`SELECT a.id, a.file_name_display, a.file_name, a.user_id, a.course_id, 
 		a.mark, a.total_value, a.processed, a.created_at, a.updated_at,
 		u.id, u.first_name, u.last_name, u.email,
-		c.id, c.course_name, a.description, a.graded_file, a.graded_file_display
+		c.id, c.course_name, a.description, a.graded_file, a.graded_file_display, a.letter_grade
 		FROM 
 			assignments a 
 			left join users u on (a.user_id = u.id)
@@ -1035,7 +1036,8 @@ func (m *DBModel) AllAssignments(id int) ([]clientmodels.Assignment, error) {
 			&s.Course.CourseName,
 			&s.Description,
 			&s.GradedFile,
-			&s.GradedFileDisplayName)
+			&s.GradedFileDisplayName,
+			&s.LetterGrade)
 		if err != nil {
 			return nil, err
 		}
@@ -1059,7 +1061,7 @@ func (m *DBModel) GetAssignment(id int) (clientmodels.Assignment, error) {
 	stmt := `SELECT a.id, a.file_name_display, a.file_name, a.user_id, a.course_id, 
 		a.mark, a.total_value, a.processed, a.created_at, a.updated_at,
 		u.id, u.first_name, u.last_name, u.email,
-		c.id, c.course_name, a.description, a.graded_file, a.graded_file_display
+		c.id, c.course_name, a.description, a.graded_file, a.graded_file_display, a.letter_grade
 		FROM 
 			assignments a 
 			left join users u on (a.user_id = u.id)
@@ -1087,7 +1089,8 @@ func (m *DBModel) GetAssignment(id int) (clientmodels.Assignment, error) {
 		&s.Course.CourseName,
 		&s.Description,
 		&s.GradedFile,
-		&s.GradedFileDisplayName)
+		&s.GradedFileDisplayName,
+		&s.LetterGrade)
 	if err != nil {
 		return s, err
 	}
@@ -1107,9 +1110,10 @@ func (m *DBModel) GradeAssignment(a clientmodels.Assignment) error {
 			processed = 1,
 			updated_at = $3,
 			graded_file = $4,
-			graded_file_display = $5
+			graded_file_display = $5,
+			letter_grade = $6
 		where 
-			id = $6`
+			id = $7`
 
 	_, err := m.DB.ExecContext(ctx, stmt,
 		a.Mark,
@@ -1117,6 +1121,7 @@ func (m *DBModel) GradeAssignment(a clientmodels.Assignment) error {
 		time.Now(),
 		a.GradedFile,
 		a.GradedFileDisplayName,
+		a.LetterGrade,
 		a.ID)
 	if err != nil {
 		return err

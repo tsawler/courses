@@ -285,6 +285,8 @@
                                         <td class="text-center">
                                             {{if gt .TotalValue 0}}
                                                 {{.Mark}}/{{.TotalValue}}
+                                            {{else if ne "" .LetterGrade}}
+                                                {{.LetterGrade}}
                                             {{else}}
                                                 N/A
                                             {{end}}

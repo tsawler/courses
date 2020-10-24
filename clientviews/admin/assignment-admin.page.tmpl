@@ -28,7 +28,7 @@
         </p>
 
         <div class="form-row">
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
                 <label for="course_name">Mark:</label>
                 {{with .Form.Errors.Get "mark"}}
                     <label class='text-danger'>{{.}}</label>
@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
                 <label for="total_value">Out of:</label>
                 {{with .Form.Errors.Get "total_value"}}
                     <label class='text-danger'>{{.}}</label>
@@ -64,6 +64,26 @@
                            autocomplete="off" type='text'
                            name='total_value'
                            value='{{$a.TotalValue}}'>
+                    <div class="invalid-feedback">
+                        Please enter a value
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="total_value">Letter Grade:</label>
+                {{with .Form.Errors.Get "letter_grade"}}
+                    <label class='text-danger'>{{.}}</label>
+                {{end}}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-font fa-fw"></i></span>
+                    </div>
+                    <input class="form-control required {{with .Form.Errors.Get "letter_grade"}} is-invalid {{end}}"
+                           id="letter_grade"
+                           autocomplete="off" type='text'
+                           name='letter_grade'
+                           value='{{$a.LetterGrade}}'>
                     <div class="invalid-feedback">
                         Please enter a value
                     </div>

@@ -683,6 +683,7 @@ func GradeAssignment(w http.ResponseWriter, r *http.Request) {
 	a.TotalValue, _ = strconv.Atoi(r.Form.Get("total_value"))
 	a.GradedFileDisplayName = displayName
 	a.GradedFile = fileName
+	a.LetterGrade = r.Form.Get("letter_grade")
 
 	_ = dbModel.GradeAssignment(a)
 
@@ -1214,6 +1215,6 @@ func PostSectionStudents(w http.ResponseWriter, r *http.Request) {
 		errorLog.Println(err)
 	}
 
-	session.Put(r.Context(), "flash", "Changs saved")
+	session.Put(r.Context(), "flash", "Changes saved")
 	http.Redirect(w, r, fmt.Sprintf("/admin/sections/%d", sectionID), http.StatusSeeOther)
 }
