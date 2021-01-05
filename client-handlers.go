@@ -372,7 +372,6 @@ func PostAdminLecture(w http.ResponseWriter, r *http.Request) {
 
 	if lectureID == 0 {
 		lecture.Notes = ""
-		lecture.SortOrder = 1
 		_, err := dbModel.InsertLecture(lecture)
 		if err != nil {
 			errorLog.Print(err)

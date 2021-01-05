@@ -793,7 +793,7 @@ func (m *DBModel) InsertLecture(c clientmodels.Lecture) (int, error) {
 		}
 	} else {
 		query := `insert into lectures (course_id, lecture_name, active, sort_order, notes, created_at, updated_at, posted_date)
-			values ($1, $2, $3, (select max(sort_order) + 1 from lectures where course_id = $1), $4, $5, $6, $7) returning id`
+			values ($1, $2, $3, (select coalesce(max(sort_order) + 1, 1) from lectures where course_id = $1), $4, $5, $6, $7) returning id`
 
 		err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.Active, c.Notes, time.Now(), time.Now(), c.PostedDate).Scan(&newID)
 
