@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/tsawler/goblender/client/clienthandlers/clientmodels"
+	"log"
 	"strings"
 	"time"
 )
@@ -782,12 +783,13 @@ func (m *DBModel) InsertLecture(c clientmodels.Lecture) (int, error) {
 	if c.VideoID > 0 {
 
 		query := `insert into lectures (course_id, lecture_name, video_id, active, sort_order, notes, created_at, updated_at, posted_date)
-			values ($1, $2, $3, $4, (select max(sort_order) + 1 from lectures where course_id = $1), $5, $6, $7, $8) returning id`
+			values ($1, $2, $3, $4, (select coalesce(max(sort_order) + 1, 1) from lectures where course_id = $1), $5, $6, $7, $8) returning id`
 
 		err := m.DB.QueryRowContext(ctx, query, c.CourseID, c.LectureName, c.VideoID, c.Active, c.Notes, time.Now(), time.Now(), c.PostedDate).Scan(&newID)
 
 		if err != nil {
 			fmt.Println("Error inserting new course lecture")
+			log.Println("Error inserting", err)
 			fmt.Println(err)
 			return 0, err
 		}
@@ -799,6 +801,7 @@ func (m *DBModel) InsertLecture(c clientmodels.Lecture) (int, error) {
 
 		if err != nil {
 			fmt.Println("Error inserting new course lecture")
+			log.Println("Error inserting2", err)
 			fmt.Println(err)
 			return 0, err
 		}
