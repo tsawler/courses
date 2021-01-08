@@ -1,0 +1,259 @@
+{{template "admin-base" .}}
+
+{{define "title"}}Video - GoBlender Admin{{end}}
+
+{{define "admin-title"}}Video{{end}}
+{{define "content-title"}}Video{{end}}
+
+{{define "content"}}
+
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <input type='hidden' name='csrf_token' value='{{.CSRFToken}}'>
+            <input type='hidden' id="video_id" name='id' value='{{.Video.ID}}'>
+
+            {{with .Form.Errors.Get "generic"}}
+                <div class="alert alert-danger" role="alert">{{.}}</div>
+            {{end}}
+            {{if eq .Video.ID 0}}
+                <div class="form-group">
+                    {{with .Form.Errors.Get ".Video.file_name"}}
+                        <label class='text-danger'>{{.}}</label>
+                    {{end}}
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input"
+                               id="videoFile" accept=".mp4">
+                        <label class="custom-file-label" for="videoFile">
+<span class="d-inline-block text-truncate w-75"
+      style="overflow:hidden">Choose Video</span>
+                        </label>
+                    </div>
+                </div>
+            {{else}}
+
+                <div class="form-row">
+                    <div class="form-group col-md-6 col-xs-12">
+                        <label>Video</label><br>
+                        <video playsinline="playsinline" controls
+                               width="500">
+                            <source src="/static/site-content/videos/{{.Video.FileName}}.mp4" type="video/mp4">
+                        </video>
+                    </div>
+
+                    <div class="form-group col-md-6 col-xs-12">
+                        <div class="float-left">
+                            <label>Preview Image</label>
+                        </div>
+                        <div class="float-right">
+                            <input type="file" name="poster_frame" id="poster_frame" accept=".jpg,.jpeg">
+                        </div>
+                        <div class="clearfix"></div>
+                        <img alt="" class="img-fluid" src="/static/site-content/videos/{{.Video.Thumb}}">
+                    </div>
+
+                </div>
+
+                <a href="#!" class="btn btn-info btn-sm copy"
+                   data-clipboard-text='{{.ServerUrl}}/static/site-content/videos/{{.Video.FileName}}.mp4'>Copy
+                    Direct URL</a>
+                <a href="#!" class="btn btn-info btn-sm copy"
+                   data-clipboard-text='<iframe frameborder="0" width="560" height="315" src="{{.ServerUrl}}/embedded-video/{{.Video.ID}}"></iframe>'>Copy
+                    Embed URL</a>
+                <p>&nbsp;</p>
+            {{end}}
+
+            <div class="form-group">
+                <label>Video Name:</label>
+                {{with .Form.Errors.Get "video_name"}}
+                    <label class='text-danger'>{{.}}</label>
+                {{end}}
+                <input class="form-control" id="video_name" autocomplete="off" type='text'
+                       name='video_name' required
+                       value='{{.Video.VideoName}}'>
+            </div>
+
+            <div class="form-group">
+                <label>Process video after upload?</label>
+                <select class="custom-select" name="process" id="process">
+                    <option value="0">No</option>
+                    <option value="1" selected>Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>360 Video?</label>
+                {{with .Form.Errors.Get "is_360"}}
+                    <label class='text-danger'>{{.}}</label>
+                {{end}}
+                <select class="custom-select" name="is_360" id="is_360">
+                    <option value="0" {{if eq 0 .Video.Is360}} selected {{end}}>No</option>
+                    <option value="1" {{if eq 1 .Video.Is360}} selected {{end}}>Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Description:</label>
+                {{with .Form.Errors.Get ".Video.Description"}}
+                    <label class='text-danger'>{{.}}</label>
+                {{end}}
+                <input id="description" type="hidden" name="description"
+                       value="{{- if ne .Video.Description "" -}}{{-  .Video.Description -}}{{- end -}}"
+                >
+                <trix-editor class="trix-content" input="description"></trix-editor>
+            </div>
+
+            <hr>
+            <a href="javascript:" class="btn btn-primary" onclick="saveVideo()">Save Changes</a>
+            {{if gt .Video.ID 0}}
+                <a href="javascript:" onclick="confirmDelete({{.Video.ID}})" class="btn btn-danger">Delete</a>
+            {{end}}
+            <a href="/admin/videos/all" class="btn btn-info">Cancel</a>
+
+        </div>
+        <div class="col"></div>
+    </div>
+{{end}}
+
+{{define "js"}}
+    <script src="/static/js/tus.min.js"></script>
+    <script>
+        let progressWindow;
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            bsCustomFileInput.init();
+            var clipboard = new Clipboard('.copy');
+            clipboard.on('success', function (e) {
+                successAlert("Link copied to clipboard!");
+            });
+        });
+
+        {{if gt .Video.ID 0}}
+        async function confirmDelete(x) {
+            const {value: result} = await Swal.fire({
+                html: "Are you sure you want to delete this video?",
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                icon: 'warning',
+            })
+
+            if (result) {
+                window.location.href = '/admin/videos/delete/' + x;
+            }
+        }
+        {{end}}
+
+        function uploadFile(videoID, uploadType) {
+            let progressBarHtml = `
+<div class="progress">
+    <div id="progress" style="" class="progress-bar progress-bar-striped progress-bar-animated"
+         role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+         style="width: 100%"></div>
+</div>`
+
+            progressWindow = Swal.fire({
+                icon: 'info',
+                title: "Uploading...",
+                html: progressBarHtml,
+            })
+
+            let fileUpload;
+            let file;
+            if (uploadType === "video") {
+                fileUpload = document.getElementById("videoFile");
+                file = fileUpload.files[0];
+            } else {
+                fileUpload = document.getElementById("poster_frame");
+                file = fileUpload.files[0];
+            }
+            let url = "/files/";
+            if (location.protocol !== 'https:') {
+                url = "http://localhost:1080/files/";
+            }
+
+            var upload = new tus.Upload(file, {
+                endpoint: url,
+                retryDelays: [0, 3000, 5000, 10000, 20000],
+                metadata: {
+                    filename: file.name,
+                    filetype: file.type,
+                    "upload_type": uploadType,
+                    "id": videoID,
+                    "user_id": {{.Auth.ID}},
+                    "token": '{{.Auth.Email}}',
+                    "endpoint": 'http://{{.TusHost}}/tusd/hook',
+                    "process": document.getElementById("process").value,
+                },
+                onError: function (error) {
+                    console.log("Failed because: " + error);
+                    progressWindow.close();
+                    errorAlert("Error - Cannot upload file!");
+                },
+                onProgress: function (bytesUploaded, bytesTotal) {
+                    var progressBar = document.getElementById("progress");
+                    var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
+
+                    progressBar.setAttribute("aria-valuenow", percentage.toString())
+                    progressBar.setAttribute("style", 'width: ' + percentage + '%;')
+
+                    console.log(bytesUploaded, bytesTotal, percentage + "%")
+                },
+                onSuccess: function () {
+                    console.log("Download %s from %s", upload.file.name, upload.url)
+                    successAlert("Uploaded!");
+                    progressWindow.close();
+                    window.location = "/admin/videos/all";
+                }
+            })
+
+            upload.start();
+        }
+
+        function saveVideo() {
+            if (document.getElementById("video_name").value === "") {
+                errorAlert("Please give your video a name!");
+                return;
+            }
+
+            let elementExists = !!document.getElementById("videoFile");
+            if (elementExists) {
+                if (document.getElementById("video_id").value == "0") {
+                    if (document.getElementById("videoFile").files.length === 0) {
+                        errorAlert("Please choose a video!");
+                        return;
+                    }
+                }
+            }
+            const formData = new FormData();
+            formData.append('id', document.getElementById("video_id").value);
+            formData.append('video_name', document.getElementById("video_name").value);
+            formData.append('description', document.getElementById("description").value);
+            formData.append('is_360', document.getElementById("is_360").value);
+            formData.append('csrf_token', {{.CSRFToken}});
+            let ajax = new XMLHttpRequest();
+            ajax.responseType = "json";
+            ajax.open("POST", "/admin/videos/edit-ajax");
+            ajax.send(formData);
+            ajax.onreadystatechange = function () {
+                if (ajax.readyState === 4) {
+                    let resp = ajax.response;
+                    let json = JSON.parse(JSON.stringify(resp));
+                    if (!json.ok) {
+                        errorAlert("Errors: " + json.message);
+                    } else {
+                        let elementExists = !!document.getElementById("videoFile");
+                        if (elementExists) {
+                            if (document.getElementById("videoFile").files.length > 0) {
+                                uploadFile(json.id, "video");
+                            }
+                        } else if (document.getElementById("poster_frame").files.length > 0) {
+// custom poster frame
+                            uploadFile(json.id, "poster");
+                        } else {
+                            window.location = "/admin/videos/all";
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+{{end}}
