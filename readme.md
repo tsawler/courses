@@ -138,7 +138,7 @@ func SomeMiddleware(next http.Handler) http.Handler {
         if ok {
             next.ServeHTTP(w, r)
         } else {
-         helpers.ClientError(w, http.StatusUnauthorized)
+            helpers.ClientError(w, http.StatusUnauthorized)
         }
     })
 }
