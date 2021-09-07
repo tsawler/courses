@@ -5,6 +5,7 @@
 {{define "admin-title"}}Lecture{{end}}
 {{define "content-title"}}Lecture{{end}}
 {{define "css"}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rome/3.0.2/rome.css" integrity="sha512-TAAJeGIyqkrJ4o4ZkIPesmqNKH9zowoRBGHkHUf1s4vWeII8Dv3NayKIq8Hws02HWT3OpocxeSaOQEQo9SH7ZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="/static/js/ts/bootstrap4/tail.select-default.min.css" rel="stylesheet">
     <style>
         .tail-select {
@@ -123,6 +124,7 @@
 
 {{define "js"}}
     {{$lecture := index .RowSets "lecture"}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rome/3.0.2/rome.standalone.min.js" integrity="sha512-cJ4aSZY0xBXrcH65MOwCloQAiTNCBm2F8/KlcBTlczgn4txZkT7h3YSXULN06pkUnsySMEg5BU4QCHAr97U7ng==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/static/js/ts/tail.select.min.js"></script>
     <script>
         let videoChoice = document.getElementById("video_choice");
